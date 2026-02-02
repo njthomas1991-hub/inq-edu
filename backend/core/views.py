@@ -214,10 +214,12 @@ def class_detail_view(request, class_id):
         return HttpResponseForbidden("You don't have access to this class")
 
     students = class_obj.students.all().select_related('student')
+    teacher_classes = Class.objects.filter(teacher=request.user)
 
     return render(request, "core/class_detail.html", {
         "class_obj": class_obj,
         "students": students,
+        "teacher_classes": teacher_classes,
     })
 
 
@@ -240,6 +242,45 @@ def remove_student_view(request, class_id, student_id):
         
     except Class.DoesNotExist:
         return HttpResponseForbidden("Class not found")
+    
+    return redirect('class_detail', class_id=class_id)
+
+
+@login_required
+def transfer_student_view(request, class_id, student_id):
+    """Transfer a student from one class to another"""
+    if request.method != "POST":
+        return HttpResponseForbidden("POST method required")
+    
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    try:
+        source_class = Class.objects.get(id=class_id)
+        if source_class.teacher_id != request.user.id:
+            return HttpResponseForbidden("You don't have access to this class")
+        
+        target_class_id = request.POST.get('target_class_id')
+        target_class = Class.objects.get(id=target_class_id)
+        
+        # Verify teacher owns target class too
+        if target_class.teacher_id != request.user.id:
+            return HttpResponseForbidden("You don't have access to the target class")
+        
+        # Get the enrollment
+        enrollment = ClassStudent.objects.get(class_obj=source_class, student_id=student_id)
+        
+        # Check if student is already in target class
+        if not ClassStudent.objects.filter(class_obj=target_class, student_id=student_id).exists():
+            # Update the enrollment to point to new class
+            enrollment.class_obj = target_class
+            enrollment.save()
+        else:
+            # Student already in target class, just remove from source
+            enrollment.delete()
+        
+    except (Class.DoesNotExist, ClassStudent.DoesNotExist):
+        return HttpResponseForbidden("Class or enrollment not found")
     
     return redirect('class_detail', class_id=class_id)
 
