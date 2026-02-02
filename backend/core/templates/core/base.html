@@ -213,7 +213,12 @@
         <div>
             {% if user.is_authenticated %}
                 <span class="me-2">Welcome, {{ user.username }}</span>
-                <a class="link-primary" href="{% url 'logout' %}">Logout</a>
+                <form method="post" action="{% url 'logout' %}" style="display: inline; margin: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="link-primary" style="background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; font: inherit;">
+                        Logout
+                    </button>
+                </form>
             {% else %}
                 <a class="link-primary me-2" href="{% url 'teacher_login' %}">Login</a>
                 <a class="link-primary" href="{% url 'signup' %}">Register</a>
