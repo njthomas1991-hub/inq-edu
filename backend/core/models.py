@@ -51,7 +51,7 @@ class ClassStudent(models.Model):
 
 
 # SchoolAnalyticsProfile Model - School admins who can access multiple teachers' data
-class School_Analytics_Profile(models.Model):
+class SchoolAnalyticsProfile(models.Model):
     teacher = models.OneToOneField(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='analytics_profile')
     school = models.CharField(max_length=255)
     can_access_all_teachers = models.BooleanField(default=True, help_text="Access all teachers' data in the same school")
