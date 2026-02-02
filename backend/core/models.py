@@ -12,6 +12,10 @@ class User(AbstractUser):
     school = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        verbose_name = 'Teacher Sign-up'
+        verbose_name_plural = 'Teacher Sign-ups'
+
     def __str__(self):
         return f"{self.get_full_name() or self.username} ({self.get_role_display()})"
 
