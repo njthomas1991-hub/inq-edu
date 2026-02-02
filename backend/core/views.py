@@ -4,7 +4,7 @@ from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.shortcuts import render, redirect
-from .models import User
+from .models import User, Class, ClassStudent
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -53,6 +53,23 @@ def teacher_dashboard_view(request):
     return render(request, "core/teacher_dashboard.html", {
         "classes": classes,
         "analytics_profile": analytics_profile,
+    })
+
+
+@login_required
+def class_detail_view(request, class_id):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    class_obj = Class.objects.get(id=class_id)
+    if class_obj.teacher_id != request.user.id:
+        return HttpResponseForbidden("You don't have access to this class")
+
+    students = class_obj.students.all().select_related('student')
+
+    return render(request, "core/class_detail.html", {
+        "class_obj": class_obj,
+        "students": students,
     })
 
 
