@@ -6,21 +6,36 @@ from django.db import connection
 
 cursor = connection.cursor()
 
-# Add description column to Class if it doesn't exist
+# Rename clazz_id to class_obj_id in core_classstudent
 try:
-    cursor.execute('ALTER TABLE core_class ADD COLUMN description TEXT NULL')
-    print('Added description column to core_class')
+    cursor.execute('ALTER TABLE core_classstudent RENAME COLUMN clazz_id TO class_obj_id')
+    print('Renamed clazz_id to class_obj_id')
 except Exception as e:
-    print(f'Description column already exists or error: {e}')
+    print(f'Could not rename clazz_id: {e}')
 
-# Drop old tables that don't exist in new schema
-tables_to_drop = ['core_studentprofile', 'core_session', 'core_objectiveattempt', 'core_studentobjectivemastery', 'core_gameevent', 'core_school']
+# Check if student_id points to core_studentprofile (old) or core_user (new)
+try:
+    cursor.execute("""
+        SELECT constraint_name 
+        FROM information_schema.table_constraints 
+        WHERE table_name = 'core_classstudent' 
+        AND constraint_type = 'FOREIGN KEY'
+    """)
+    constraints = cursor.fetchall()
+    print(f'Found constraints: {constraints}')
+    
+    # Drop old foreign key constraint pointing to core_studentprofile
+    for constraint in constraints:
+        try:
+            cursor.execute(f'ALTER TABLE core_classstudent DROP CONSTRAINT {constraint[0]}')
+            print(f'Dropped constraint: {constraint[0]}')
+        except Exception as e:
+            print(f'Could not drop constraint {constraint[0]}: {e}')
+    
+    # Add new foreign key constraint pointing to core_user
+    cursor.execute('ALTER TABLE core_classstudent ADD CONSTRAINT core_classstudent_student_fk FOREIGN KEY (student_id) REFERENCES core_user(id)')
+    print('Added new foreign key constraint for student_id -> core_user')
+except Exception as e:
+    print(f'Error updating foreign key: {e}')
 
-for table in tables_to_drop:
-    try:
-        cursor.execute(f'DROP TABLE IF EXISTS {table} CASCADE')
-        print(f'Dropped {table}')
-    except Exception as e:
-        print(f'Could not drop {table}: {e}')
-
-print('Database cleanup complete')
+print('Database fix complete')
