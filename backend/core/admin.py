@@ -1,89 +1,49 @@
 from django.contrib import admin
-from .models import (
-    User, School, StudentProfile, Class, ClassStudent, Session,
-    LearningObjective, ObjectiveAttempt, StudentObjectiveMastery, GameEvent
-)
+from .models import User, Class, ClassStudent
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 
 class UserAdmin(BaseUserAdmin):
     model = User
-    list_display = ('username', 'role', 'is_staff', 'is_active')
+    list_display = ('username', 'get_full_name', 'role', 'school', 'is_staff')
     list_filter = ('role', 'is_staff', 'is_active')
     fieldsets = (
-        (None, {'fields': ('username', 'password', 'role', 'school')}),
+        (None, {'fields': ('username', 'password')}),
+        ('Personal Info', {'fields': ('first_name', 'last_name', 'email')}),
+        ('Account', {'fields': ('role', 'school')}),
         ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser')}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'role', 'school', 'password1', 'password2', 'is_staff', 'is_active')
+            'fields': ('username', 'password1', 'password2', 'role', 'school', 'is_staff', 'is_active')
         }),
     )
-    search_fields = ('username',)
+    search_fields = ('username', 'first_name', 'last_name', 'email')
     ordering = ('username',)
-    filter_horizontal = ()
-
-
-@admin.register(School)
-class SchoolAdmin(admin.ModelAdmin):
-    list_display = ('name', 'created_at')
-    search_fields = ('name',)
-
-
-@admin.register(StudentProfile)
-class StudentProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'year_ks', 'created_at')
-    list_filter = ('year_ks',)
-    search_fields = ('user__username',)
 
 
 @admin.register(Class)
 class ClassAdmin(admin.ModelAdmin):
-    list_display = ('name', 'teacher', 'subject', 'year_ks')
-    list_filter = ('subject', 'year_ks')
-    search_fields = ('name', 'teacher__username')
+    list_display = ('name', 'teacher', 'subject', 'year_ks', 'created_at')
+    list_filter = ('year_ks', 'subject', 'created_at')
+    search_fields = ('name', 'teacher__username', 'subject')
+    readonly_fields = ('created_at',)
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Teachers only see their own classes
+        if not request.user.is_superuser and request.user.role == 'teacher':
+            qs = qs.filter(teacher=request.user)
+        return qs
 
 
 @admin.register(ClassStudent)
 class ClassStudentAdmin(admin.ModelAdmin):
-    list_display = ('student', 'clazz')
-    search_fields = ('student__user__username', 'clazz__name')
-
-
-@admin.register(Session)
-class SessionAdmin(admin.ModelAdmin):
-    list_display = ('student', 'started_at', 'score')
-    list_filter = ('started_at',)
-    search_fields = ('student__user__username',)
-
-
-@admin.register(LearningObjective)
-class LearningObjectiveAdmin(admin.ModelAdmin):
-    list_display = ('subject', 'year_ks', 'difficulty', 'description')
-    list_filter = ('subject', 'year_ks', 'difficulty')
-    search_fields = ('description',)
-
-
-@admin.register(ObjectiveAttempt)
-class ObjectiveAttemptAdmin(admin.ModelAdmin):
-    list_display = ('session', 'objective', 'correct', 'attempts')
-    list_filter = ('correct',)
-    search_fields = ('session__student__user__username', 'objective__description')
-
-
-@admin.register(StudentObjectiveMastery)
-class StudentObjectiveMasteryAdmin(admin.ModelAdmin):
-    list_display = ('student', 'objective', 'mastery_score')
-    list_filter = ('mastery_score',)
-    search_fields = ('student__user__username', 'objective__description')
-
-
-@admin.register(GameEvent)
-class GameEventAdmin(admin.ModelAdmin):
-    list_display = ('student', 'event_type', 'created_at')
-    list_filter = ('event_type', 'created_at')
-    search_fields = ('student__user__username',)
+    list_display = ('student', 'class_obj', 'date_joined')
+    list_filter = ('date_joined', 'class_obj')
+    search_fields = ('student__username', 'class_obj__name')
+    readonly_fields = ('date_joined',)
 
 
 admin.site.register(User, UserAdmin)
