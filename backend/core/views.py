@@ -5,6 +5,18 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.shortcuts import render, redirect
 from .models import User, Class, ClassStudent
+
+
+class ClassForm(forms.ModelForm):
+    class Meta:
+        model = Class
+        fields = ('name', 'subject', 'year_ks', 'description')
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Class name'}),
+            'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Subject'}),
+            'year_ks': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 4}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Optional description'}),
+        }, Class, ClassStudent
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -71,5 +83,23 @@ def class_detail_view(request, class_id):
         "class_obj": class_obj,
         "students": students,
     })
+
+
+@login_required
+def add_class_view(request):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    if request.method == "POST":
+        form = ClassForm(request.POST)
+        if form.is_valid():
+            class_obj = form.save(commit=False)
+            class_obj.teacher = request.user
+            class_obj.save()
+            return redirect("teacher_dashboard")
+    else:
+        form = ClassForm()
+
+    return render(request, "core/add_class.html", {"form": form})
 
 
