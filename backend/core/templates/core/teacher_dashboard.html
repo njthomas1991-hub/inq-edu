@@ -26,13 +26,15 @@
                         {% if classes %}
                             <ul class="list-group list-group-flush">
                                 {% for class_obj in classes %}
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="fw-semibold">{{ class_obj.name }}</div>
-                                            <div class="text-muted small">{{ class_obj.subject }} • KS{{ class_obj.year_ks }}</div>
-                                        </div>
-                                        <span class="badge bg-primary">{{ class_obj.students.count }} students</span>
-                                    </li>
+                                    <a href="/teacher/class/{{ class_obj.id }}/" style="text-decoration: none; color: inherit;">
+                                        <li class="list-group-item d-flex justify-content-between align-items-center" style="cursor: pointer;">
+                                            <div>
+                                                <div class="fw-semibold">{{ class_obj.name }}</div>
+                                                <div class="text-muted small">{{ class_obj.subject }} • KS{{ class_obj.year_ks }}</div>
+                                            </div>
+                                            <span class="badge bg-primary">{{ class_obj.students.count }} students</span>
+                                        </li>
+                                    </a>
                                 {% endfor %}
                             </ul>
                         {% else %}
