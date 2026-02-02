@@ -1,0 +1,78 @@
+{% extends "core/base.html" %}
+
+{% block title %}Contact Us - inq-ed{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold">Get in Touch</h1>
+                <p class="lead text-muted">We'd love to hear from you</p>
+            </div>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <form>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="firstName" class="form-label">First Name *</label>
+                                <input type="text" class="form-control" id="firstName" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="lastName" class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" id="lastName" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="subject" class="form-label">Subject *</label>
+                                <input type="text" class="form-control" id="subject" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="message" class="form-label">Message *</label>
+                                <textarea class="form-control" id="message" rows="5" required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-primary btn-lg w-100">Send Message</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-4 text-center">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="display-6 mb-3">📧</div>
+                            <h5 class="card-title">Email</h5>
+                            <p class="card-text text-muted small">hello@inq-ed.com</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="display-6 mb-3">💬</div>
+                            <h5 class="card-title">Support</h5>
+                            <p class="card-text text-muted small">support@inq-ed.com</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="display-6 mb-3">🏢</div>
+                            <h5 class="card-title">Schools</h5>
+                            <p class="card-text text-muted small">schools@inq-ed.com</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

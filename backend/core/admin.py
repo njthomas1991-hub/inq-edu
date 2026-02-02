@@ -130,9 +130,9 @@ class ClassAdmin(admin.ModelAdmin):
 
 
 class ClassStudentAdmin(admin.ModelAdmin):
-    list_display = ('student', 'class_obj', 'date_joined')
-    list_filter = ('date_joined', 'class_obj')
-    search_fields = ('student__username', 'class_obj__name')
+    list_display = ('student', 'clazz', 'date_joined')
+    list_filter = ('date_joined', 'clazz')
+    search_fields = ('student__username', 'clazz__name')
     readonly_fields = ('date_joined',)
 
 

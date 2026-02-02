@@ -143,11 +143,13 @@ class Migration(migrations.Migration):
             name='ClassStudent',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('clazz', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.class')),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='core.studentprofile')),
+                ('date_joined', models.DateTimeField(auto_now_add=True)),
+                ('class_obj', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='students', to='core.class')),
+                ('student', models.ForeignKey(limit_choices_to={'role': 'student'}, on_delete=django.db.models.deletion.CASCADE, related_name='enrolled_classes', to=settings.AUTH_USER_MODEL)),
             ],
             options={
-                'unique_together': {('student', 'clazz')},
+                'verbose_name_plural': 'Class Students',
+                'unique_together': {('student', 'class_obj')},
             },
         ),
     ]

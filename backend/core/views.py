@@ -18,37 +18,42 @@ class ClassForm(forms.ModelForm):
             'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Subject'}),
             'year_ks': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 4}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Optional description'}),
-        }, Class, ClassStudent
+        }
+
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 # Simple home page view
 def home_page_view(request):
-    return HttpResponse("Welcome to inq-ed! Your inquiry-based education platform is live.")
+    return render(request, "core/home.html")
 
 
 def about_page_view(request):
-    return HttpResponse("About inq-ed")
+    return render(request, "core/about.html")
 
 
 def kindlewick_page_view(request):
-    return HttpResponse("Kindle Wick")
+    return render(request, "core/kindlewick.html")
 
 
 def questopia_page_view(request):
-    return HttpResponse("Questopia")
+    return render(request, "core/questopia.html")
 
 
 def pricing_page_view(request):
-    return HttpResponse("Pricing")
+    return render(request, "core/pricing.html")
 
 
 def teacher_hub_view(request):
-    return HttpResponse("Teacher Hub")
+    return render(request, "core/teacher_hub.html")
 
 
 def contact_page_view(request):
-    return HttpResponse("Contact")
+    return render(request, "core/contact.html")
+
+
+def wonderworld_page_view(request):
+    return render(request, "core/wonderworld.html")
 
 @api_view(['GET'])
 def hello(request):
@@ -176,7 +181,7 @@ def create_student_account_view(request):
             if class_id:
                 try:
                     class_obj = Class.objects.get(id=class_id)
-                    ClassStudent.objects.create(student=user, class_obj=class_obj)
+                    ClassStudent.objects.create(student=user, clazz=class_obj)
                     # Redirect back to class detail page
                     return redirect('class_detail', class_id=class_id)
                 except Class.DoesNotExist:
@@ -238,7 +243,7 @@ def remove_student_view(request, class_id, student_id):
             return HttpResponseForbidden("You don't have access to this class")
         
         # Remove the student from the class
-        ClassStudent.objects.filter(class_obj=class_obj, student_id=student_id).delete()
+        ClassStudent.objects.filter(clazz=class_obj, student_id=student_id).delete()
         
     except Class.DoesNotExist:
         return HttpResponseForbidden("Class not found")
@@ -268,12 +273,12 @@ def transfer_student_view(request, class_id, student_id):
             return HttpResponseForbidden("You don't have access to the target class")
         
         # Get the enrollment
-        enrollment = ClassStudent.objects.get(class_obj=source_class, student_id=student_id)
+        enrollment = ClassStudent.objects.get(clazz=source_class, student_id=student_id)
         
         # Check if student is already in target class
-        if not ClassStudent.objects.filter(class_obj=target_class, student_id=student_id).exists():
+        if not ClassStudent.objects.filter(clazz=target_class, student_id=student_id).exists():
             # Update the enrollment to point to new class
-            enrollment.class_obj = target_class
+            enrollment.clazz = target_class
             enrollment.save()
         else:
             # Student already in target class, just remove from source
