@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 from .views import home_page_view, hello, teacher_dashboard_view, teacher_signup_view, student_signup_view, student_signup_with_details_view, create_student_account_view, class_detail_view, add_class_view
 
 urlpatterns = [
-    path("", home_page_view),
+    path("", home_page_view, name="home"),
     path("api/hello/", hello),
     path("teacher/signup/", teacher_signup_view, name="signup"),
     path("student/signup/", student_signup_view, name="student_signup"),
