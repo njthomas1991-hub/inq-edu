@@ -1,1 +1,1 @@
-web: gunicorn --chdir backend --bind 0.0.0.0:$PORT backend.wsgi:application
+web: PYTHONPATH=/app/backend gunicorn --bind 0.0.0.0:$PORT backend.wsgi:application
