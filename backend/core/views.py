@@ -222,6 +222,29 @@ def class_detail_view(request, class_id):
 
 
 @login_required
+def remove_student_view(request, class_id, student_id):
+    """Remove a student from a class"""
+    if request.method != "POST":
+        return HttpResponseForbidden("POST method required")
+    
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    try:
+        class_obj = Class.objects.get(id=class_id)
+        if class_obj.teacher_id != request.user.id:
+            return HttpResponseForbidden("You don't have access to this class")
+        
+        # Remove the student from the class
+        ClassStudent.objects.filter(class_obj=class_obj, student_id=student_id).delete()
+        
+    except Class.DoesNotExist:
+        return HttpResponseForbidden("Class not found")
+    
+    return redirect('class_detail', class_id=class_id)
+
+
+@login_required
 def add_class_view(request):
     if getattr(request.user, "role", None) != "teacher":
         return HttpResponseForbidden("Teacher access only")
