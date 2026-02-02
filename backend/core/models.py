@@ -19,7 +19,7 @@ class User(AbstractUser):
         ('admin', 'Admin'),
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
-    school = models.ForeignKey(School, on_delete=models.SET_NULL, null=True, blank=True)
+    school = models.CharField(max_length=255, null=True, blank=True)
     # first_name, last_name, username, password are inherited
     created_at = models.DateTimeField(auto_now_add=True)
     last_login_at = models.DateTimeField(null=True, blank=True)
