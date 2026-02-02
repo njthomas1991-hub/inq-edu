@@ -26,6 +26,10 @@ from rest_framework.response import Response
 def home_page_view(request):
     return HttpResponse("Welcome to inq-ed! Your inquiry-based education platform is live.")
 
+
+def about_page_view(request):
+    return HttpResponse("About inq-ed")
+
 @api_view(['GET'])
 def hello(request):
     return Response({"message": "Hello from Django API!"})
