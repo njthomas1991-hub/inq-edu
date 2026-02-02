@@ -44,6 +44,10 @@ class UserAdmin(BaseUserAdmin):
         return request.user.is_superuser
 
 
+def _is_teacher(user):
+    return user.is_authenticated and getattr(user, "role", None) == "teacher"
+
+
 class ClassStudentInline(admin.TabularInline):
     model = ClassStudent
     extra = 1
@@ -70,6 +74,30 @@ class ClassAdmin(admin.ModelAdmin):
             qs = qs.filter(teacher=request.user)
         return qs
 
+    def has_view_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        if _is_teacher(request.user):
+            return obj is None or obj.teacher_id == request.user.id
+        return False
+
+    def has_add_permission(self, request):
+        return request.user.is_superuser or _is_teacher(request.user)
+
+    def has_change_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        if _is_teacher(request.user):
+            return obj is None or obj.teacher_id == request.user.id
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        if _is_teacher(request.user):
+            return obj is None or obj.teacher_id == request.user.id
+        return False
+
 
 class ClassStudentAdmin(admin.ModelAdmin):
     list_display = ('student', 'class_obj', 'date_joined')
@@ -89,6 +117,34 @@ class SchoolAnalyticsProfileAdmin(admin.ModelAdmin):
         ('Permissions', {'fields': ('can_access_all_teachers',)}),
         ('Metadata', {'fields': ('created_at',)}),
     )
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        if _is_teacher(request.user):
+            profile = getattr(request.user, "analytics_profile", None)
+            if profile:
+                return qs.filter(school=profile.school)
+            return qs.none()
+        return qs.none()
+
+    def has_view_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        if _is_teacher(request.user):
+            profile = getattr(request.user, "analytics_profile", None)
+            return obj is not None and profile and obj.school == profile.school
+        return False
+
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
 
 
 admin.site.register(User, UserAdmin)
