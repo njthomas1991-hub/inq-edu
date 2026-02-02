@@ -1,0 +1,48 @@
+{% extends "core/base.html" %}
+
+{% block title %}Student Account Created{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Student Account Details</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Share these credentials with the student:</p>
+                    
+                    <div class="alert alert-light border">
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Name</label>
+                            <div class="fs-5 fw-semibold">{{ first_name }} {{ last_name }}</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label text-muted small">Username</label>
+                            <div class="fs-5 fw-semibold font-monospace">{{ username }}</div>
+                        </div>
+                        <div class="mb-0">
+                            <label class="form-label text-muted small">Password</label>
+                            <div class="fs-5 fw-semibold font-monospace">{{ password }}</div>
+                        </div>
+                    </div>
+
+                    <form method="post" action="/api/create-student/" class="d-none" id="createForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="first_name" value="{{ first_name }}">
+                        <input type="hidden" name="last_name" value="{{ last_name }}">
+                        <input type="hidden" name="username" value="{{ username }}">
+                        <input type="hidden" name="password" value="{{ password }}">
+                    </form>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button class="btn btn-success" onclick="document.getElementById('createForm').submit();">Create Account</button>
+                        <a href="/teacher/" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
