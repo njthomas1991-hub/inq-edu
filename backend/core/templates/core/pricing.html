@@ -1,0 +1,92 @@
+{% extends "core/base.html" %}
+
+{% block title %}Pricing - inq-ed{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Simple, Transparent Pricing</h1>
+        <p class="lead text-muted">Choose the plan that fits your needs</p>
+    </div>
+    
+    <div class="row g-4 justify-content-center">
+        <!-- Free Plan -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-center mb-3">Free</h3>
+                    <div class="text-center mb-4">
+                        <span class="display-4 fw-bold">£0</span>
+                        <span class="text-muted">/month</span>
+                    </div>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">✓ Up to 30 students</li>
+                        <li class="mb-2">✓ Basic analytics</li>
+                        <li class="mb-2">✓ 3 classes</li>
+                        <li class="mb-2">✓ Core learning features</li>
+                        <li class="mb-2 text-muted">✗ Advanced games</li>
+                        <li class="mb-2 text-muted">✗ Custom content</li>
+                    </ul>
+                    <div class="text-center mt-4">
+                        <a href="{% url 'signup' %}" class="btn btn-outline-primary w-100">Get Started</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pro Plan -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 shadow border-primary" style="transform: scale(1.05);">
+                <div class="card-header bg-primary text-white text-center">
+                    <strong>Most Popular</strong>
+                </div>
+                <div class="card-body p-4">
+                    <h3 class="card-title text-center mb-3">Pro</h3>
+                    <div class="text-center mb-4">
+                        <span class="display-4 fw-bold">£9</span>
+                        <span class="text-muted">/month</span>
+                    </div>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">✓ Unlimited students</li>
+                        <li class="mb-2">✓ Advanced analytics</li>
+                        <li class="mb-2">✓ Unlimited classes</li>
+                        <li class="mb-2">✓ All learning features</li>
+                        <li class="mb-2">✓ Premium games</li>
+                        <li class="mb-2">✓ Priority support</li>
+                    </ul>
+                    <div class="text-center mt-4">
+                        <a href="{% url 'signup' %}" class="btn btn-primary w-100">Start Free Trial</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- School Plan -->
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-center mb-3">School</h3>
+                    <div class="text-center mb-4">
+                        <span class="display-4 fw-bold">Custom</span>
+                    </div>
+                    <ul class="list-unstyled">
+                        <li class="mb-2">✓ Multiple teachers</li>
+                        <li class="mb-2">✓ School-wide analytics</li>
+                        <li class="mb-2">✓ Custom branding</li>
+                        <li class="mb-2">✓ Dedicated support</li>
+                        <li class="mb-2">✓ Training sessions</li>
+                        <li class="mb-2">✓ Custom integrations</li>
+                    </ul>
+                    <div class="text-center mt-4">
+                        <a href="{% url 'contact' %}" class="btn btn-outline-primary w-100">Contact Us</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center mt-5">
+        <p class="text-muted">All plans include a 30-day money-back guarantee</p>
+    </div>
+</div>
+{% endblock %}

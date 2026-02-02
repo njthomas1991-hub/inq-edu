@@ -40,15 +40,15 @@ class Class(models.Model):
 # ClassStudent Model - Students enrolled in a class
 class ClassStudent(models.Model):
     student = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'student'}, related_name='enrolled_classes')
-    class_obj = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='students')
+    clazz = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='students')
     date_joined = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ('student', 'class_obj')
+        unique_together = ('student', 'clazz')
         verbose_name_plural = "Class Students"
 
     def __str__(self):
-        return f"{self.student.username} in {self.class_obj.name}"
+        return f"{self.student.username} in {self.clazz.name}"
 
 
 # SchoolAnalyticsProfile Model - School admins who can access multiple teachers' data

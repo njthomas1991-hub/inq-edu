@@ -1,0 +1,85 @@
+{% extends "core/base.html" %}
+
+{% block title %}Teacher Hub - inq-ed{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold">Teacher Hub</h1>
+                <p class="lead text-muted">Your central command for classroom management</p>
+            </div>
+            
+            <div class="row g-4 mb-5">
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body p-4">
+                            <h3 class="card-title">📊 Analytics Dashboard</h3>
+                            <p class="card-text">Track student progress, identify learning gaps, and make data-driven decisions with comprehensive analytics.</p>
+                            <ul class="list-unstyled mt-3">
+                                <li>• Real-time progress tracking</li>
+                                <li>• Individual student insights</li>
+                                <li>• Class performance overview</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body p-4">
+                            <h3 class="card-title">👥 Class Management</h3>
+                            <p class="card-text">Organize your classes, manage student rosters, and streamline administrative tasks.</p>
+                            <ul class="list-unstyled mt-3">
+                                <li>• Easy student enrollment</li>
+                                <li>• Multiple class support</li>
+                                <li>• Quick student transfers</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body p-4">
+                            <h3 class="card-title">📚 Curriculum Tools</h3>
+                            <p class="card-text">Access curriculum-aligned resources and create customized learning experiences.</p>
+                            <ul class="list-unstyled mt-3">
+                                <li>• Key Stage aligned content</li>
+                                <li>• Customizable lessons</li>
+                                <li>• Resource library</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body p-4">
+                            <h3 class="card-title">🎯 Learning Pathways</h3>
+                            <p class="card-text">Design personalized learning journeys tailored to individual student needs.</p>
+                            <ul class="list-unstyled mt-3">
+                                <li>• Adaptive learning paths</li>
+                                <li>• Differentiation support</li>
+                                <li>• Goal setting tools</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm bg-primary text-white">
+                <div class="card-body p-5 text-center">
+                    <h3 class="mb-3">Ready to Transform Your Classroom?</h3>
+                    <p class="mb-4">Join thousands of teachers using inq-ed to make learning more engaging and effective.</p>
+                    <div class="d-flex gap-3 justify-content-center">
+                        <a href="{% url 'signup' %}" class="btn btn-light btn-lg">Sign Up</a>
+                        <a href="{% url 'teacher_login' %}" class="btn btn-outline-light btn-lg">Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

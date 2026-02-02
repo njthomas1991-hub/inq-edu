@@ -1,0 +1,63 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block title %}WonderWorld - INQ-ED{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="text-center mb-5">
+                <img src="{% static 'core/images/wonderworld logo.png' %}" alt="WonderWorld" class="img-fluid mb-4" style="max-width: 300px;">
+                <h1 class="display-4 fw-bold mb-3">WonderWorld</h1>
+                <p class="lead text-muted">Explore an immersive learning adventure</p>
+            </div>
+
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-globe fa-3x text-primary"></i>
+                            </div>
+                            <h5 class="card-title">Explore Worlds</h5>
+                            <p class="card-text">Discover different themed worlds filled with educational challenges and activities.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-puzzle-piece fa-3x text-success"></i>
+                            </div>
+                            <h5 class="card-title">Solve Puzzles</h5>
+                            <p class="card-text">Challenge yourself with interactive puzzles that make learning engaging and fun.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-trophy fa-3x text-warning"></i>
+                            </div>
+                            <h5 class="card-title">Earn Rewards</h5>
+                            <p class="card-text">Collect achievements and rewards as you progress through your learning journey.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info text-center" role="alert">
+                <h4 class="alert-heading">Coming Soon!</h4>
+                <p class="mb-0">WonderWorld is currently under development. Stay tuned for an amazing learning experience!</p>
+            </div>
+
+            <div class="text-center mt-4">
+                <a href="{% url 'home' %}" class="btn btn-outline-primary">Back to Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
