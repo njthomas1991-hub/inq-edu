@@ -30,6 +30,10 @@ def home_page_view(request):
 def about_page_view(request):
     return HttpResponse("About inq-ed")
 
+
+def kindlewick_page_view(request):
+    return HttpResponse("Kindle Wick")
+
 @api_view(['GET'])
 def hello(request):
     return Response({"message": "Hello from Django API!"})
