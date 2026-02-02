@@ -27,7 +27,7 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('username', 'first_name', 'last_name', 'email')
     ordering = ('username',)
     
-    def has_view_permission(self, request):
+    def has_view_permission(self, request, obj=None):
         # Only superusers can view User admin
         return request.user.is_superuser
     
