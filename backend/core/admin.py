@@ -1,6 +1,11 @@
 from django.contrib import admin
+from django.contrib.auth.models import Group
 from .models import User, Class, ClassStudent, SchoolAnalyticsProfile
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+
+
+# Unregister the Group model from admin
+admin.site.unregister(Group)
 
 
 class UserAdmin(BaseUserAdmin):
