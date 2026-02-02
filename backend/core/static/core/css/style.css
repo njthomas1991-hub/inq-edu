@@ -199,6 +199,31 @@ footer {
     background-color: var(--theme-bg-2);
 }
 
+/* Home card image fit */
+.card-img-top {
+    width: auto;
+    height: 200px;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+/* Quick access card image fit */
+.quick-access-image-wrapper {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.quick-access-image-wrapper img {
+    width: auto;
+    height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
 /* Text colors */
 .lead, p, h1, h2, h3, h4, h5, h6 {
     color: var(--theme-text);
