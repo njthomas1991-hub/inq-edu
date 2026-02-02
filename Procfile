@@ -1,1 +1,1 @@
-web: cd backend && python manage.py migrate && gunicorn backend.wsgi --log-file -
+web: gunicorn -w 4 -b 0.0.0.0:$PORT --chdir backend backend.wsgi
