@@ -34,6 +34,9 @@
                         <input type="hidden" name="last_name" value="{{ last_name }}">
                         <input type="hidden" name="username" value="{{ username }}">
                         <input type="hidden" name="password" value="{{ password }}">
+                        {% if class_id %}
+                            <input type="hidden" name="class_id" value="{{ class_id }}">
+                        {% endif %}
                     </form>
 
                     <div class="d-flex gap-2 mt-4">
