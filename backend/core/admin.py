@@ -22,18 +22,18 @@ class UserAdmin(BaseUserAdmin):
     )
     search_fields = ('username',)
     ordering = ('username',)
-    filter_horizontal = ()  # Remove groups and user_permissions
+    filter_horizontal = ()
 
 
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
-    list_display = ('name',)
+    list_display = ('name', 'created_at')
     search_fields = ('name',)
 
 
 @admin.register(StudentProfile)
 class StudentProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'year_ks')
+    list_display = ('user', 'year_ks', 'created_at')
     list_filter = ('year_ks',)
     search_fields = ('user__username',)
 
@@ -47,16 +47,15 @@ class ClassAdmin(admin.ModelAdmin):
 
 @admin.register(ClassStudent)
 class ClassStudentAdmin(admin.ModelAdmin):
-    list_display = ('student', 'class_obj', 'date_joined')
-    list_filter = ('date_joined',)
-    search_fields = ('student__username', 'class_obj__name')
+    list_display = ('student', 'clazz')
+    search_fields = ('student__user__username', 'clazz__name')
 
 
 @admin.register(Session)
 class SessionAdmin(admin.ModelAdmin):
-    list_display = ('student', 'start_time', 'score')
-    list_filter = ('start_time',)
-    search_fields = ('student__username',)
+    list_display = ('student', 'started_at', 'score')
+    list_filter = ('started_at',)
+    search_fields = ('student__user__username',)
 
 
 @admin.register(LearningObjective)
@@ -68,23 +67,23 @@ class LearningObjectiveAdmin(admin.ModelAdmin):
 
 @admin.register(ObjectiveAttempt)
 class ObjectiveAttemptAdmin(admin.ModelAdmin):
-    list_display = ('student', 'objective', 'success', 'timestamp')
-    list_filter = ('success', 'timestamp')
-    search_fields = ('student__username', 'objective__description')
+    list_display = ('session', 'objective', 'correct', 'attempts')
+    list_filter = ('correct',)
+    search_fields = ('session__student__user__username', 'objective__description')
 
 
 @admin.register(StudentObjectiveMastery)
 class StudentObjectiveMasteryAdmin(admin.ModelAdmin):
-    list_display = ('student', 'objective', 'mastery_level')
-    list_filter = ('mastery_level',)
-    search_fields = ('student__username', 'objective__description')
+    list_display = ('student', 'objective', 'mastery_score')
+    list_filter = ('mastery_score',)
+    search_fields = ('student__user__username', 'objective__description')
 
 
 @admin.register(GameEvent)
 class GameEventAdmin(admin.ModelAdmin):
-    list_display = ('student', 'event_type', 'timestamp')
-    list_filter = ('event_type', 'timestamp')
-    search_fields = ('student__username',)
+    list_display = ('student', 'event_type', 'created_at')
+    list_filter = ('event_type', 'created_at')
+    search_fields = ('student__user__username',)
 
 
 admin.site.register(User, UserAdmin)
