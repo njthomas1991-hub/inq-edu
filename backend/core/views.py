@@ -38,6 +38,12 @@ class TeacherSignUpForm(UserCreationForm):
         fields = ("username", "first_name", "last_name", "email", "school", "password1", "password2")
 
 
+class StudentSignUpForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ("username", "password1", "password2")
+
+
 def teacher_signup_view(request):
     if request.method == "POST":
         form = TeacherSignUpForm(request.POST)
@@ -52,6 +58,21 @@ def teacher_signup_view(request):
         form = TeacherSignUpForm()
 
     return render(request, "core/teacher_signup.html", {"form": form})
+
+
+def student_signup_view(request):
+    if request.method == "POST":
+        form = StudentSignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.role = "student"
+            user.save()
+            login(request, user)
+            return redirect("student_dashboard")
+    else:
+        form = StudentSignUpForm()
+
+    return render(request, "core/student_signup.html", {"form": form})
 
 
 @login_required
