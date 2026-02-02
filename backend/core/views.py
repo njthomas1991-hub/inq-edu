@@ -5,6 +5,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.shortcuts import render, redirect
 from .models import User, Class, ClassStudent
+import string
+import random
 
 
 class ClassForm(forms.ModelForm):
@@ -44,6 +46,11 @@ class StudentSignUpForm(UserCreationForm):
         fields = ("username", "password1", "password2")
 
 
+class StudentSignUpWithDetailsForm(forms.Form):
+    first_name = forms.CharField(max_length=150, required=True, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}))
+    last_name = forms.CharField(max_length=150, required=True, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}))
+
+
 def teacher_signup_view(request):
     if request.method == "POST":
         form = TeacherSignUpForm(request.POST)
@@ -73,6 +80,69 @@ def student_signup_view(request):
         form = StudentSignUpForm()
 
     return render(request, "core/student_signup.html", {"form": form})
+
+
+def generate_simple_password():
+    """Generate a simple password for 7-9 year olds (memorable and easy)"""
+    adjectives = ['Happy', 'Sunny', 'Quick', 'Brave', 'Smart', 'Cool', 'Bright', 'Clever']
+    nouns = ['Bear', 'Lion', 'Tiger', 'Eagle', 'Panda', 'Fox', 'Wolf', 'Hawk']
+    number = random.randint(1, 9)
+    return f"{random.choice(adjectives)}{random.choice(nouns)}{number}"
+
+
+def student_signup_with_details_view(request):
+    if request.method == "POST":
+        form = StudentSignUpWithDetailsForm(request.POST)
+        if form.is_valid():
+            first_name = form.cleaned_data['first_name']
+            last_name = form.cleaned_data['last_name']
+            
+            # Auto-generate username: firstname + last name initial
+            username = (first_name + last_name[0]).lower()
+            
+            # Check if username already exists, if so add a number
+            base_username = username
+            counter = 1
+            while User.objects.filter(username=username).exists():
+                username = f"{base_username}{counter}"
+                counter += 1
+            
+            # Auto-generate simple password
+            password = generate_simple_password()
+            
+            return render(request, "core/student_signup_confirmation.html", {
+                "first_name": first_name,
+                "last_name": last_name,
+                "username": username,
+                "password": password,
+            })
+    else:
+        form = StudentSignUpWithDetailsForm()
+
+    return render(request, "core/student_signup_with_details.html", {"form": form})
+
+
+def create_student_account_view(request):
+    """API endpoint to create student account from confirmation page"""
+    if request.method == "POST":
+        first_name = request.POST.get('first_name', '')
+        last_name = request.POST.get('last_name', '')
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+        
+        if username and password:
+            # Create the student user
+            user = User.objects.create_user(
+                username=username,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                role='student'
+            )
+            login(request, user)
+            return redirect("student_dashboard")
+    
+    return redirect("student_signup_guided")
 
 
 @login_required
