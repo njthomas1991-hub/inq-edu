@@ -90,7 +90,7 @@
             <!-- WonderWorld Card -->
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 shadow-sm border-0">
-                    <img src="{% static 'core/images/wonderworld logo.png' %}" class="card-img-top" alt="WonderWorld" style="height: 200px; object-fit: cover;">
+                    <img src="{% static 'core/images/wonderworld logo.png' %}" class="card-img-top" alt="WonderWorld" style="height: 296px; object-fit: cover;">
                     <div class="card-body">
                         <h5 class="card-title">WonderWorld</h5>
                         <p class="card-text">Explore a magical world filled with puzzles, challenges, and educational quests.</p>
@@ -107,7 +107,7 @@
             <!-- Questopia Card -->
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 shadow-sm border-0">
-                    <img src="{% static 'core/images/questopia badge.png' %}" class="card-img-top" alt="Questopia" style="height: 100px; object-fit: cover;">
+                    <img src="{% static 'core/images/questopia badge.png' %}" class="card-img-top" alt="Questopia" style="height: 296px; object-fit: cover;">
                     <div class="card-body">
                         <h5 class="card-title">Questopia</h5>
                         <p class="card-text">Embark on epic quests and adventures while mastering key learning concepts.</p>
@@ -124,15 +124,34 @@
             <!-- Kindle Wick Card -->
             <div class="col-md-6 col-lg-4">
                 <div class="card h-100 shadow-sm border-0">
-                    <img src="{% static 'core/images/teacher hub logo.png' %}" class="card-img-top" alt="Kindle Wick" style="height: 200px; object-fit: cover;">
+                    <img src="{% static 'core/images/kindlewick logo.png' %}" class="card-img-top" alt="Kindle Wick" style="height: 296px; object-fit: cover;">
                     <div class="card-body">
                         <h5 class="card-title">Kindle Wick</h5>
-                        <p class="card-text">A cozy learning space designed for personalized educational experiences.</p>
+                        <h5 class="card-title">Ages 7-9</h5>
+                        <p class="card-text">An exciting learning platform designed for gamified educational experiences, correlating with the nation curiculum in Maths and English.</p>
                         <div class="d-flex align-items-center gap-2">
                             <div class="widgit-symbol" data-symbol="learning">
                                 <div class="widgit-symbol-placeholder">📖</div>
                             </div>
                             <a href="{% url 'kindlewick' %}" class="btn btn-primary btn-sm">Explore</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher-hub card -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="{% static 'core/images/teacher hub logo.png' %}" class="card-img-top" alt="Teacher Hub" style="height: 296px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">Teacher Hub</h5>
+                        <p class="card-text">create classes to monitor engagement and track progress. View individual student stats and whole class analytics.</p>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="widgit-symbol" data-symbol="learning">
+                                <div class="widgit-symbol-placeholder">📖</div>
+                            </div>
+                            <a href="{% url 'teacherhub' %}" class="btn btn-primary btn-sm">Explore</a>
                         </div>
                     </div>
                 </div>
