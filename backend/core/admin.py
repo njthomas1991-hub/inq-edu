@@ -26,6 +26,22 @@ class UserAdmin(BaseUserAdmin):
     )
     search_fields = ('username', 'first_name', 'last_name', 'email')
     ordering = ('username',)
+    
+    def has_view_permission(self, request):
+        # Only superusers can view User admin
+        return request.user.is_superuser
+    
+    def has_add_permission(self, request):
+        # Only superusers can add users
+        return request.user.is_superuser
+    
+    def has_change_permission(self, request, obj=None):
+        # Only superusers can change users
+        return request.user.is_superuser
+    
+    def has_delete_permission(self, request, obj=None):
+        # Only superusers can delete users
+        return request.user.is_superuser
 
 
 class ClassStudentInline(admin.TabularInline):
