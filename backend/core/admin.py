@@ -21,11 +21,19 @@ class UserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'password1', 'password2', 'role', 'school', 'is_staff', 'is_active')
+            'fields': ('username', 'password1', 'password2')
         }),
     )
     search_fields = ('username', 'first_name', 'last_name', 'email')
     ordering = ('username',)
+    
+    def save_model(self, request, obj, form, change):
+        # When adding a new student, set role='student' and inherit teacher's school
+        if not change:
+            obj.role = 'student'
+            if hasattr(request.user, 'school') and request.user.school:
+                obj.school = request.user.school
+        super().save_model(request, obj, form, change)
     
     def get_queryset(self, request):
         qs = super().get_queryset(request)
