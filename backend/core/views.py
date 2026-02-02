@@ -46,6 +46,10 @@ def pricing_page_view(request):
 def teacher_hub_view(request):
     return HttpResponse("Teacher Hub")
 
+
+def contact_page_view(request):
+    return HttpResponse("Contact")
+
 @api_view(['GET'])
 def hello(request):
     return Response({"message": "Hello from Django API!"})
