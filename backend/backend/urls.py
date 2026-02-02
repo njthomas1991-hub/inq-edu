@@ -22,12 +22,6 @@ from django.urls import path, include
 urlpatterns = [
     path('', include('core.urls')),
 ]
-    path('kindlewick/', views.kindlewick, name='kindlewick'),
-    path('pricing/', views.pricing, name='pricing'),
-    path('teacher_hub/', views.teacher_hub, name='teacher_hub'),
-    path('contact/', views.contact, name='contact'),
-    path('signup/', views.signup, name='signup'),
-]
 
 # Serve static files (images/css/js) during development
 if settings.DEBUG:
