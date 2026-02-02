@@ -50,7 +50,6 @@ class ClassAdmin(admin.ModelAdmin):
         return qs
 
 
-@admin.register(ClassStudent)
 class ClassStudentAdmin(admin.ModelAdmin):
     list_display = ('student', 'class_obj', 'date_joined')
     list_filter = ('date_joined', 'class_obj')
