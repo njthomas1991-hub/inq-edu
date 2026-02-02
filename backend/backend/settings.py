@@ -56,6 +56,9 @@ INSTALLED_APPS = [
 
 AUTH_USER_MODEL = 'core.User'
 
+LOGIN_URL = '/teacher/login/'
+LOGIN_REDIRECT_URL = '/teacher/'
+
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
