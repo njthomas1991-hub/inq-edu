@@ -115,6 +115,8 @@ def generate_simple_password():
 
 
 def student_signup_with_details_view(request):
+    class_id = request.GET.get('class_id') or request.POST.get('class_id')
+    
     if request.method == "POST":
         form = StudentSignUpWithDetailsForm(request.POST)
         if form.is_valid():
@@ -139,11 +141,15 @@ def student_signup_with_details_view(request):
                 "last_name": last_name,
                 "username": username,
                 "password": password,
+                "class_id": class_id,
             })
     else:
         form = StudentSignUpWithDetailsForm()
 
-    return render(request, "core/student_signup_with_details.html", {"form": form})
+    return render(request, "core/student_signup_with_details.html", {
+        "form": form,
+        "class_id": class_id,
+    })
 
 
 def create_student_account_view(request):
@@ -153,6 +159,7 @@ def create_student_account_view(request):
         last_name = request.POST.get('last_name', '')
         username = request.POST.get('username', '')
         password = request.POST.get('password', '')
+        class_id = request.POST.get('class_id', '')
         
         if username and password:
             # Create the student user
@@ -161,8 +168,20 @@ def create_student_account_view(request):
                 password=password,
                 first_name=first_name,
                 last_name=last_name,
-                role='student'
+                role='student',
+                plain_password=password  # Store plain password for display
             )
+            
+            # If class_id is provided, enroll student in class
+            if class_id:
+                try:
+                    class_obj = Class.objects.get(id=class_id)
+                    ClassStudent.objects.create(student=user, class_obj=class_obj)
+                    # Redirect back to class detail page
+                    return redirect('class_detail', class_id=class_id)
+                except Class.DoesNotExist:
+                    pass
+            
             return render(request, "core/student_account_created.html", {
                 "username": username,
                 "password": password,

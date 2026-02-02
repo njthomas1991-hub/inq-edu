@@ -10,6 +10,7 @@ class User(AbstractUser):
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
     school = models.CharField(max_length=255, null=True, blank=True)
+    plain_password = models.CharField(max_length=100, null=True, blank=True, help_text="Plain text password for display purposes (students only)")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
