@@ -58,6 +58,7 @@ AUTH_USER_MODEL = 'core.User'
 
 LOGIN_URL = '/teacher/login/'
 LOGIN_REDIRECT_URL = '/teacher/'
+LOGOUT_REDIRECT_URL = '/'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
