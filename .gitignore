@@ -1,24 +1,66 @@
 # Python
 .venv/
+venv/
+env/
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Django
 db.sqlite3
 staticfiles/
+*.log
+local_settings.py
+migrations/
+!migrations/__init__.py
 
 # Environment variables
 .env
+.env.local
+.env.*.local
+env.py
 
 # Node
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm
+package-lock.json
 
-# VS Code
+# IDE
 .vscode/
-
-# OS junk
+.idea/
+*.swp
+*.swo
+*~
 .DS_Store
-Thumbs.db
+.project
+.pydevproject
+.settings/
+*.sublime-project
+*.sublime-workspace
 
-#secret key
-env.py
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+.hypothesis/
+
+# OS
+Thumbs.db
+.DS_Store
+*.bak
+
+# Build outputs
+/frontend/build/
+/backend/staticfiles/
