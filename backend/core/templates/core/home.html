@@ -1,0 +1,318 @@
+{% extends "core/base.html" %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section with Video -->
+<section class="hero hero-text text-center" style="min-height: 100vh; display: flex; flex-direction: column; overflow: hidden;">
+    <!-- Header -->
+    <div class="py-4 hero-header" style="z-index: 3;">
+        <h2 class="display-4 fw-bold mb-0">Learning Through Play</h2>
+    </div>
+    
+    <!-- Video Container (Grows to fill available space) -->
+    <div class="position-relative flex-grow-1" style="overflow: hidden; z-index: 1;">
+        <video 
+            width="100%" 
+            height="100%" 
+            style="object-fit: cover; display: block;"
+            autoplay 
+            muted 
+            loop 
+            playsinline>
+            <source src="{% static 'core/videos/hero slides.mp4' %}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        
+        <!-- Dark Overlay for Better Text Readability -->
+        <div class="position-absolute top-0 start-0 w-100 h-100 hero-video-overlay" style="z-index: 2;"></div>
+    </div>
+    
+    <!-- Content Below Video -->
+    <div class="py-4 hero-content" style="z-index: 3;">
+        <p class="lead mb-4" style="font-size: 1.1rem; max-width: 600px; margin-left: auto; margin-right: auto; padding: 0 1rem;">Discover engaging educational games that make learning fun and interactive for students of all ages.</p>
+        <div class="d-flex justify-content-center align-items-center gap-3">
+            <div class="widgit-symbol" data-symbol="start">
+                <div class="widgit-symbol-placeholder">▶️</div>
+            </div>
+            <a href="{% url 'signup' %}" class="btn btn-light btn-lg">Get Started Today</a>
+        </div>
+    </div>
+</section>
+
+<!-- Quick Access Buttons Section -->
+<section class="quick-access py-5">
+    <div class="container">
+        <div class="row g-4">
+            <!-- WonderWorld Button -->
+            <div class="col-4 col-md-6 col-lg-4">
+                <a href="{% url 'wonderworld' %}" class="quick-access-btn text-decoration-none">
+                    <div class="quick-access-image-wrapper">
+                        <img src="{% static 'core/images/wonderworld logo.png' %}" alt="WonderWorld" class="img-fluid">
+                    </div>
+                    <div class="quick-access-overlay">
+                        <span class="quick-access-text">Enter WonderWorld</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Questopia Button -->
+            <div class="col-4 col-md-6 col-lg-4">
+                <a href="{% url 'questopia' %}" class="quick-access-btn text-decoration-none">
+                    <div class="quick-access-image-wrapper">
+                        <img src="{% static 'core/images/questopia badge.png' %}" alt="Questopia" class="img-fluid">
+                    </div>
+                    <div class="quick-access-overlay">
+                        <span class="quick-access-text">Start Questopia</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Teacher hub Button -->
+            <div class="col-4 col-md-6 col-lg-4">
+                <a href="{% url 'teacher_hub' %}" class="quick-access-btn text-decoration-none">
+                    <div class="quick-access-image-wrapper">
+                        <img src="{% static 'core/images/teacher hub logo.png' %}" alt="Teacher Hub" class="img-fluid">
+                    </div>
+                    <div class="quick-access-overlay">
+                        <span class="quick-access-text">Explore our Teacher Hub</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Platforms Section -->
+<section class="platforms py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">Our Platforms</h2>
+        <div class="row g-4">
+            <!-- WonderWorld Card -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="{% static 'core/images/wonderworld logo.png' %}" class="card-img-top" alt="WonderWorld" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">WonderWorld</h5>
+                        <p class="card-text">Explore a magical world filled with puzzles, challenges, and educational quests.</p>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="widgit-symbol" data-symbol="explore">
+                                <div class="widgit-symbol-placeholder">🌍</div>
+                            </div>
+                            <a href="{% url 'wonderworld' %}" class="btn btn-primary btn-sm">Explore</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Questopia Card -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="{% static 'core/images/questopia badge.png' %}" class="card-img-top" alt="Questopia" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">Questopia</h5>
+                        <p class="card-text">Embark on epic quests and adventures while mastering key learning concepts.</p>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="widgit-symbol" data-symbol="quest">
+                                <div class="widgit-symbol-placeholder">⚔️</div>
+                            </div>
+                            <a href="{% url 'questopia' %}" class="btn btn-primary btn-sm">Explore</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kindle Wick Card -->
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-0">
+                    <img src="{% static 'core/images/teacher hub logo.png' %}" class="card-img-top" alt="Kindle Wick" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">Kindle Wick</h5>
+                        <p class="card-text">A cozy learning space designed for personalized educational experiences.</p>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="widgit-symbol" data-symbol="learning">
+                                <div class="widgit-symbol-placeholder">📖</div>
+                            </div>
+                            <a href="{% url 'kindlewick' %}" class="btn btn-primary btn-sm">Explore</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">How It Works</h2>
+        <div class="row g-4 text-center">
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <div class="display-4 text-primary mb-3">1</div>
+                    <h5>Sign Up</h5>
+                    <p>Create your account in minutes and choose your learning platform.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <div class="display-4 text-primary mb-3">2</div>
+                    <h5>Play & Learn</h5>
+                    <p>Engage with interactive games and educational content tailored to your level.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    <div class="display-4 text-primary mb-3">3</div>
+                    <h5>Track Progress</h5>
+                    <p>Monitor your achievements and see your improvement over time.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">Why Choose INQ-ED?</h2>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="d-flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-check-circle text-success" style="font-size: 2rem;"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5>Engaging Content</h5>
+                        <p>Our games are designed by educators to be both fun and educational.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-chart-line text-success" style="font-size: 2rem;"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5>Progress Tracking</h5>
+                        <p>Detailed analytics help teachers and parents monitor learning outcomes.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-users text-success" style="font-size: 2rem;"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5>Collaborative Learning</h5>
+                        <p>Students can team up with peers to solve challenges and complete quests.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-shield-alt text-success" style="font-size: 2rem;"></i>
+                    </div>
+                    <div class="flex-grow-1 ms-3">
+                        <h5>Safe & Secure</h5>
+                        <p>We prioritize student safety and privacy with industry-leading security measures.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta py-5 text-center text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <h2 class="mb-4">Ready to Transform Learning?</h2>
+        <p class="lead mb-4">Join thousands of educators and students using INQ-ED today.</p>
+        <div class="d-flex justify-content-center align-items-center gap-3">
+            <div class="widgit-symbol" data-symbol="start">
+                <div class="widgit-symbol-placeholder">🚀</div>
+            </div>
+            <a href="{% url 'signup' %}" class="btn btn-light btn-lg">Start Your Journey</a>
+        </div>
+    </div>
+</section>
+
+<style>
+.hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.cta {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+/* Quick Access Buttons */
+.quick-access-btn {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%;
+}
+
+.quick-access-btn:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.quick-access-image-wrapper {
+    position: relative;
+    overflow: hidden;
+    border-radius: 12px;
+    height: auto;
+    background: #f0f0f0;
+}
+
+.quick-access-image-wrapper img {
+    width: 100%;
+    height: auto;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.quick-access-btn:hover .quick-access-image-wrapper img {
+    transform: scale(1.1);
+}
+
+.quick-access-overlay {
+    position: static;
+    display: block;
+    padding: 12px 8px 4px;
+    text-align: center;
+}
+
+.quick-access-text {
+    color: #1f2937;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 0;
+}
+</style>
+{% endblock %}

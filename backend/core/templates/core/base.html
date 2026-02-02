@@ -1,0 +1,894 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}INQ-ED{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'core/images/favicon/favicon-16x16.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'core/images/favicon/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'core/images/favicon/favicon-16x16.png' %}">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+</head>
+<body>
+<!-- Skip to Main Content Link (for keyboard users) -->
+<a href="#main-content" class="skip-to-main">Skip to main content</a>
+
+<!-- Dyslexia Overlay -->
+<div id="dyslexiaOverlay" class="dyslexia-overlay" style="display: none;"></div>
+
+<!-- Accessibility Toolbar Button -->
+<button class="accessibility-toggle" id="accessibilityToggle" aria-label="Open accessibility menu" title="Accessibility">
+    <i class="fas fa-universal-access"></i>
+</button>
+
+<!-- Accessibility Panel -->
+<div class="accessibility-panel" id="accessibilityPanel">
+    <div class="accessibility-panel-header">
+        <h5 class="mb-0">Accessibility Options</h5>
+        <button class="btn-close" id="closeAccessibility" aria-label="Close accessibility menu"></button>
+    </div>
+    <div class="accessibility-panel-body">
+        <!-- MOST COMMON: Theme Toggle -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="themeToggleCheckbox" class="accessibility-checkbox">
+                <span><i class="fas fa-moon" id="themeIconPanel"></i> Dark Mode</span>
+            </label>
+        </div>
+
+        <!-- MOST COMMON: Text Size Toggle -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="largTextToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-text-height"></i> Large Text</span>
+            </label>
+        </div>
+
+        <!-- MOST COMMON: High Contrast Mode -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="highContrastToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-adjust"></i> High Contrast</span>
+            </label>
+        </div>
+
+        <!-- COMMON: Widgit Symbols -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="widgitToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-icons"></i> Show Symbols</span>
+            </label>
+        </div>
+
+        <!-- COMMON: Dyslexia Mode -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="dyslexiaToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-eye"></i> Dyslexia Friendly</span>
+            </label>
+            <div id="dyslexiaOptions" class="accessibility-sub-options" style="display: none; margin-top: 10px;">
+                <label class="small">Choose overlay color:</label>
+                <div class="dyslexia-color-options">
+                    <button class="dyslexia-color" data-color="#fff5cc" title="Yellow" style="background-color: #fff5cc;"></button>
+                    <button class="dyslexia-color" data-color="#d4e7f5" title="Blue" style="background-color: #d4e7f5;"></button>
+                    <button class="dyslexia-color" data-color="#d4f1d4" title="Green" style="background-color: #d4f1d4;"></button>
+                    <button class="dyslexia-color" data-color="#f5d4e7" title="Pink" style="background-color: #f5d4e7;"></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMMON: Reading Guide -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="readingGuideToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-ruler-horizontal"></i> Reading Guide</span>
+            </label>
+        </div>
+
+        <!-- MODERATE: Text to Speech -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="textToSpeechToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-volume-up"></i> Text to Speech</span>
+            </label>
+            <div id="ttsControls" class="accessibility-sub-options" style="display: none; margin-top: 10px;">
+                <button id="speakPageBtn" class="btn btn-sm btn-outline-primary w-100 mb-2">
+                    <i class="fas fa-book-reader"></i> Read Entire Page
+                </button>
+                <button id="stopSpeakBtn" class="btn btn-sm btn-outline-secondary w-100">
+                    <i class="fas fa-stop"></i> Stop Reading
+                </button>
+            </div>
+        </div>
+
+        <!-- MODERATE: TTS Speed Control -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <span><i class="fas fa-tachometer-alt"></i> Speech Speed</span>
+            </label>
+            <div class="mt-2">
+                <input type="range" id="ttsSpeedSlider" min="0.5" max="2" step="0.1" value="1" class="form-range">
+                <small class="d-block text-center"><span id="ttsSpeedValue">1.0</span>x</small>
+            </div>
+        </div>
+
+        <!-- MODERATE: Reduced Motion -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="reducedMotionToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-ban"></i> Reduce Motion</span>
+            </label>
+        </div>
+
+        <!-- MODERATE: Underline Links -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="underlineLinksToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-link"></i> Underline All Links</span>
+            </label>
+        </div>
+
+        <!-- LESS COMMON: Speech to Text -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="speechToTextToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-microphone"></i> Voice Commands</span>
+            </label>
+            <div id="sttControls" class="accessibility-sub-options" style="display: none; margin-top: 10px;">
+                <button id="startListeningBtn" class="btn btn-sm btn-outline-success w-100">
+                    <i class="fas fa-microphone"></i> Start Listening
+                </button>
+                <p id="sttResult" class="small mt-2" style="display: none;"></p>
+            </div>
+        </div>
+
+        <!-- LESS COMMON: Focus Mode -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="focusModeToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-crosshairs"></i> Focus Mode</span>
+            </label>
+        </div>
+
+        <!-- LESS COMMON: Letter Spacing -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <span><i class="fas fa-text-width"></i> Letter Spacing</span>
+            </label>
+            <div class="mt-2">
+                <input type="range" id="letterSpacingSlider" min="0" max="5" step="0.5" value="0" class="form-range">
+                <small class="d-block text-center"><span id="letterSpacingValue">0</span>px</small>
+            </div>
+        </div>
+
+        <!-- LESS COMMON: Word Spacing -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <span><i class="fas fa-arrows-alt-h"></i> Word Spacing</span>
+            </label>
+            <div class="mt-2">
+                <input type="range" id="wordSpacingSlider" min="0" max="10" step="1" value="0" class="form-range">
+                <small class="d-block text-center"><span id="wordSpacingValue">0</span>px</small>
+            </div>
+        </div>
+
+        <!-- SPECIALIZED: Color Blindness Filters -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <span><i class="fas fa-eye-dropper"></i> Color Blindness Filter</span>
+            </label>
+            <select id="colorBlindnessFilter" class="form-select form-select-sm mt-2">
+                <option value="none">None</option>
+                <option value="protanopia">Protanopia (Red-Blind)</option>
+                <option value="deuteranopia">Deuteranopia (Green-Blind)</option>
+                <option value="tritanopia">Tritanopia (Blue-Blind)</option>
+                <option value="achromatopsia">Achromatopsia (Total)</option>
+            </select>
+        </div>
+
+        <!-- SPECIALIZED: Pause All Media -->
+        <div class="accessibility-option">
+            <button id="pauseAllMediaBtn" class="btn btn-sm btn-outline-warning w-100">
+                <i class="fas fa-pause-circle"></i> Pause All Media
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Reading Guide Element -->
+<div id="readingGuide" class="reading-guide" style="display: none;"></div>
+
+<!-- ARIA Live Region for announcements -->
+<div id="ariaLiveRegion" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+<header class="mb-3">
+    <div class="bg-light py-1 px-3 d-flex flex-column flex-md-row justify-content-center justify-content-md-between align-items-center small gap-2">
+        <div class="fw-semibold">Inclusive Quest Education</div>
+        <div>
+            {% if user.is_authenticated %}
+                <span class="me-2">Welcome, {{ user.username }}</span>
+                <a class="link-primary" href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <a class="link-primary me-2" href="{% url 'login' %}">Login</a>
+                <a class="link-primary" href="{% url 'register' %}">Register</a>
+            {% endif %}
+        </div>
+    </div>
+    <nav class="navbar navbar-light bg-light border-top">
+        <div class="container-fluid d-flex align-items-center gap-3">
+            <div class="dropdown">
+                <a class="navbar-brand d-flex align-items-center dropdown-toggle" href="#" id="brandMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="{% static 'core/images/inq-ed-logo.png' %}" alt="Logo" class="img-fluid" style="max-height: 64px;">
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="brandMenu">
+                    <li><a class="dropdown-item" href="{% url 'home' %}">Home</a></li>
+                    <li><a class="dropdown-item" href="{% url 'about' %}">About</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li class="dropdown-submenu">
+                        <a class="dropdown-item dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Platforms
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="dropdown-submenu">
+                                <a class="dropdown-item dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    WonderWorld
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="{% url 'kindlewick' %}">Kindle Wick</a></li>
+                                </ul>
+                            </li>
+                            <li><a class="dropdown-item" href="{% url 'questopia' %}">Questopia</a></li>
+                        </ul>
+                    </li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'pricing' %}">Pricing</a></li>
+                    <li><a class="dropdown-item" href="{% url 'teacher_hub' %}">Teacher Hub</a></li>
+                    <li><a class="dropdown-item" href="{% url 'contact' %}">Contact</a></li>
+                </ul>
+            </div>
+
+            <a class="btn btn-primary ms-auto" href="{% url 'signup' %}">Get Started</a>
+        </div>
+    </nav>
+</header>
+<main id="main-content" tabindex="-1">
+    {% block content %}{% endblock %}
+</main>
+<footer class="text-center py-4 mt-4 border-top">
+    <p class="mb-0">&copy; 2024 Inclusive Quest Education</p>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// Theme Toggle Functionality
+const themeToggleCheckbox = document.getElementById('themeToggleCheckbox');
+const themeIconPanel = document.getElementById('themeIconPanel');
+const html = document.documentElement;
+
+// Check for saved theme preference or default to light
+const currentTheme = localStorage.getItem('theme') || 'light';
+if (currentTheme === 'dark') {
+    html.setAttribute('data-theme', 'dark');
+    themeToggleCheckbox.checked = true;
+    updateThemeIcon('dark');
+} else {
+    html.removeAttribute('data-theme');
+    themeToggleCheckbox.checked = false;
+    updateThemeIcon('light');
+}
+
+function updateThemeIcon(theme) {
+    if (theme === 'dark') {
+        themeIconPanel.classList.remove('fa-moon');
+        themeIconPanel.classList.add('fa-sun');
+    } else {
+        themeIconPanel.classList.remove('fa-sun');
+        themeIconPanel.classList.add('fa-moon');
+    }
+}
+
+// Theme toggle checkbox in accessibility panel
+themeToggleCheckbox.addEventListener('change', function() {
+    if (this.checked) {
+        html.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        updateThemeIcon('dark');
+    } else {
+        html.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        updateThemeIcon('light');
+    }
+})
+
+// Accessibility Features
+const accessibilityToggle = document.getElementById('accessibilityToggle');
+const accessibilityPanel = document.getElementById('accessibilityPanel');
+const closeAccessibility = document.getElementById('closeAccessibility');
+const largTextToggle = document.getElementById('largTextToggle');
+const dyslexiaToggle = document.getElementById('dyslexiaToggle');
+const dyslexiaOptions = document.getElementById('dyslexiaOptions');
+const dyslexiaOverlay = document.getElementById('dyslexiaOverlay');
+const dyslexiaColorBtns = document.querySelectorAll('.dyslexia-color');
+const textToSpeechToggle = document.getElementById('textToSpeechToggle');
+const ttsControls = document.getElementById('ttsControls');
+const speakPageBtn = document.getElementById('speakPageBtn');
+const stopSpeakBtn = document.getElementById('stopSpeakBtn');
+const speechToTextToggle = document.getElementById('speechToTextToggle');
+const sttControls = document.getElementById('sttControls');
+const startListeningBtn = document.getElementById('startListeningBtn');
+const sttResult = document.getElementById('sttResult');
+
+// Accessibility Toggle Panel
+accessibilityToggle.addEventListener('click', () => {
+    accessibilityPanel.classList.toggle('active');
+    if (accessibilityPanel.classList.contains('active')) {
+        // Focus first focusable element in panel when opened
+        setTimeout(() => {
+            const firstFocusable = accessibilityPanel.querySelector('input, button, [tabindex]:not([tabindex="-1"])');
+            if (firstFocusable) firstFocusable.focus();
+        }, 100);
+    }
+});
+
+closeAccessibility.addEventListener('click', () => {
+    accessibilityPanel.classList.remove('active');
+    // Return focus to toggle button after closing
+    accessibilityToggle.focus();
+});
+
+// Keyboard Navigation for Accessibility Panel
+document.addEventListener('keydown', (e) => {
+    // Escape to close accessibility panel
+    if (e.key === 'Escape' && accessibilityPanel.classList.contains('active')) {
+        accessibilityPanel.classList.remove('active');
+        accessibilityToggle.focus();
+    }
+    
+    // Alt+A to toggle accessibility panel
+    if (e.altKey && e.key === 'a') {
+        e.preventDefault();
+        accessibilityToggle.click();
+    }
+});
+
+// Focus trap in accessibility panel (Tab key management)
+if (accessibilityPanel) {
+    const focusableElements = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+    
+    accessibilityPanel.addEventListener('keydown', (e) => {
+        if (e.key === 'Tab') {
+            const focusables = Array.from(accessibilityPanel.querySelectorAll(focusableElements));
+            const firstFocusable = focusables[0];
+            const lastFocusable = focusables[focusables.length - 1];
+            
+            if (e.shiftKey) {
+                // Shift + Tab: Move backwards
+                if (document.activeElement === firstFocusable) {
+                    e.preventDefault();
+                    lastFocusable.focus();
+                }
+            } else {
+                // Tab: Move forwards
+                if (document.activeElement === lastFocusable) {
+                    e.preventDefault();
+                    firstFocusable.focus();
+                }
+            }
+        }
+    });
+}
+
+// Large Text Toggle
+largTextToggle.addEventListener('change', function() {
+    if (this.checked) {
+        document.body.classList.add('large-text');
+        localStorage.setItem('largeText', 'true');
+    } else {
+        document.body.classList.remove('large-text');
+        localStorage.setItem('largeText', 'false');
+    }
+});
+
+// Dyslexia Mode
+dyslexiaToggle.addEventListener('change', function() {
+    dyslexiaOptions.style.display = this.checked ? 'block' : 'none';
+    if (this.checked) {
+        dyslexiaOverlay.style.display = 'block';
+        localStorage.setItem('dyslexiaMode', 'true');
+    } else {
+        dyslexiaOverlay.style.display = 'none';
+        localStorage.setItem('dyslexiaMode', 'false');
+    }
+});
+
+// Dyslexia Color Selection
+dyslexiaColorBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+        const color = this.dataset.color;
+        dyslexiaOverlay.style.backgroundColor = color;
+        localStorage.setItem('dyslexiaColor', color);
+    });
+});
+
+// Text to Speech
+let isTTSActive = false;
+
+textToSpeechToggle.addEventListener('change', function() {
+    isTTSActive = this.checked;
+    ttsControls.style.display = this.checked ? 'block' : 'none';
+    localStorage.setItem('textToSpeech', this.checked ? 'true' : 'false');
+    
+    if (isTTSActive) {
+        // Add click-to-speak cursor
+        document.body.style.cursor = 'pointer';
+        document.body.classList.add('tts-active');
+    } else {
+        // Remove click-to-speak cursor
+        document.body.style.cursor = 'default';
+        document.body.classList.remove('tts-active');
+        window.speechSynthesis.cancel();
+    }
+});
+
+// Click-to-speak functionality
+document.addEventListener('click', function(e) {
+    if (!isTTSActive) return;
+    
+    // Skip clicks on buttons and accessibility panel
+    const skipElements = ['button', 'input', '#accessibilityPanel', '.accessibility-toggle', '.navbar'];
+    const target = e.target;
+    
+    if (skipElements.some(selector => {
+        if (selector.startsWith('#') || selector.startsWith('.')) {
+            return target.closest(selector);
+        }
+        return target.tagName.toLowerCase() === selector;
+    })) {
+        return;
+    }
+    
+    // Prevent default click behavior while in TTS mode
+    if (target.closest('a, button, input, [role="button"]')) {
+        return;
+    }
+    
+    e.preventDefault();
+    
+    // Get text from clicked element or nearest container
+    let textToSpeak = '';
+    const selectedText = window.getSelection().toString().trim();
+    
+    if (selectedText) {
+        textToSpeak = selectedText;
+    } else {
+        let container = target;
+        // Find a meaningful text container
+        while (container && !textToSpeak.trim()) {
+            if (container.innerText && container.innerText.trim().length > 0) {
+                textToSpeak = container.innerText.trim();
+                // Don't read huge containers (entire sections)
+                if (textToSpeak.length > 500) {
+                    // Try parent instead
+                    container = container.parentElement;
+                    textToSpeak = '';
+                    continue;
+                }
+                break;
+            }
+            container = container.parentElement;
+        }
+    }
+    
+    if (textToSpeak && textToSpeak.length > 0) {
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        utterance.rate = ttsSpeed;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        window.speechSynthesis.speak(utterance);
+    }
+}, true);
+
+// "Read Entire Page" button - reads all main content
+speakPageBtn.addEventListener('click', () => {
+    // Get main content, skip nav and footer
+    const mainContent = document.getElementById('main-content');
+    const textToSpeak = mainContent ? mainContent.innerText : document.body.innerText;
+    
+    if (textToSpeak.trim()) {
+        const utterance = new SpeechSynthesisUtterance(textToSpeak);
+        utterance.rate = ttsSpeed;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        window.speechSynthesis.speak(utterance);
+    }
+});
+
+// "Stop Reading" button - stops all speech
+stopSpeakBtn.addEventListener('click', () => {
+    window.speechSynthesis.cancel();
+});
+
+// Speech to Text
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+
+speechToTextToggle.addEventListener('change', function() {
+    sttControls.style.display = this.checked ? 'block' : 'none';
+    localStorage.setItem('speechToText', this.checked ? 'true' : 'false');
+});
+
+startListeningBtn.addEventListener('click', () => {
+    sttResult.style.display = 'block';
+    sttResult.textContent = 'Listening...';
+    recognition.start();
+});
+
+recognition.addEventListener('result', (event) => {
+    let transcript = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+    }
+    sttResult.textContent = 'You said: ' + transcript;
+});
+
+recognition.addEventListener('error', () => {
+    sttResult.textContent = 'Error: Speech recognition failed';
+});
+
+// Load Saved Preferences
+function loadAccessibilityPreferences() {
+    if (localStorage.getItem('largeText') === 'true') {
+        largTextToggle.checked = true;
+        document.body.classList.add('large-text');
+    }
+    if (localStorage.getItem('dyslexiaMode') === 'true') {
+        dyslexiaToggle.checked = true;
+        dyslexiaOverlay.style.display = 'block';
+        dyslexiaOptions.style.display = 'block';
+        const savedColor = localStorage.getItem('dyslexiaColor') || '#fff5cc';
+        dyslexiaOverlay.style.backgroundColor = savedColor;
+    }
+    if (localStorage.getItem('textToSpeech') === 'true') {
+        textToSpeechToggle.checked = true;
+        ttsControls.style.display = 'block';
+        isTTSActive = true;
+        document.body.classList.add('tts-active');
+    }
+    if (localStorage.getItem('speechToText') === 'true') {
+        speechToTextToggle.checked = true;
+        sttControls.style.display = 'block';
+    }
+    if (localStorage.getItem('highContrast') === 'true') {
+        document.getElementById('highContrastToggle').checked = true;
+        document.body.classList.add('high-contrast');
+    }
+    if (localStorage.getItem('reducedMotion') === 'true') {
+        document.getElementById('reducedMotionToggle').checked = true;
+        document.body.classList.add('reduced-motion');
+    }
+    if (localStorage.getItem('readingGuide') === 'true') {
+        document.getElementById('readingGuideToggle').checked = true;
+        document.getElementById('readingGuide').style.display = 'block';
+        document.getElementById('readingGuideColors').style.display = 'block';
+    }
+    const savedReadingGuideColor = localStorage.getItem('readingGuideColor') || 'cream';
+    const readingGuide = document.getElementById('readingGuide');
+    readingGuide.classList.add('color-' + savedReadingGuideColor);
+    document.querySelector(`#readingGuideColors .color-btn[title="${savedReadingGuideColor.charAt(0).toUpperCase() + savedReadingGuideColor.slice(1)}"]`)?.classList.add('active');
+    if (localStorage.getItem('focusMode') === 'true') {
+        document.getElementById('focusModeToggle').checked = true;
+        document.body.classList.add('focus-mode');
+    }
+    if (localStorage.getItem('underlineLinks') === 'true') {
+        document.getElementById('underlineLinksToggle').checked = true;
+        document.body.classList.add('underline-links');
+    }
+    const savedLetterSpacing = localStorage.getItem('letterSpacing');
+    if (savedLetterSpacing) {
+        document.getElementById('letterSpacingSlider').value = savedLetterSpacing;
+        document.documentElement.style.setProperty('--custom-letter-spacing', savedLetterSpacing + 'px');
+        document.body.classList.add('custom-spacing');
+    }
+    const savedWordSpacing = localStorage.getItem('wordSpacing');
+    if (savedWordSpacing) {
+        document.getElementById('wordSpacingSlider').value = savedWordSpacing;
+        document.documentElement.style.setProperty('--custom-word-spacing', savedWordSpacing + 'px');
+        document.body.classList.add('custom-spacing');
+    }
+    const savedTTSSpeed = localStorage.getItem('ttsSpeed');
+    if (savedTTSSpeed) {
+        document.getElementById('ttsSpeedSlider').value = savedTTSSpeed;
+        document.getElementById('ttsSpeedValue').textContent = savedTTSSpeed;
+    }
+    const savedColorFilter = localStorage.getItem('colorBlindnessFilter');
+    if (savedColorFilter && savedColorFilter !== 'none') {
+        document.getElementById('colorBlindnessFilter').value = savedColorFilter;
+        document.body.classList.add('filter-' + savedColorFilter);
+    }
+    if (localStorage.getItem('widgitSymbols') === 'true') {
+        document.getElementById('widgitSymbolsToggle').checked = true;
+        document.body.classList.add('widgit-active');
+    }
+}
+
+// ========================================
+// Advanced Accessibility Features
+// ========================================
+
+// High Contrast Mode
+const highContrastToggle = document.getElementById('highContrastToggle');
+highContrastToggle.addEventListener('change', function() {
+    if (this.checked) {
+        document.body.classList.add('high-contrast');
+        localStorage.setItem('highContrast', 'true');
+        announceToScreenReader('High contrast mode enabled');
+    } else {
+        document.body.classList.remove('high-contrast');
+        localStorage.setItem('highContrast', 'false');
+        announceToScreenReader('High contrast mode disabled');
+    }
+});
+
+// Reduced Motion
+const reducedMotionToggle = document.getElementById('reducedMotionToggle');
+reducedMotionToggle.addEventListener('change', function() {
+    if (this.checked) {
+        document.body.classList.add('reduced-motion');
+        localStorage.setItem('reducedMotion', 'true');
+        announceToScreenReader('Reduced motion enabled');
+    } else {
+        document.body.classList.remove('reduced-motion');
+        localStorage.setItem('reducedMotion', 'false');
+        announceToScreenReader('Reduced motion disabled');
+    }
+});
+
+// Reading Guide
+const readingGuideToggle = document.getElementById('readingGuideToggle');
+const readingGuide = document.getElementById('readingGuide');
+const readingGuideColors = document.getElementById('readingGuideColors');
+let currentReadingGuideColor = 'cream';
+
+readingGuideToggle.addEventListener('change', function() {
+    if (this.checked) {
+        readingGuide.style.display = 'block';
+        readingGuideColors.style.display = 'block';
+        localStorage.setItem('readingGuide', 'true');
+        announceToScreenReader('Reading guide enabled');
+    } else {
+        readingGuide.style.display = 'none';
+        readingGuideColors.style.display = 'none';
+        localStorage.setItem('readingGuide', 'false');
+        announceToScreenReader('Reading guide disabled');
+    }
+});
+
+// Reading Guide Color Selection
+document.querySelectorAll('#readingGuideColors .color-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const color = btn.dataset.color;
+        const colorName = btn.title.toLowerCase();
+        
+        // Remove all color classes
+        readingGuide.classList.remove('color-cream', 'color-blue', 'color-pink', 'color-green');
+        
+        // Add selected color class
+        readingGuide.classList.add('color-' + colorName);
+        currentReadingGuideColor = colorName;
+        
+        // Update active state
+        document.querySelectorAll('#readingGuideColors .color-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        localStorage.setItem('readingGuideColor', colorName);
+        announceToScreenReader('Reading guide color changed to ' + colorName);
+    });
+});
+
+// Update reading guide position on mouse move
+document.addEventListener('mousemove', (e) => {
+    if (readingGuide.style.display === 'block') {
+        readingGuide.style.top = (e.clientY - 20) + 'px';
+    }
+});
+
+// TTS Speed Control
+const ttsSpeedSlider = document.getElementById('ttsSpeedSlider');
+const ttsSpeedValue = document.getElementById('ttsSpeedValue');
+let ttsSpeed = 1.0;
+
+ttsSpeedSlider.addEventListener('input', function() {
+    ttsSpeed = parseFloat(this.value);
+    ttsSpeedValue.textContent = ttsSpeed.toFixed(1);
+    localStorage.setItem('ttsSpeed', ttsSpeed);
+});
+
+// Update TTS functions to use speed
+function speakText(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = ttsSpeed;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    window.speechSynthesis.speak(utterance);
+}
+
+// Focus Mode
+const focusModeToggle = document.getElementById('focusModeToggle');
+focusModeToggle.addEventListener('change', function() {
+    if (this.checked) {
+        document.body.classList.add('focus-mode');
+        localStorage.setItem('focusMode', 'true');
+        announceToScreenReader('Focus mode enabled');
+        enableFocusMode();
+    } else {
+        document.body.classList.remove('focus-mode');
+        localStorage.setItem('focusMode', 'false');
+        announceToScreenReader('Focus mode disabled');
+        disableFocusMode();
+    }
+});
+
+function enableFocusMode() {
+    document.addEventListener('mouseover', highlightFocusedElement);
+}
+
+function disableFocusMode() {
+    document.removeEventListener('mouseover', highlightFocusedElement);
+    document.querySelectorAll('.focus-active').forEach(el => {
+        el.classList.remove('focus-active');
+    });
+}
+
+function highlightFocusedElement(e) {
+    document.querySelectorAll('.focus-active').forEach(el => {
+        el.classList.remove('focus-active');
+    });
+    const target = e.target.closest('p, h1, h2, h3, h4, h5, h6, section, article, div.card, li');
+    if (target) {
+        target.classList.add('focus-active');
+    }
+}
+
+// Underline All Links
+const underlineLinksToggle = document.getElementById('underlineLinksToggle');
+underlineLinksToggle.addEventListener('change', function() {
+    if (this.checked) {
+        document.body.classList.add('underline-links');
+        localStorage.setItem('underlineLinks', 'true');
+        announceToScreenReader('All links underlined');
+    } else {
+        document.body.classList.remove('underline-links');
+        localStorage.setItem('underlineLinks', 'false');
+        announceToScreenReader('Link underlines removed');
+    }
+});
+
+// Letter Spacing
+const letterSpacingSlider = document.getElementById('letterSpacingSlider');
+const letterSpacingValue = document.getElementById('letterSpacingValue');
+
+letterSpacingSlider.addEventListener('input', function() {
+    const value = this.value;
+    letterSpacingValue.textContent = value;
+    document.documentElement.style.setProperty('--custom-letter-spacing', value + 'px');
+    document.body.classList.add('custom-spacing');
+    localStorage.setItem('letterSpacing', value);
+});
+
+// Word Spacing
+const wordSpacingSlider = document.getElementById('wordSpacingSlider');
+const wordSpacingValue = document.getElementById('wordSpacingValue');
+
+wordSpacingSlider.addEventListener('input', function() {
+    const value = this.value;
+    wordSpacingValue.textContent = value;
+    document.documentElement.style.setProperty('--custom-word-spacing', value + 'px');
+    document.body.classList.add('custom-spacing');
+    localStorage.setItem('wordSpacing', value);
+});
+
+// Color Blindness Filters
+const colorBlindnessFilter = document.getElementById('colorBlindnessFilter');
+colorBlindnessFilter.addEventListener('change', function() {
+    // Remove all filter classes
+    document.body.classList.remove('filter-protanopia', 'filter-deuteranopia', 'filter-tritanopia', 'filter-achromatopsia');
+    
+    if (this.value !== 'none') {
+        document.body.classList.add('filter-' + this.value);
+        localStorage.setItem('colorBlindnessFilter', this.value);
+        announceToScreenReader(this.options[this.selectedIndex].text + ' filter enabled');
+    } else {
+        localStorage.setItem('colorBlindnessFilter', 'none');
+        announceToScreenReader('Color filter disabled');
+    }
+});
+
+// Pause All Media
+const pauseAllMediaBtn = document.getElementById('pauseAllMediaBtn');
+pauseAllMediaBtn.addEventListener('click', function() {
+    // Pause all videos
+    document.querySelectorAll('video').forEach(video => {
+        video.pause();
+    });
+    
+    // Pause all audio
+    document.querySelectorAll('audio').forEach(audio => {
+        audio.pause();
+    });
+    
+    // Stop all animations (optional)
+    if (!document.body.classList.contains('reduced-motion')) {
+        document.body.classList.add('reduced-motion');
+        setTimeout(() => {
+            document.body.classList.remove('reduced-motion');
+        }, 100);
+    }
+    
+    announceToScreenReader('All media paused');
+});
+
+// ARIA Live Region - Screen Reader Announcements
+function announceToScreenReader(message) {
+    const ariaLiveRegion = document.getElementById('ariaLiveRegion');
+    ariaLiveRegion.textContent = message;
+    
+    // Clear after a short delay
+    setTimeout(() => {
+        ariaLiveRegion.textContent = '';
+    }, 1000);
+}
+
+// Widgit Symbols Toggle
+const widgitToggle = document.getElementById('widgitToggle');
+widgitToggle.addEventListener('change', function() {
+    if (this.checked) {
+        document.body.classList.add('widgit-active');
+        localStorage.setItem('widgitSymbols', 'true');
+        announceToScreenReader('Widgit symbols enabled');
+    } else {
+        document.body.classList.remove('widgit-active');
+        localStorage.setItem('widgitSymbols', 'false');
+        announceToScreenReader('Widgit symbols disabled');
+    }
+});
+
+loadAccessibilityPreferences();
+</script>
+
+<!-- SVG Filters for Color Blindness Simulation -->
+<svg style="position: absolute; width: 0; height: 0;" aria-hidden="true">
+    <defs>
+        <!-- Protanopia (Red-Blind) -->
+        <filter id="protanopia-filter">
+            <feColorMatrix type="matrix" values="0.567, 0.433, 0,     0, 0
+                                                   0.558, 0.442, 0,     0, 0
+                                                   0,     0.242, 0.758, 0, 0
+                                                   0,     0,     0,     1, 0"/>
+        </filter>
+        
+        <!-- Deuteranopia (Green-Blind) -->
+        <filter id="deuteranopia-filter">
+            <feColorMatrix type="matrix" values="0.625, 0.375, 0,   0, 0
+                                                   0.7,   0.3,   0,   0, 0
+                                                   0,     0.3,   0.7, 0, 0
+                                                   0,     0,     0,   1, 0"/>
+        </filter>
+        
+        <!-- Tritanopia (Blue-Blind) -->
+        <filter id="tritanopia-filter">
+            <feColorMatrix type="matrix" values="0.95, 0.05,  0,     0, 0
+                                                   0,    0.433, 0.567, 0, 0
+                                                   0,    0.475, 0.525, 0, 0
+                                                   0,    0,     0,     1, 0"/>
+        </filter>
+    </defs>
+</svg>
+
+</body>
+</html>
