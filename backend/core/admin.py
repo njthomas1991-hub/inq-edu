@@ -27,21 +27,43 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('username', 'first_name', 'last_name', 'email')
     ordering = ('username',)
     
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Teachers only see students (role='student')
+        if not request.user.is_superuser and _is_teacher(request.user):
+            qs = qs.filter(role='student')
+        return qs
+    
     def has_view_permission(self, request, obj=None):
-        # Only superusers can view User admin
-        return request.user.is_superuser
+        # Superusers can view all users
+        if request.user.is_superuser:
+            return True
+        # Teachers can view students only
+        if _is_teacher(request.user):
+            return obj is None or obj.role == 'student'
+        return False
     
     def has_add_permission(self, request):
-        # Only superusers can add users
-        return request.user.is_superuser
+        # Superusers and teachers can add students
+        return request.user.is_superuser or _is_teacher(request.user)
     
     def has_change_permission(self, request, obj=None):
-        # Only superusers can change users
-        return request.user.is_superuser
+        # Superusers can change all users
+        if request.user.is_superuser:
+            return True
+        # Teachers can only change students
+        if _is_teacher(request.user):
+            return obj is None or obj.role == 'student'
+        return False
     
     def has_delete_permission(self, request, obj=None):
-        # Only superusers can delete users
-        return request.user.is_superuser
+        # Superusers can delete all users
+        if request.user.is_superuser:
+            return True
+        # Teachers can only delete students
+        if _is_teacher(request.user):
+            return obj is None or obj.role == 'student'
+        return False
 
 
 def _is_teacher(user):
