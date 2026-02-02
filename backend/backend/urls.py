@@ -18,16 +18,10 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import path, include
-from core import views
 
 urlpatterns = [
     path('', include('core.urls')),
-    path('login/', views.login, name='login'),
-    path('logout/', views.logout, name='logout'),
-    path('register/', views.register, name='register'),
-    path('about/', views.about, name='about'),
-    path('wonderworld/', views.wonderworld, name='wonderworld'),
-    path('questopia/', views.questopia, name='questopia'),
+]
     path('kindlewick/', views.kindlewick, name='kindlewick'),
     path('pricing/', views.pricing, name='pricing'),
     path('teacher_hub/', views.teacher_hub, name='teacher_hub'),
