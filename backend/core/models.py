@@ -48,3 +48,17 @@ class ClassStudent(models.Model):
 
     def __str__(self):
         return f"{self.student.username} in {self.class_obj.name}"
+
+
+# Superuser Model - School admins who can access multiple teachers' data
+class Superuser(models.Model):
+    teacher = models.OneToOneField(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='superuser_profile')
+    school = models.CharField(max_length=255)
+    can_access_all_teachers = models.BooleanField(default=True, help_text="Access all teachers' data in the same school")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = "Superusers"
+
+    def __str__(self):
+        return f"{self.teacher.get_full_name() or self.teacher.username} (Admin) - {self.school}"

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Class, ClassStudent
+from .models import User, Class, ClassStudent, Superuser
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 
@@ -11,7 +11,7 @@ class UserAdmin(BaseUserAdmin):
         (None, {'fields': ('username', 'password')}),
         ('Personal Info', {'fields': ('first_name', 'last_name', 'email')}),
         ('Account', {'fields': ('role', 'school')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active')}),
     )
     add_fieldsets = (
         (None, {
@@ -55,6 +55,19 @@ class ClassStudentAdmin(admin.ModelAdmin):
     list_filter = ('date_joined', 'class_obj')
     search_fields = ('student__username', 'class_obj__name')
     readonly_fields = ('date_joined',)
+
+
+@admin.register(Superuser)
+class SuperuserAdmin(admin.ModelAdmin):
+    list_display = ('teacher', 'school', 'can_access_all_teachers', 'created_at')
+    list_filter = ('school', 'can_access_all_teachers', 'created_at')
+    search_fields = ('teacher__username', 'teacher__first_name', 'teacher__last_name', 'school')
+    readonly_fields = ('created_at',)
+    fieldsets = (
+        ('School Admin Info', {'fields': ('teacher', 'school')}),
+        ('Permissions', {'fields': ('can_access_all_teachers',)}),
+        ('Metadata', {'fields': ('created_at',)}),
+    )
 
 
 admin.site.register(User, UserAdmin)
