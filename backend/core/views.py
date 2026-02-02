@@ -42,6 +42,10 @@ def questopia_page_view(request):
 def pricing_page_view(request):
     return HttpResponse("Pricing")
 
+
+def teacher_hub_view(request):
+    return HttpResponse("Teacher Hub")
+
 @api_view(['GET'])
 def hello(request):
     return Response({"message": "Hello from Django API!"})
