@@ -1,1 +1,1 @@
-web: export PYTHONPATH=/app/backend:$PYTHONPATH && python manage.py migrate && gunicorn --bind 0.0.0.0:$PORT backend.backend.wsgi:application
+web: bash start.sh
