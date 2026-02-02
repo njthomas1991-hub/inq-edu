@@ -23,12 +23,24 @@ class UserAdmin(BaseUserAdmin):
     ordering = ('username',)
 
 
+class ClassStudentInline(admin.TabularInline):
+    model = ClassStudent
+    extra = 1
+    readonly_fields = ('date_joined',)
+    fields = ('student', 'date_joined')
+
+
 @admin.register(Class)
 class ClassAdmin(admin.ModelAdmin):
-    list_display = ('name', 'teacher', 'subject', 'year_ks', 'created_at')
+    list_display = ('name', 'teacher', 'subject', 'year_ks', 'get_student_count', 'created_at')
     list_filter = ('year_ks', 'subject', 'created_at')
     search_fields = ('name', 'teacher__username', 'subject')
     readonly_fields = ('created_at',)
+    inlines = [ClassStudentInline]
+    
+    def get_student_count(self, obj):
+        return obj.students.count()
+    get_student_count.short_description = 'Students'
     
     def get_queryset(self, request):
         qs = super().get_queryset(request)
