@@ -1,11 +1,12 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import home_page_view, about_page_view, kindlewick_page_view, hello, teacher_dashboard_view, teacher_signup_view, student_signup_view, student_signup_with_details_view, create_student_account_view, class_detail_view, add_class_view
+from .views import home_page_view, about_page_view, kindlewick_page_view, questopia_page_view, hello, teacher_dashboard_view, teacher_signup_view, student_signup_view, student_signup_with_details_view, create_student_account_view, class_detail_view, add_class_view
 
 urlpatterns = [
     path("", home_page_view, name="home"),
     path("about/", about_page_view, name="about"),
     path("kindlewick/", kindlewick_page_view, name="kindlewick"),
+    path("questopia/", questopia_page_view, name="questopia"),
     path("api/hello/", hello),
     path("teacher/signup/", teacher_signup_view, name="signup"),
     path("student/signup/", student_signup_view, name="student_signup"),

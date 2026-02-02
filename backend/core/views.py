@@ -34,6 +34,10 @@ def about_page_view(request):
 def kindlewick_page_view(request):
     return HttpResponse("Kindle Wick")
 
+
+def questopia_page_view(request):
+    return HttpResponse("Questopia")
+
 @api_view(['GET'])
 def hello(request):
     return Response({"message": "Hello from Django API!"})
