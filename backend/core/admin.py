@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import User, Class, ClassStudent, Superuser
+from .models import User, Class, ClassStudent, SchoolAnalyticsProfile
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
 
@@ -57,8 +57,8 @@ class ClassStudentAdmin(admin.ModelAdmin):
     readonly_fields = ('date_joined',)
 
 
-@admin.register(Superuser)
-class SuperuserAdmin(admin.ModelAdmin):
+@admin.register(SchoolAnalyticsProfile)
+class SchoolAnalyticsProfileAdmin(admin.ModelAdmin):
     list_display = ('teacher', 'school', 'can_access_all_teachers', 'created_at')
     list_filter = ('school', 'can_access_all_teachers', 'created_at')
     search_fields = ('teacher__username', 'teacher__first_name', 'teacher__last_name', 'school')
