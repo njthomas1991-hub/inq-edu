@@ -139,8 +139,10 @@ def create_student_account_view(request):
                 last_name=last_name,
                 role='student'
             )
-            login(request, user)
-            return redirect("student_dashboard")
+            return render(request, "core/student_account_created.html", {
+                "username": username,
+                "password": password,
+            })
     
     return redirect("student_signup_guided")
 
