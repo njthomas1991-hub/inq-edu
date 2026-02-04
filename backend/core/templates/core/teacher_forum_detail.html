@@ -1,0 +1,60 @@
+{% extends "core/base_teacher.html" %}
+
+{% block title %}{{ post.title }} - Community Forum{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a class="btn btn-link px-0 mb-3" href="{% url 'teacher_forum' %}"><i class="fas fa-arrow-left"></i> Back to Forum</a>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 class="h4">{{ post.title }}</h1>
+                    <div class="text-muted small">By {{ post.author.get_full_name|default:post.author.username }} · {{ post.created_at|date:"M d, Y" }}</div>
+                </div>
+                <div>
+                    {% if post.is_pinned %}<span class="badge bg-warning text-dark me-1">Pinned</span>{% endif %}
+                    {% if post.is_locked %}<span class="badge bg-danger">Locked</span>{% endif %}
+                </div>
+            </div>
+            <hr>
+            <div class="content">
+                {{ post.content|linebreaks }}
+            </div>
+        </div>
+    </div>
+
+    <h5 class="mb-3">Replies ({{ post.replies_count }})</h5>
+    {% if post.replies.count %}
+        <div class="list-group mb-4">
+            {% for reply in post.replies.all %}
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <strong>{{ reply.author.get_full_name|default:reply.author.username }}</strong>
+                        <small class="text-muted">{{ reply.created_at|date:"M d, Y" }}</small>
+                    </div>
+                    <div class="mt-2">{{ reply.content|linebreaks }}</div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">No replies yet.</div>
+    {% endif %}
+
+    {% if post.is_locked %}
+        <div class="alert alert-warning">This thread is locked. Replies are disabled.</div>
+    {% else %}
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">Add a Reply</h5>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">{{ reply_form.content.label_tag }}{{ reply_form.content }}</div>
+                    <button class="btn btn-primary" type="submit">Post Reply</button>
+                </form>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -3,8 +3,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.contrib.auth.forms import UserCreationForm
 from django import forms
-from django.shortcuts import render, redirect
-from .models import User, Class, ClassStudent
+from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Q, F
+from .models import (
+    User, Class, ClassStudent,
+    NewsAnnouncement, HelpTutorial, TeachingResource,
+    ForumPost, ForumReply
+)
 import string
 import random
 
@@ -18,6 +23,40 @@ class ClassForm(forms.ModelForm):
             'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Subject'}),
             'year_ks': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 4}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Optional description'}),
+        }
+
+
+class TeachingResourceForm(forms.ModelForm):
+    class Meta:
+        model = TeachingResource
+        fields = ('title', 'content', 'excerpt', 'resource_type', 'key_stage', 'subject', 'status')
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Resource title'}),
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 6, 'placeholder': 'Describe the resource'}),
+            'excerpt': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Short summary'}),
+            'resource_type': forms.Select(attrs={'class': 'form-select'}),
+            'key_stage': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 4}),
+            'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Subject (optional)'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
+        }
+
+
+class ForumPostForm(forms.ModelForm):
+    class Meta:
+        model = ForumPost
+        fields = ('title', 'content')
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Discussion title'}),
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Start the discussion...'}),
+        }
+
+
+class ForumReplyForm(forms.ModelForm):
+    class Meta:
+        model = ForumReply
+        fields = ('content',)
+        widgets = {
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Write your reply...'}),
         }
 
 from rest_framework.decorators import api_view
@@ -306,5 +345,159 @@ def add_class_view(request):
         form = ClassForm()
 
     return render(request, "core/add_class.html", {"form": form})
+
+
+@login_required
+def teacher_news_list_view(request):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    if request.user.is_superuser:
+        news_items = NewsAnnouncement.objects.all()
+    else:
+        news_items = NewsAnnouncement.objects.filter(status='published')
+
+    return render(request, "core/teacher_news_list.html", {
+        "news_items": news_items,
+    })
+
+
+@login_required
+def teacher_news_detail_view(request, slug):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    if request.user.is_superuser:
+        news_item = get_object_or_404(NewsAnnouncement, slug=slug)
+    else:
+        news_item = get_object_or_404(NewsAnnouncement, slug=slug, status='published')
+
+    return render(request, "core/teacher_news_detail.html", {
+        "news_item": news_item,
+    })
+
+
+@login_required
+def teacher_help_list_view(request):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    if request.user.is_superuser:
+        tutorials = HelpTutorial.objects.all()
+    else:
+        tutorials = HelpTutorial.objects.filter(status='published')
+
+    return render(request, "core/teacher_help_list.html", {
+        "tutorials": tutorials,
+    })
+
+
+@login_required
+def teacher_help_detail_view(request, slug):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    if request.user.is_superuser:
+        tutorial = get_object_or_404(HelpTutorial, slug=slug)
+    else:
+        tutorial = get_object_or_404(HelpTutorial, slug=slug, status='published')
+
+    return render(request, "core/teacher_help_detail.html", {
+        "tutorial": tutorial,
+    })
+
+
+@login_required
+def teacher_resources_list_view(request):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    resources = TeachingResource.objects.filter(
+        Q(status='published') | Q(author=request.user)
+    ).distinct()
+
+    if request.method == "POST":
+        form = TeachingResourceForm(request.POST)
+        if form.is_valid():
+            resource = form.save(commit=False)
+            resource.author = request.user
+            resource.save()
+            form.save_m2m()
+            return redirect("teacher_resources")
+    else:
+        form = TeachingResourceForm()
+
+    return render(request, "core/teacher_resources_list.html", {
+        "resources": resources,
+        "form": form,
+    })
+
+
+@login_required
+def teacher_resource_detail_view(request, slug):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    resource = get_object_or_404(
+        TeachingResource,
+        slug=slug,
+    )
+
+    if resource.status != 'published' and resource.author != request.user and not request.user.is_superuser:
+        return HttpResponseForbidden("You don't have access to this resource")
+
+    return render(request, "core/teacher_resource_detail.html", {
+        "resource": resource,
+    })
+
+
+@login_required
+def teacher_forum_list_view(request):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    posts = ForumPost.objects.all()
+
+    if request.method == "POST":
+        form = ForumPostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            return redirect("teacher_forum")
+    else:
+        form = ForumPostForm()
+
+    return render(request, "core/teacher_forum_list.html", {
+        "posts": posts,
+        "form": form,
+    })
+
+
+@login_required
+def teacher_forum_detail_view(request, post_id):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    post = get_object_or_404(ForumPost, id=post_id)
+
+    if request.method == "POST":
+        if post.is_locked:
+            return HttpResponseForbidden("This thread is locked")
+        reply_form = ForumReplyForm(request.POST)
+        if reply_form.is_valid():
+            reply = reply_form.save(commit=False)
+            reply.author = request.user
+            reply.post = post
+            reply.save()
+            return redirect("teacher_forum_detail", post_id=post.id)
+    else:
+        reply_form = ForumReplyForm()
+        ForumPost.objects.filter(id=post_id).update(views=F('views') + 1)
+
+    return render(request, "core/teacher_forum_detail.html", {
+        "post": post,
+        "reply_form": reply_form,
+    })
 
 

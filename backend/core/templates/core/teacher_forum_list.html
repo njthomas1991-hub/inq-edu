@@ -1,0 +1,48 @@
+{% extends "core/base_teacher.html" %}
+
+{% block title %}Community Forum - Teacher Hub{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h3 mb-1">Community Forum</h1>
+            <p class="text-muted mb-0">Ask questions and share ideas with other teachers.</p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#forumForm" aria-expanded="false">
+            <i class="fas fa-plus"></i> Start Discussion
+        </button>
+    </div>
+
+    <div class="collapse mb-4" id="forumForm">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title">New Forum Post</h5>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">{{ form.title.label_tag }}{{ form.title }}</div>
+                    <div class="mb-3">{{ form.content.label_tag }}{{ form.content }}</div>
+                    <button class="btn btn-success" type="submit">Post</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {% if posts %}
+        <div class="list-group shadow-sm">
+            {% for post in posts %}
+                <a class="list-group-item list-group-item-action" href="{% url 'teacher_forum_detail' post.id %}">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{% if post.is_pinned %}<i class="fas fa-thumbtack text-warning"></i>{% endif %} {{ post.title }}</h5>
+                        <small class="text-muted">{{ post.updated_at|date:"M d, Y" }}</small>
+                    </div>
+                    <p class="mb-1 text-muted">{{ post.content|truncatewords:24 }}</p>
+                    <small class="text-muted">By {{ post.author.get_full_name|default:post.author.username }} · {{ post.replies_count }} replies · {{ post.views }} views</small>
+                </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">No discussions yet. Start the first one!</div>
+    {% endif %}
+</div>
+{% endblock %}
