@@ -218,7 +218,7 @@ def class_detail_view(request, class_id):
     if class_obj.teacher_id != request.user.id:
         return HttpResponseForbidden("You don't have access to this class")
 
-    students = class_obj.students.all().select_related('student')
+    students = class_obj.students.all().select_related('student').order_by('student__first_name', 'student__last_name')
     teacher_classes = Class.objects.filter(teacher=request.user)
 
     return render(request, "core/class_detail.html", {
