@@ -376,12 +376,17 @@ footer {
     z-index: 999;
     padding: 30px 20px;
     overflow-y: auto;
-    transition: left 0.3s ease;
+    transition: left 0.3s ease, visibility 0s 0.3s, opacity 0.3s ease;
     border-right: 1px solid var(--theme-border);
+    visibility: hidden;
+    opacity: 0;
 }
 
 .accessibility-panel.active {
     left: 0;
+    visibility: visible;
+    opacity: 1;
+    transition: left 0.3s ease, visibility 0s, opacity 0.3s ease;
 }
 
 .accessibility-panel h3 {
