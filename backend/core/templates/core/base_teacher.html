@@ -16,6 +16,197 @@
     <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
 </head>
 <body class="bg-light">
+<!-- Skip to Main Content Link (for keyboard users) -->
+<a href="#main-content" class="skip-to-main">Skip to main content</a>
+
+<!-- Dyslexia Overlay -->
+<div id="dyslexiaOverlay" class="dyslexia-overlay" style="display: none;"></div>
+
+<!-- Accessibility Toolbar Button -->
+<button class="accessibility-toggle" id="accessibilityToggle" aria-label="Open accessibility menu" title="Accessibility">
+    <i class="fas fa-universal-access"></i>
+</button>
+
+<!-- Accessibility Panel -->
+<div class="accessibility-panel" id="accessibilityPanel">
+    <div class="accessibility-panel-header">
+        <h5 class="mb-0">Accessibility Options</h5>
+        <button class="btn-close" id="closeAccessibility" aria-label="Close accessibility menu"></button>
+    </div>
+    <div class="accessibility-panel-body">
+        <!-- MOST COMMON: Theme Toggle -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="themeToggleCheckbox" class="accessibility-checkbox">
+                <span><i class="fas fa-moon" id="themeIconPanel"></i> Dark Mode</span>
+            </label>
+        </div>
+
+        <!-- MOST COMMON: Text Size Toggle -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="largTextToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-text-height"></i> Large Text</span>
+            </label>
+        </div>
+
+        <!-- MOST COMMON: High Contrast Mode -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="highContrastToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-adjust"></i> High Contrast</span>
+            </label>
+        </div>
+
+        <!-- COMMON: Widgit Symbols -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="widgitToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-icons"></i> Show Symbols</span>
+            </label>
+        </div>
+
+        <!-- COMMON: Dyslexia Mode -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="dyslexiaToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-eye"></i> Dyslexia Friendly</span>
+            </label>
+            <div id="dyslexiaOptions" class="accessibility-sub-options" style="display: none; margin-top: 10px;">
+                <label class="small">Choose overlay color:</label>
+                <div class="dyslexia-color-options">
+                    <button class="dyslexia-color" data-color="#fff5cc" title="Yellow" style="background-color: #fff5cc;"></button>
+                    <button class="dyslexia-color" data-color="#d4e7f5" title="Blue" style="background-color: #d4e7f5;"></button>
+                    <button class="dyslexia-color" data-color="#d4f1d4" title="Green" style="background-color: #d4f1d4;"></button>
+                    <button class="dyslexia-color" data-color="#f5d4e7" title="Pink" style="background-color: #f5d4e7;"></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COMMON: Reading Guide -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="readingGuideToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-ruler-horizontal"></i> Reading Guide</span>
+            </label>
+        </div>
+
+        <!-- MODERATE: Text to Speech -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="textToSpeechToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-volume-up"></i> Text to Speech</span>
+            </label>
+            <div id="ttsControls" class="accessibility-sub-options" style="display: none; margin-top: 10px;">
+                <button id="speakPageBtn" class="btn btn-sm btn-outline-primary w-100 mb-2">
+                    <i class="fas fa-book-reader"></i> Read Entire Page
+                </button>
+                <button id="stopSpeakBtn" class="btn btn-sm btn-outline-secondary w-100">
+                    <i class="fas fa-stop"></i> Stop Reading
+                </button>
+            </div>
+        </div>
+
+        <!-- MODERATE: TTS Speed Control -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <span><i class="fas fa-tachometer-alt"></i> Speech Speed</span>
+            </label>
+            <div class="mt-2">
+                <input type="range" id="ttsSpeedSlider" min="0.5" max="2" step="0.1" value="1" class="form-range">
+                <small class="d-block text-center"><span id="ttsSpeedValue">1.0</span>x</small>
+            </div>
+        </div>
+
+        <!-- MODERATE: Reduced Motion -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="reducedMotionToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-ban"></i> Reduce Motion</span>
+            </label>
+        </div>
+
+        <!-- MODERATE: Underline Links -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="underlineLinksToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-link"></i> Underline All Links</span>
+            </label>
+        </div>
+
+        <!-- LESS COMMON: Speech to Text -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="speechToTextToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-microphone"></i> Voice Commands</span>
+            </label>
+            <div id="sttControls" class="accessibility-sub-options" style="display: none; margin-top: 10px;">
+                <button id="startListeningBtn" class="btn btn-sm btn-outline-success w-100">
+                    <i class="fas fa-microphone"></i> Start Listening
+                </button>
+                <p id="sttResult" class="small mt-2" style="display: none;"></p>
+            </div>
+        </div>
+
+        <!-- LESS COMMON: Focus Mode -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="focusModeToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-crosshairs"></i> Focus Mode</span>
+            </label>
+        </div>
+
+        <!-- LESS COMMON: Letter Spacing -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <span><i class="fas fa-text-width"></i> Letter Spacing</span>
+            </label>
+            <div class="mt-2">
+                <input type="range" id="letterSpacingSlider" min="0" max="5" step="0.5" value="0" class="form-range">
+                <small class="d-block text-center"><span id="letterSpacingValue">0</span>px</small>
+            </div>
+        </div>
+
+        <!-- LESS COMMON: Word Spacing -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <span><i class="fas fa-arrows-alt-h"></i> Word Spacing</span>
+            </label>
+            <div class="mt-2">
+                <input type="range" id="wordSpacingSlider" min="0" max="10" step="1" value="0" class="form-range">
+                <small class="d-block text-center"><span id="wordSpacingValue">0</span>px</small>
+            </div>
+        </div>
+
+        <!-- SPECIALIZED: Color Blindness Filters -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <span><i class="fas fa-eye-dropper"></i> Color Blindness Filter</span>
+            </label>
+            <select id="colorBlindnessFilter" class="form-select form-select-sm mt-2">
+                <option value="none">None</option>
+                <option value="protanopia">Protanopia (Red-Blind)</option>
+                <option value="deuteranopia">Deuteranopia (Green-Blind)</option>
+                <option value="tritanopia">Tritanopia (Blue-Blind)</option>
+                <option value="achromatopsia">Achromatopsia (Total)</option>
+            </select>
+        </div>
+
+        <!-- SPECIALIZED: Pause All Media -->
+        <div class="accessibility-option">
+            <button id="pauseAllMediaBtn" class="btn btn-sm btn-outline-warning w-100">
+                <i class="fas fa-pause-circle"></i> Pause All Media
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Reading Guide Element -->
+<div id="readingGuide" class="reading-guide" style="display: none;"></div>
+
+<!-- ARIA Live Region for announcements -->
+<div id="ariaLiveRegion" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
     <!-- Teacher Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
@@ -108,6 +299,7 @@
 
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'core/js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
