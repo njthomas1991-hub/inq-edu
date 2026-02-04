@@ -1,11 +1,36 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
-from .models import User, Class, ClassStudent, SchoolAnalyticsProfile
+from .models import User, Class, ClassStudent, SchoolAnalyticsProfile, Post
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django_summernote.admin import SummernoteModelAdmin
 
 
 # Unregister the Group model from admin
 admin.site.unregister(Group)
+
+
+@admin.register(Post)
+class PostAdmin(SummernoteModelAdmin):
+    list_display = ('title', 'category', 'author', 'status', 'featured', 'published_at', 'created_at')
+    list_filter = ('status', 'category', 'featured', 'created_at')
+    search_fields = ('title', 'content', 'excerpt')
+    prepopulated_fields = {'slug': ('title',)}
+    summernote_fields = ('content',)
+    date_hierarchy = 'published_at'
+    
+    fieldsets = (
+        ('Content', {
+            'fields': ('title', 'slug', 'author', 'category', 'content', 'excerpt')
+        }),
+        ('Publishing', {
+            'fields': ('status', 'featured', 'published_at')
+        }),
+    )
+    
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:  # New post
+            obj.author = request.user
+        super().save_model(request, obj, form, change)
 
 
 class UserAdmin(BaseUserAdmin):
