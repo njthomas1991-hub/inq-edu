@@ -66,24 +66,18 @@ class SchoolAnalyticsProfile(models.Model):
         return f"{self.teacher.get_full_name() or self.teacher.username} (Admin) - {self.school}"
 
 
-# Post Model - News, guides, and educational resources
-class Post(models.Model):
+# NewsAnnouncement Model - Admin only
+class NewsAnnouncement(models.Model):
     STATUS_CHOICES = (
         ('draft', 'Draft'),
         ('published', 'Published'),
     )
-    CATEGORY_CHOICES = (
-        ('news', 'News & Announcements'),
-        ('guide', 'Help & Tutorials'),
-        ('resource', 'Teaching Resources'),
-    )
     
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='posts')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='news_posts')
     content = models.TextField()
     excerpt = models.TextField(max_length=300, blank=True, help_text="Brief summary shown in listings")
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='news')
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
     featured = models.BooleanField(default=False, help_text="Show on homepage")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -92,8 +86,8 @@ class Post(models.Model):
     
     class Meta:
         ordering = ['-published_at', '-created_at']
-        verbose_name = 'Post'
-        verbose_name_plural = "Posts"
+        verbose_name = 'News & Announcement'
+        verbose_name_plural = "News & Announcements"
     
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -104,3 +98,135 @@ class Post(models.Model):
     
     def __str__(self):
         return self.title
+
+
+# HelpTutorial Model - Admin only
+class HelpTutorial(models.Model):
+    STATUS_CHOICES = (
+        ('draft', 'Draft'),
+        ('published', 'Published'),
+    )
+    
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True, blank=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='help_posts')
+    content = models.TextField()
+    excerpt = models.TextField(max_length=300, blank=True, help_text="Brief summary shown in listings")
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
+    featured = models.BooleanField(default=False, help_text="Show on homepage")
+    order = models.IntegerField(default=0, help_text="Display order (lower numbers first)")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    published_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['order', '-published_at', '-created_at']
+        verbose_name = 'Help & Tutorial'
+        verbose_name_plural = "Help & Tutorials"
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        if self.status == 'published' and not self.published_at:
+            self.published_at = timezone.now()
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.title
+
+
+# TeachingResource Model - Shared by teachers
+class TeachingResource(models.Model):
+    STATUS_CHOICES = (
+        ('draft', 'Draft'),
+        ('published', 'Published'),
+    )
+    RESOURCE_TYPE_CHOICES = (
+        ('lesson_plan', 'Lesson Plan'),
+        ('activity', 'Activity'),
+        ('worksheet', 'Worksheet'),
+        ('physical_material', 'Physical Material'),
+        ('game_setup', 'Game Setup Guide'),
+        ('other', 'Other'),
+    )
+    
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True, blank=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='teaching_resources')
+    content = models.TextField()
+    excerpt = models.TextField(max_length=300, blank=True, help_text="Brief summary shown in listings")
+    resource_type = models.CharField(max_length=20, choices=RESOURCE_TYPE_CHOICES, default='other')
+    key_stage = models.IntegerField(null=True, blank=True, help_text="Key Stage (1-4)")
+    subject = models.CharField(max_length=100, blank=True)
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
+    featured = models.BooleanField(default=False, help_text="Featured resource")
+    likes = models.ManyToManyField(User, related_name='liked_resources', blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    published_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-published_at', '-created_at']
+        verbose_name = 'Teaching Resource'
+        verbose_name_plural = "Teaching Resources"
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            while TeachingResource.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        if self.status == 'published' and not self.published_at:
+            self.published_at = timezone.now()
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return self.title
+    
+    @property
+    def likes_count(self):
+        return self.likes.count()
+
+
+# ForumPost Model - Community discussions
+class ForumPost(models.Model):
+    title = models.CharField(max_length=255)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='forum_posts')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_pinned = models.BooleanField(default=False, help_text="Pin to top of forum")
+    is_locked = models.BooleanField(default=False, help_text="Prevent new replies")
+    views = models.IntegerField(default=0)
+    
+    class Meta:
+        ordering = ['-is_pinned', '-updated_at']
+        verbose_name = 'Forum Post'
+        verbose_name_plural = "Forum Posts"
+    
+    def __str__(self):
+        return self.title
+    
+    @property
+    def replies_count(self):
+        return self.replies.count()
+
+
+# ForumReply Model - Replies to forum posts
+class ForumReply(models.Model):
+    post = models.ForeignKey(ForumPost, on_delete=models.CASCADE, related_name='replies')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='forum_replies')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Forum Reply'
+        verbose_name_plural = "Forum Replies"
+    
+    def __str__(self):
+        return f"Reply by {self.author.username} on {self.post.title}"

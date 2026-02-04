@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
-from .models import User, Class, ClassStudent, SchoolAnalyticsProfile, Post
+from .models import (User, Class, ClassStudent, SchoolAnalyticsProfile, 
+                     NewsAnnouncement, HelpTutorial, TeachingResource, ForumPost, ForumReply)
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django_summernote.admin import SummernoteModelAdmin
 
@@ -9,10 +10,11 @@ from django_summernote.admin import SummernoteModelAdmin
 admin.site.unregister(Group)
 
 
-@admin.register(Post)
-class PostAdmin(SummernoteModelAdmin):
-    list_display = ('title', 'category', 'author', 'status', 'featured', 'published_at', 'created_at')
-    list_filter = ('status', 'category', 'featured', 'created_at')
+# News & Announcements - Admin only
+@admin.register(NewsAnnouncement)
+class NewsAnnouncementAdmin(SummernoteModelAdmin):
+    list_display = ('title', 'author', 'status', 'featured', 'published_at', 'created_at')
+    list_filter = ('status', 'featured', 'created_at')
     search_fields = ('title', 'content', 'excerpt')
     prepopulated_fields = {'slug': ('title',)}
     summernote_fields = ('content',)
@@ -20,7 +22,7 @@ class PostAdmin(SummernoteModelAdmin):
     
     fieldsets = (
         ('Content', {
-            'fields': ('title', 'slug', 'author', 'category', 'content', 'excerpt')
+            'fields': ('title', 'slug', 'content', 'excerpt')
         }),
         ('Publishing', {
             'fields': ('status', 'featured', 'published_at')
@@ -28,9 +30,234 @@ class PostAdmin(SummernoteModelAdmin):
     )
     
     def save_model(self, request, obj, form, change):
-        if not obj.pk:  # New post
+        if not obj.pk:
             obj.author = request.user
         super().save_model(request, obj, form, change)
+    
+    def has_module_permission(self, request):
+        return request.user.is_superuser
+    
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser
+    
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+    
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser
+    
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+
+# Help & Tutorials - Admin only
+@admin.register(HelpTutorial)
+class HelpTutorialAdmin(SummernoteModelAdmin):
+    list_display = ('title', 'author', 'status', 'order', 'featured', 'published_at', 'created_at')
+    list_filter = ('status', 'featured', 'created_at')
+    search_fields = ('title', 'content', 'excerpt')
+    prepopulated_fields = {'slug': ('title',)}
+    summernote_fields = ('content',)
+    date_hierarchy = 'published_at'
+    
+    fieldsets = (
+        ('Content', {
+            'fields': ('title', 'slug', 'content', 'excerpt')
+        }),
+        ('Publishing', {
+            'fields': ('status', 'featured', 'order', 'published_at')
+        }),
+    )
+    
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:
+            obj.author = request.user
+        super().save_model(request, obj, form, change)
+    
+    def has_module_permission(self, request):
+        return request.user.is_superuser
+    
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser
+    
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+    
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser
+    
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+
+# Teaching Resources - All teachers can add/edit
+@admin.register(TeachingResource)
+class TeachingResourceAdmin(SummernoteModelAdmin):
+    list_display = ('title', 'author', 'resource_type', 'key_stage', 'subject', 'status', 'likes_count', 'published_at')
+    list_filter = ('status', 'resource_type', 'key_stage', 'subject', 'created_at')
+    search_fields = ('title', 'content', 'excerpt', 'subject')
+    prepopulated_fields = {'slug': ('title',)}
+    summernote_fields = ('content',)
+    date_hierarchy = 'published_at'
+    filter_horizontal = ('likes',)
+    
+    fieldsets = (
+        ('Content', {
+            'fields': ('title', 'slug', 'content', 'excerpt')
+        }),
+        ('Classification', {
+            'fields': ('resource_type', 'key_stage', 'subject')
+        }),
+        ('Publishing', {
+            'fields': ('status', 'featured', 'published_at')
+        }),
+    )
+    
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:
+            obj.author = request.user
+        super().save_model(request, obj, form, change)
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        # Teachers see all resources (it's a shared space)
+        return qs
+    
+    def has_module_permission(self, request):
+        return request.user.is_superuser or _is_teacher(request.user)
+    
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser or _is_teacher(request.user)
+    
+    def has_add_permission(self, request):
+        return request.user.is_superuser or _is_teacher(request.user)
+    
+    def has_change_permission(self, request, obj=None):
+        # Superusers can edit all, teachers can edit their own
+        if request.user.is_superuser:
+            return True
+        if _is_teacher(request.user) and obj:
+            return obj.author == request.user
+        return _is_teacher(request.user) and obj is None
+    
+    def has_delete_permission(self, request, obj=None):
+        # Superusers can delete all, teachers can delete their own
+        if request.user.is_superuser:
+            return True
+        if _is_teacher(request.user) and obj:
+            return obj.author == request.user
+        return False
+
+
+# Forum Reply Inline
+class ForumReplyInline(admin.TabularInline):
+    model = ForumReply
+    extra = 0
+    readonly_fields = ('author', 'created_at')
+    fields = ('author', 'content', 'created_at')
+    
+    def has_add_permission(self, request, obj=None):
+        return False
+
+
+# Forum Posts - All teachers can participate
+@admin.register(ForumPost)
+class ForumPostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'author', 'replies_count', 'views', 'is_pinned', 'is_locked', 'created_at', 'updated_at')
+    list_filter = ('is_pinned', 'is_locked', 'created_at')
+    search_fields = ('title', 'content')
+    readonly_fields = ('views', 'created_at', 'updated_at')
+    inlines = [ForumReplyInline]
+    
+    fieldsets = (
+        ('Content', {
+            'fields': ('title', 'content')
+        }),
+        ('Moderation', {
+            'fields': ('is_pinned', 'is_locked', 'views')
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+    
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:
+            obj.author = request.user
+        super().save_model(request, obj, form, change)
+    
+    def has_module_permission(self, request):
+        return request.user.is_superuser or _is_teacher(request.user)
+    
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser or _is_teacher(request.user)
+    
+    def has_add_permission(self, request):
+        return request.user.is_superuser or _is_teacher(request.user)
+    
+    def has_change_permission(self, request, obj=None):
+        # Superusers can edit all, teachers can edit their own
+        if request.user.is_superuser:
+            return True
+        if _is_teacher(request.user) and obj:
+            return obj.author == request.user
+        return _is_teacher(request.user) and obj is None
+    
+    def has_delete_permission(self, request, obj=None):
+        # Superusers can delete all, teachers can delete their own
+        if request.user.is_superuser:
+            return True
+        if _is_teacher(request.user) and obj:
+            return obj.author == request.user
+        return False
+
+
+# Forum Replies - Managed through ForumPost
+@admin.register(ForumReply)
+class ForumReplyAdmin(admin.ModelAdmin):
+    list_display = ('post', 'author', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('content', 'post__title')
+    readonly_fields = ('created_at', 'updated_at')
+    
+    fieldsets = (
+        ('Content', {
+            'fields': ('post', 'content')
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+    
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:
+            obj.author = request.user
+        super().save_model(request, obj, form, change)
+    
+    def has_module_permission(self, request):
+        return request.user.is_superuser or _is_teacher(request.user)
+    
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser or _is_teacher(request.user)
+    
+    def has_add_permission(self, request):
+        return request.user.is_superuser or _is_teacher(request.user)
+    
+    def has_change_permission(self, request, obj=None):
+        # Superusers can edit all, teachers can edit their own
+        if request.user.is_superuser:
+            return True
+        if _is_teacher(request.user) and obj:
+            return obj.author == request.user
+        return _is_teacher(request.user) and obj is None
+    
+    def has_delete_permission(self, request, obj=None):
+        # Superusers can delete all, teachers can delete their own
+        if request.user.is_superuser:
+            return True
+        if _is_teacher(request.user) and obj:
+            return obj.author == request.user
+        return False
 
 
 class UserAdmin(BaseUserAdmin):
