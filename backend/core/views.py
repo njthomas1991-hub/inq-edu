@@ -1,7 +1,7 @@
 from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth import login
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q, F
@@ -97,6 +97,27 @@ def wonderworld_page_view(request):
 @api_view(['GET'])
 def hello(request):
     return Response({"message": "Hello from Django API!"})
+
+
+def custom_login_view(request):
+    """Custom login that redirects based on user role"""
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                # Redirect based on role
+                if user.role == 'student':
+                    return redirect('home')
+                else:  # teacher
+                    return redirect('teacher_dashboard')
+    else:
+        form = AuthenticationForm()
+    
+    return render(request, "core/teacher_login.html", {"form": form})
 
 
 class TeacherSignUpForm(UserCreationForm):
