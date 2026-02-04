@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'core',
+    'django_summernote',
 ]
 
 AUTH_USER_MODEL = 'core.User'
