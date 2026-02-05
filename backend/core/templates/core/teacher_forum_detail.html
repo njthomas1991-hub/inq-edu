@@ -20,7 +20,7 @@
             </div>
             <hr>
             <div class="content">
-                {{ post.content|linebreaks }}
+                {{ post.content|safe }}
             </div>
         </div>
     </div>
@@ -34,7 +34,7 @@
                         <strong>{{ reply.author.get_full_name|default:reply.author.username }}</strong>
                         <small class="text-muted">{{ reply.created_at|date:"M d, Y" }}</small>
                     </div>
-                    <div class="mt-2">{{ reply.content|linebreaks }}</div>
+                    <div class="mt-2">{{ reply.content|safe }}</div>
                 </div>
             {% endfor %}
         </div>
@@ -50,7 +50,7 @@
                 <h5 class="card-title">Add a Reply</h5>
                 <form method="post">
                     {% csrf_token %}
-                    <div class="mb-3">{{ reply_form.content.label_tag }}{{ reply_form.content }}</div>
+                    <div class="mb-3">{{ reply_form.content }}</div>
                     <button class="btn btn-primary" type="submit">Post Reply</button>
                 </form>
             </div>
