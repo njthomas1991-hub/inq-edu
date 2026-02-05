@@ -30,11 +30,12 @@ class ClassForm(forms.ModelForm):
 class TeachingResourceForm(forms.ModelForm):
     class Meta:
         model = TeachingResource
-        fields = ('title', 'content', 'excerpt', 'resource_type', 'key_stage', 'subject', 'status')
+        fields = ('title', 'content', 'excerpt', 'file', 'resource_type', 'key_stage', 'subject', 'status')
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Resource title'}),
             'content': SummernoteWidget(attrs={'summernote': {'height': '400'}}),
             'excerpt': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Short summary'}),
+            'file': forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx'}),
             'resource_type': forms.Select(attrs={'class': 'form-select'}),
             'key_stage': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 4}),
             'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Subject (optional)'}),
@@ -471,7 +472,7 @@ def teacher_resources_list_view(request):
     ).distinct()
 
     if request.method == "POST":
-        form = TeachingResourceForm(request.POST)
+        form = TeachingResourceForm(request.POST, request.FILES)
         if form.is_valid():
             resource = form.save(commit=False)
             resource.author = request.user
@@ -528,7 +529,7 @@ def teacher_resource_edit_view(request, slug):
         return HttpResponseForbidden("You can only edit your own resources")
 
     if request.method == "POST":
-        form = TeachingResourceForm(request.POST, instance=resource)
+        form = TeachingResourceForm(request.POST, request.FILES, instance=resource)
         if form.is_valid():
             form.save()
             return redirect("teacher_resource_detail", slug=resource.slug)
