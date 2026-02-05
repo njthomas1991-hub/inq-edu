@@ -51,10 +51,10 @@
     $(document).ready(function() {
         var $contentField = $('#id_content');
         var summernoteInitialized = false;
-        
+
         // Handle collapse show event - initialize Summernote when user opens the form
         $('#forumForm').on('show.bs.collapse', function () {
-            if (!summernoteInitialized && $contentField.length) {
+            if (!summernoteInitialized && $contentField.length && !$contentField.data('summernote')) {
                 $contentField.summernote({
                     height: 300,
                     minHeight: 250,
@@ -71,6 +71,8 @@
                         ['view', ['fullscreen', 'codeview', 'help']]
                     ]
                 });
+                summernoteInitialized = true;
+            } else if ($contentField.length && $contentField.data('summernote')) {
                 summernoteInitialized = true;
             }
         });

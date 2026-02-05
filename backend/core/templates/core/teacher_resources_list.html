@@ -68,10 +68,10 @@
     $(document).ready(function() {
         var $contentField = $('#id_content');
         var summernoteInitialized = false;
-        
+
         // Handle collapse show event - initialize Summernote when user opens the form
         $('#resourceForm').on('show.bs.collapse', function () {
-            if (!summernoteInitialized && $contentField.length) {
+            if (!summernoteInitialized && $contentField.length && !$contentField.data('summernote')) {
                 $contentField.summernote({
                     height: 400,
                     minHeight: 350,
@@ -88,6 +88,8 @@
                         ['view', ['fullscreen', 'codeview', 'help']]
                     ]
                 });
+                summernoteInitialized = true;
+            } else if ($contentField.length && $contentField.data('summernote')) {
                 summernoteInitialized = true;
             }
         });
