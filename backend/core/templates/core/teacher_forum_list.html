@@ -49,37 +49,31 @@
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-        // Initialize Summernote
         var $contentField = $('#id_content');
-        if ($contentField.length) {
-            $contentField.summernote({
-                height: 300,
-                minHeight: 250,
-                placeholder: 'Start the discussion...',
-                toolbar: [
-                    ['style', ['style']],
-                    ['font', ['bold', 'underline', 'italic', 'clear']],
-                    ['fontname', ['fontname']],
-                    ['fontsize', ['fontsize']],
-                    ['color', ['color']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['table', ['table']],
-                    ['insert', ['link', 'picture']],
-                    ['view', ['fullscreen', 'codeview', 'help']]
-                ]
-            });
-        }
+        var summernoteInitialized = false;
         
-        // Handle collapse toggle
-        var collapseElement = document.getElementById('forumForm');
-        if (collapseElement) {
-            collapseElement.addEventListener('show.bs.collapse', function () {
-                // Trigger Summernote to focus and layout properly
-                setTimeout(function() {
-                    $contentField.summernote('focus');
-                }, 200);
-            });
-        }
+        // Handle collapse show event - initialize Summernote when user opens the form
+        $('#forumForm').on('show.bs.collapse', function () {
+            if (!summernoteInitialized && $contentField.length) {
+                $contentField.summernote({
+                    height: 300,
+                    minHeight: 250,
+                    placeholder: 'Start the discussion...',
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'underline', 'italic', 'clear']],
+                        ['fontname', ['fontname']],
+                        ['fontsize', ['fontsize']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture']],
+                        ['view', ['fullscreen', 'codeview', 'help']]
+                    ]
+                });
+                summernoteInitialized = true;
+            }
+        });
     });
 </script>
 {% endblock %}

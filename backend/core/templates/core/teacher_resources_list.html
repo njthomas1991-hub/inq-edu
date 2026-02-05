@@ -66,21 +66,30 @@
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-        $('#id_content').summernote({
-            height: 400,
-            minHeight: 350,
-            placeholder: 'Describe the resource...',
-            toolbar: [
-                ['style', ['style']],
-                ['font', ['bold', 'underline', 'italic', 'clear']],
-                ['fontname', ['fontname']],
-                ['fontsize', ['fontsize']],
-                ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph', 'height']],
-                ['table', ['table']],
-                ['insert', ['link', 'picture', 'video']],
-                ['view', ['fullscreen', 'codeview', 'help']]
-            ]
+        var $contentField = $('#id_content');
+        var summernoteInitialized = false;
+        
+        // Handle collapse show event - initialize Summernote when user opens the form
+        $('#resourceForm').on('show.bs.collapse', function () {
+            if (!summernoteInitialized && $contentField.length) {
+                $contentField.summernote({
+                    height: 400,
+                    minHeight: 350,
+                    placeholder: 'Describe the resource...',
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'underline', 'italic', 'clear']],
+                        ['fontname', ['fontname']],
+                        ['fontsize', ['fontsize']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph', 'height']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture', 'video']],
+                        ['view', ['fullscreen', 'codeview', 'help']]
+                    ]
+                });
+                summernoteInitialized = true;
+            }
         });
     });
 </script>
