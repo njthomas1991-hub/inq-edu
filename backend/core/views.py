@@ -546,3 +546,20 @@ def teacher_forum_detail_view(request, post_id):
     })
 
 
+@login_required
+def teacher_forum_delete_view(request, post_id):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    post = get_object_or_404(ForumPost, id=post_id)
+
+    if post.author != request.user and not request.user.is_superuser:
+        return HttpResponseForbidden("You can only delete your own discussions")
+
+    if request.method == "POST":
+        post.delete()
+        return redirect("teacher_forum")
+
+    return redirect("teacher_forum_detail", post_id=post.id)
+
+

@@ -31,14 +31,26 @@
     {% if posts %}
         <div class="list-group shadow-sm">
             {% for post in posts %}
-                <a class="list-group-item list-group-item-action" href="{% url 'teacher_forum_detail' post.id %}">
-                    <div class="d-flex w-100 justify-content-between">
-                        <h5 class="mb-1">{% if post.is_pinned %}<i class="fas fa-thumbtack text-warning"></i>{% endif %} {{ post.title }}</h5>
-                        <small class="text-muted">{{ post.updated_at|date:"M d, Y" }}</small>
+                <div class="list-group-item">
+                    <div class="d-flex w-100 justify-content-between align-items-start">
+                        <h5 class="mb-1">
+                            <a class="text-decoration-none" href="{% url 'teacher_forum_detail' post.id %}">
+                                {% if post.is_pinned %}<i class="fas fa-thumbtack text-warning"></i>{% endif %} {{ post.title }}
+                            </a>
+                        </h5>
+                        <div class="d-flex align-items-center gap-2">
+                            <small class="text-muted">{{ post.updated_at|date:"M d, Y" }}</small>
+                            {% if post.author == request.user or request.user.is_superuser %}
+                                <form method="post" action="{% url 'teacher_forum_delete' post.id %}" onsubmit="return confirm('Delete this discussion?');">
+                                    {% csrf_token %}
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                                </form>
+                            {% endif %}
+                        </div>
                     </div>
                     <p class="mb-1 text-muted">{{ post.content|truncatewords:24 }}</p>
                     <small class="text-muted">By {{ post.author.get_full_name|default:post.author.username }} · {{ post.replies_count }} replies · {{ post.views }} views</small>
-                </a>
+                </div>
             {% endfor %}
         </div>
     {% else %}

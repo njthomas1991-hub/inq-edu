@@ -13,9 +13,15 @@
                     <h1 class="h4">{{ post.title }}</h1>
                     <div class="text-muted small">By {{ post.author.get_full_name|default:post.author.username }} · {{ post.created_at|date:"M d, Y" }}</div>
                 </div>
-                <div>
-                    {% if post.is_pinned %}<span class="badge bg-warning text-dark me-1">Pinned</span>{% endif %}
+                <div class="d-flex align-items-center gap-2">
+                    {% if post.is_pinned %}<span class="badge bg-warning text-dark">Pinned</span>{% endif %}
                     {% if post.is_locked %}<span class="badge bg-danger">Locked</span>{% endif %}
+                    {% if post.author == request.user or request.user.is_superuser %}
+                        <form method="post" action="{% url 'teacher_forum_delete' post.id %}" onsubmit="return confirm('Delete this discussion?');">
+                            {% csrf_token %}
+                            <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                        </form>
+                    {% endif %}
                 </div>
             </div>
             <hr>
