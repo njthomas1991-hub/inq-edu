@@ -18,7 +18,7 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <h5 class="card-title">Add a Teaching Resource</h5>
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="row g-3">
                         <div class="col-md-6">{{ form.title }}</div>
@@ -26,6 +26,11 @@
                         <div class="col-md-6">{{ form.key_stage }}</div>
                         <div class="col-md-6">{{ form.subject }}</div>
                         <div class="col-12">{{ form.excerpt }}</div>
+                        <div class="col-12">
+                            <label for="{{ form.file.id_for_label }}" class="form-label">Upload File (PDF, Word, Excel)</label>
+                            {{ form.file }}
+                            <small class="form-text text-muted">Optional: Upload a document to share</small>
+                        </div>
                         <div class="col-12">{{ form.content }}</div>
                         <div class="col-md-4">{{ form.status }}</div>
                     </div>
@@ -49,7 +54,10 @@
                             </div>
                             <p class="card-text text-muted">{{ resource.excerpt|default:resource.content|truncatewords:25 }}</p>
                             <div class="small text-muted">Shared by {{ resource.author.get_full_name|default:resource.author.username }}</div>
-                            <div class="small text-muted">{{ resource.comments.count }} comment{{ resource.comments.count|pluralize }}</div>
+                            <div class="small text-muted">
+                                {% if resource.file %}<i class="fas fa-paperclip text-primary"></i> Attachment | {% endif %}
+                                {{ resource.comments.count }} comment{{ resource.comments.count|pluralize }}
+                            </div>
                         </div>
                         <div class="card-footer d-flex justify-content-between align-items-center">
                             <small class="text-muted">{{ resource.created_at|date:"M d, Y" }}</small>
