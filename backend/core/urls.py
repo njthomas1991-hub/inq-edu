@@ -8,7 +8,7 @@ from .views import (
     transfer_student_view, teacher_news_list_view, teacher_news_detail_view,
     teacher_help_list_view, teacher_help_detail_view, teacher_resources_list_view,
     teacher_resource_detail_view, teacher_forum_list_view, teacher_forum_detail_view,
-    custom_login_view
+    custom_login_view, student_dashboard_view
 )
 
 urlpatterns = [
@@ -25,6 +25,7 @@ urlpatterns = [
     path("student/signup/", student_signup_view, name="student_signup"),
     path("student/signup/guided/", student_signup_with_details_view, name="student_signup_guided"),
     path("api/create-student/", create_student_account_view, name="create_student"),
+    path("student/", student_dashboard_view, name="student_dashboard"),
     path("teacher/login/", custom_login_view, name="teacher_login"),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("teacher/", teacher_dashboard_view, name="teacher_dashboard"),
