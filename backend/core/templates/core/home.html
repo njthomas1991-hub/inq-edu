@@ -69,7 +69,11 @@
 
             <!-- Teacher hub Button -->
             <div class="col-4 col-md-6 col-lg-4">
-                <a href="{% url 'teacher_hub' %}" class="quick-access-btn text-decoration-none">
+                {% if user.is_authenticated and user.role == 'teacher' %}
+                    <a href="{% url 'teacher_dashboard' %}" class="quick-access-btn text-decoration-none">
+                {% else %}
+                    <a href="{% url 'teacher_hub' %}" class="quick-access-btn text-decoration-none">
+                {% endif %}
                     <div class="quick-access-image-wrapper">
                         <img src="{% static 'core/images/teacher hub logo.png' %}" alt="Teacher Hub" class="img-fluid">
                     </div>
@@ -151,7 +155,11 @@
                             <div class="widgit-symbol" data-symbol="learning">
                                 <div class="widgit-symbol-placeholder">📖</div>
                             </div>
-                            <a href="{% url 'teacher_hub' %}" class="btn btn-primary btn-sm">Explore</a>
+                            {% if user.is_authenticated and user.role == 'teacher' %}
+                                <a href="{% url 'teacher_dashboard' %}" class="btn btn-primary btn-sm">Explore</a>
+                            {% else %}
+                                <a href="{% url 'teacher_hub' %}" class="btn btn-primary btn-sm">Explore</a>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
