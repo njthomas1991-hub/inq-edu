@@ -9,7 +9,7 @@ from django_summernote.widgets import SummernoteWidget
 from .models import (
     User, Class, ClassStudent,
     NewsAnnouncement, HelpTutorial, TeachingResource,
-    ForumPost, ForumReply
+    ForumPost, ForumReply, ResourceComment
 )
 import string
 import random
@@ -58,6 +58,15 @@ class ForumReplyForm(forms.ModelForm):
         fields = ('content',)
         widgets = {
             'content': SummernoteWidget(attrs={'summernote': {'height': '250'}}),
+        }
+
+
+class ResourceCommentForm(forms.ModelForm):
+    class Meta:
+        model = ResourceComment
+        fields = ('content',)
+        widgets = {
+            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Share your thoughts on this resource...'}),
         }
 
 from rest_framework.decorators import api_view
@@ -491,9 +500,80 @@ def teacher_resource_detail_view(request, slug):
     if resource.status != 'published' and resource.author != request.user and not request.user.is_superuser:
         return HttpResponseForbidden("You don't have access to this resource")
 
+    if request.method == "POST":
+        comment_form = ResourceCommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.author = request.user
+            comment.resource = resource
+            comment.save()
+            return redirect("teacher_resource_detail", slug=resource.slug)
+    else:
+        comment_form = ResourceCommentForm()
+
     return render(request, "core/teacher_resource_detail.html", {
         "resource": resource,
+        "comment_form": comment_form,
     })
+
+
+@login_required
+def teacher_resource_edit_view(request, slug):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    resource = get_object_or_404(TeachingResource, slug=slug)
+
+    if resource.author != request.user and not request.user.is_superuser:
+        return HttpResponseForbidden("You can only edit your own resources")
+
+    if request.method == "POST":
+        form = TeachingResourceForm(request.POST, instance=resource)
+        if form.is_valid():
+            form.save()
+            return redirect("teacher_resource_detail", slug=resource.slug)
+    else:
+        form = TeachingResourceForm(instance=resource)
+
+    return render(request, "core/teacher_resource_edit.html", {
+        "resource": resource,
+        "form": form,
+    })
+
+
+@login_required
+def teacher_resource_delete_view(request, slug):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    resource = get_object_or_404(TeachingResource, slug=slug)
+
+    if resource.author != request.user and not request.user.is_superuser:
+        return HttpResponseForbidden("You can only delete your own resources")
+
+    if request.method == "POST":
+        resource.delete()
+        return redirect("teacher_resources")
+
+    return redirect("teacher_resource_detail", slug=slug)
+
+
+@login_required
+def teacher_resource_comment_delete_view(request, slug, comment_id):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    resource = get_object_or_404(TeachingResource, slug=slug)
+    comment = get_object_or_404(ResourceComment, id=comment_id, resource=resource)
+
+    if comment.author != request.user and not request.user.is_superuser:
+        return HttpResponseForbidden("You can only delete your own comments")
+
+    if request.method == "POST":
+        comment.delete()
+        return redirect("teacher_resource_detail", slug=resource.slug)
+
+    return redirect("teacher_resource_detail", slug=resource.slug)
 
 
 @login_required

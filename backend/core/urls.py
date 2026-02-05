@@ -9,7 +9,8 @@ from .views import (
     teacher_help_list_view, teacher_help_detail_view, teacher_resources_list_view,
     teacher_resource_detail_view, teacher_forum_list_view, teacher_forum_detail_view,
     custom_login_view, student_dashboard_view, teacher_forum_delete_view, teacher_forum_edit_view,
-    teacher_forum_reply_edit_view, teacher_forum_reply_delete_view
+    teacher_forum_reply_edit_view, teacher_forum_reply_delete_view, teacher_resource_edit_view,
+    teacher_resource_delete_view, teacher_resource_comment_delete_view
 )
 
 urlpatterns = [
@@ -40,6 +41,9 @@ urlpatterns = [
     path("teacher/help/<slug:slug>/", teacher_help_detail_view, name="teacher_help_detail"),
     path("teacher/resources/", teacher_resources_list_view, name="teacher_resources"),
     path("teacher/resources/<slug:slug>/", teacher_resource_detail_view, name="teacher_resource_detail"),
+    path("teacher/resources/<slug:slug>/edit/", teacher_resource_edit_view, name="teacher_resource_edit"),
+    path("teacher/resources/<slug:slug>/delete/", teacher_resource_delete_view, name="teacher_resource_delete"),
+    path("teacher/resources/<slug:slug>/comment/<int:comment_id>/delete/", teacher_resource_comment_delete_view, name="teacher_resource_comment_delete"),
     path("teacher/forum/", teacher_forum_list_view, name="teacher_forum"),
     path("teacher/forum/<int:post_id>/", teacher_forum_detail_view, name="teacher_forum_detail"),
     path("teacher/forum/<int:post_id>/edit/", teacher_forum_edit_view, name="teacher_forum_edit"),

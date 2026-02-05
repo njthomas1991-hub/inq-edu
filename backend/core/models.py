@@ -230,3 +230,20 @@ class ForumReply(models.Model):
     
     def __str__(self):
         return f"Reply by {self.author.username} on {self.post.title}"
+
+
+# ResourceComment Model - Comments on teaching resources
+class ResourceComment(models.Model):
+    resource = models.ForeignKey(TeachingResource, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='resource_comments')
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['created_at']
+        verbose_name = 'Resource Comment'
+        verbose_name_plural = "Resource Comments"
+    
+    def __str__(self):
+        return f"Comment by {self.author.username} on {self.resource.title}"
