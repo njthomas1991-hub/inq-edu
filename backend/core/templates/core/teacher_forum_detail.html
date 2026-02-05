@@ -57,4 +57,27 @@
         </div>
     {% endif %}
 </div>
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#id_content').summernote({
+            height: 250,
+            minHeight: 200,
+            placeholder: 'Write your reply...',
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'italic', 'clear']],
+                ['fontname', ['fontname']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture']],
+                ['view', ['fullscreen', 'codeview', 'help']]
+            ]
+        });
+    });
+</script>
+{% endblock %}
 {% endblock %}

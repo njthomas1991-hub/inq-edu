@@ -159,3 +159,63 @@ STATICFILES_DIRS = []
 
 # WhiteNoise configuration
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# Summernote Configuration
+SUMMERNOTE_CONFIG = {
+    'default': {
+        'toolbar': [
+            ['style', ['style']],
+            ['font', ['bold', 'underline', 'italic', 'clear']],
+            ['fontname', ['fontname']],
+            ['fontsize', ['fontsize']],
+            ['color', ['color']],
+            ['para', ['ul', 'ol', 'paragraph', 'height']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture', 'video']],
+            ['view', ['fullscreen', 'codeview', 'help']],
+            ['undo', ['undo', 'redo']],
+        ],
+        'fontNames': ['Arial', 'Calibri', 'Comic Sans MS', 'Courier', 'Courier New', 'Garamond', 'Georgia', 'Helvetica', 'Times', 'Times New Roman', 'Trebuchet MS', 'Verdana'],
+        'fontSizes': ['8', '9', '10', '11', '12', '14', '16', '18', '20', '22', '24', '28', '32', '36', '40', '44', '48'],
+        'colors': [
+            ['#000000', '#424242', '#636363', '#969696', '#bdbdbd', '#d9d9d9', '#efefef', '#f3f3f3', '#ffffff'],
+            ['#980000', '#ff0000', '#ff9900', '#ffff00', '#00f225', '#00ffff', '#4a90e2', '#9900ff', '#ff00ff'],
+            ['#e6b3b3', '#f4cccc', '#fce5cd', '#fff2cc', '#d9e8d9', '#d0e8d9', '#d9d9e3', '#ece6f1', '#f3e6e6'],
+            ['#ea9999', '#f8cbad', '#e2efda', '#eaa6a6', '#b4a7d6', '#d5a6bd', '#d9cee4', '#ead1dc', '#f0e1d8'],
+            ['#dd7e6b', '#f6a192', '#c7a875', '#d1a574', '#9a8fb4', '#ab8fa3', '#b5a7c9', '#c4b5d9', '#dcc8b6'],
+            ['#cc4125', '#e06666', '#f1c232', '#6d9eeb', '#93c5fe', '#b4a7d6', '#9fc5f8', '#9fc5f8', '#cfe2f3'],
+        ],
+        'codemirror': {
+            'mode': 'htmlmixed',
+            'lineNumbers': True,
+            'indentUnit': 4,
+            'lineWrapping': True,
+        },
+        'height': 300,
+        'minHeight': 250,
+        'maxHeight': 600,
+        'callbacks': {
+            'onImageUpload': [
+                'function(files) { sendFile(files[0], this); }'
+            ]
+        },
+        'placeholder': 'Write your content here...',
+        'popover': {
+            'image': [
+                ['imagesize', ['imagesize']],
+                ['float', ['floatLeft', 'floatRight', 'floatNone']],
+                ['remove', ['removeMedia']]
+            ],
+            'link': [
+                ['link', ['linkDialogShow', 'unlink']]
+            ],
+            'air': [
+                ['color', ['color']],
+                ['font', ['bold', 'underline', 'italic']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture']]
+            ]
+        },
+        'lang': 'en-US'
+    }
+}

@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q, F
+from django_summernote.widgets import SummernoteWidget
 from .models import (
     User, Class, ClassStudent,
     NewsAnnouncement, HelpTutorial, TeachingResource,
@@ -32,7 +33,7 @@ class TeachingResourceForm(forms.ModelForm):
         fields = ('title', 'content', 'excerpt', 'resource_type', 'key_stage', 'subject', 'status')
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Resource title'}),
-            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 6, 'placeholder': 'Describe the resource'}),
+            'content': SummernoteWidget(attrs={'summernote': {'height': '400'}}),
             'excerpt': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Short summary'}),
             'resource_type': forms.Select(attrs={'class': 'form-select'}),
             'key_stage': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 4}),
@@ -47,7 +48,7 @@ class ForumPostForm(forms.ModelForm):
         fields = ('title', 'content')
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Discussion title'}),
-            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 5, 'placeholder': 'Start the discussion...'}),
+            'content': SummernoteWidget(attrs={'summernote': {'height': '300'}}),
         }
 
 
@@ -56,7 +57,7 @@ class ForumReplyForm(forms.ModelForm):
         model = ForumReply
         fields = ('content',)
         widgets = {
-            'content': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Write your reply...'}),
+            'content': SummernoteWidget(attrs={'summernote': {'height': '250'}}),
         }
 
 from rest_framework.decorators import api_view

@@ -45,4 +45,27 @@
         <div class="alert alert-info">No discussions yet. Start the first one!</div>
     {% endif %}
 </div>
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#id_content').summernote({
+            height: 300,
+            minHeight: 250,
+            placeholder: 'Start the discussion...',
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'italic', 'clear']],
+                ['fontname', ['fontname']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture']],
+                ['view', ['fullscreen', 'codeview', 'help']]
+            ]
+        });
+    });
+</script>
+{% endblock %}
 {% endblock %}

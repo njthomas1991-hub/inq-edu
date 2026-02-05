@@ -62,4 +62,27 @@
         <div class="alert alert-info">No resources yet. Be the first to share one.</div>
     {% endif %}
 </div>
+
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#id_content').summernote({
+            height: 400,
+            minHeight: 350,
+            placeholder: 'Describe the resource...',
+            toolbar: [
+                ['style', ['style']],
+                ['font', ['bold', 'underline', 'italic', 'clear']],
+                ['fontname', ['fontname']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph', 'height']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video']],
+                ['view', ['fullscreen', 'codeview', 'help']]
+            ]
+        });
+    });
+</script>
+{% endblock %}
 {% endblock %}
