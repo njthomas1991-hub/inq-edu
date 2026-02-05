@@ -8,7 +8,7 @@ from .views import (
     transfer_student_view, teacher_news_list_view, teacher_news_detail_view,
     teacher_help_list_view, teacher_help_detail_view, teacher_resources_list_view,
     teacher_resource_detail_view, teacher_forum_list_view, teacher_forum_detail_view,
-    custom_login_view, student_dashboard_view
+    custom_login_view, student_dashboard_view, teacher_forum_delete_view
 )
 
 urlpatterns = [
@@ -41,4 +41,5 @@ urlpatterns = [
     path("teacher/resources/<slug:slug>/", teacher_resource_detail_view, name="teacher_resource_detail"),
     path("teacher/forum/", teacher_forum_list_view, name="teacher_forum"),
     path("teacher/forum/<int:post_id>/", teacher_forum_detail_view, name="teacher_forum_detail"),
+    path("teacher/forum/<int:post_id>/delete/", teacher_forum_delete_view, name="teacher_forum_delete"),
 ]
