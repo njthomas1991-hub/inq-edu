@@ -123,10 +123,15 @@ def custom_login_view(request):
 class TeacherSignUpForm(UserCreationForm):
     email = forms.EmailField(required=False)
     school = forms.CharField(required=False, max_length=255)
+    role = forms.ChoiceField(
+        choices=User.ROLE_CHOICES,
+        widget=forms.RadioSelect,
+        required=True
+    )
 
     class Meta:
         model = User
-        fields = ("username", "first_name", "last_name", "email", "school", "password1", "password2")
+        fields = ("username", "first_name", "last_name", "email", "school", "role", "password1", "password2")
 
 
 class StudentSignUpForm(UserCreationForm):
@@ -145,10 +150,12 @@ def teacher_signup_view(request):
         form = TeacherSignUpForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.role = "teacher"
-            user.is_staff = True
+            user.role = form.cleaned_data.get("role", "teacher")
+            user.is_staff = user.role == "teacher"
             user.save()
             login(request, user)
+            if user.role == "student":
+                return redirect("home")
             return redirect("teacher_dashboard")
     else:
         form = TeacherSignUpForm()
