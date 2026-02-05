@@ -84,6 +84,8 @@ def pricing_page_view(request):
 
 
 def teacher_hub_view(request):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
     return render(request, "core/teacher_hub.html")
 
 
@@ -93,6 +95,20 @@ def contact_page_view(request):
 
 def wonderworld_page_view(request):
     return render(request, "core/wonderworld.html")
+
+
+@login_required
+def student_dashboard_view(request):
+    if getattr(request.user, "role", None) != "student":
+        return HttpResponseForbidden("Student access only")
+
+    enrollments = ClassStudent.objects.filter(student=request.user).select_related('clazz')
+    total_classes = enrollments.count()
+
+    return render(request, "core/student_dashboard.html", {
+        "enrollments": enrollments,
+        "total_classes": total_classes,
+    })
 
 @api_view(['GET'])
 def hello(request):
@@ -111,7 +127,7 @@ def custom_login_view(request):
                 login(request, user)
                 # Redirect based on role
                 if user.role == 'student':
-                    return redirect('home')
+                    return redirect('student_dashboard')
                 else:  # teacher
                     return redirect('teacher_dashboard')
     else:
@@ -155,7 +171,7 @@ def teacher_signup_view(request):
             user.save()
             login(request, user)
             if user.role == "student":
-                return redirect("home")
+                return redirect("student_dashboard")
             return redirect("teacher_dashboard")
     else:
         form = TeacherSignUpForm()
