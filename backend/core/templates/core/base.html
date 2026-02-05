@@ -258,7 +258,11 @@
                 </ul>
             </div>
 
-            <a class="btn btn-primary ms-auto" href="{% url 'signup' %}">Get Started</a>
+            {% if user.is_authenticated %}
+                <a class="btn btn-primary ms-auto" href="#platforms-section">Get Started</a>
+            {% else %}
+                <a class="btn btn-primary ms-auto" href="{% url 'signup' %}">Get Started</a>
+            {% endif %}
         </div>
     </nav>
 </header>
