@@ -20,8 +20,8 @@
                 <h5 class="card-title">New Forum Post</h5>
                 <form method="post">
                     {% csrf_token %}
-                    <div class="mb-3">{{ form.title.label_tag }}{{ form.title }}</div>
-                    <div class="mb-3">{{ form.content.label_tag }}{{ form.content }}</div>
+                    <div class="mb-3">{{ form.title }}</div>
+                    <div class="mb-3">{{ form.content }}</div>
                     <button class="btn btn-success" type="submit">Post</button>
                 </form>
             </div>
