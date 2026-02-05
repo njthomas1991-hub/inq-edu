@@ -43,16 +43,26 @@
                 <div class="col-md-6 col-lg-4">
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h5 class="card-title">{{ resource.title }}</h5>
                                 <span class="badge bg-secondary">{{ resource.get_resource_type_display }}</span>
                             </div>
                             <p class="card-text text-muted">{{ resource.excerpt|default:resource.content|truncatewords:25 }}</p>
                             <div class="small text-muted">Shared by {{ resource.author.get_full_name|default:resource.author.username }}</div>
+                            <div class="small text-muted">{{ resource.comments.count }} comment{{ resource.comments.count|pluralize }}</div>
                         </div>
                         <div class="card-footer d-flex justify-content-between align-items-center">
-                            <small class="text-muted">{{ resource.published_at|date:"M d, Y" }}</small>
-                            <a class="btn btn-sm btn-primary" href="{% url 'teacher_resource_detail' resource.slug %}">Open</a>
+                            <small class="text-muted">{{ resource.created_at|date:"M d, Y" }}</small>
+                            <div class="d-flex gap-2">
+                                <a class="btn btn-sm btn-primary" href="{% url 'teacher_resource_detail' resource.slug %}">View</a>
+                                {% if resource.author == request.user or request.user.is_superuser %}
+                                    <a class="btn btn-sm btn-outline-primary" href="{% url 'teacher_resource_edit' resource.slug %}">Edit</a>
+                                    <form method="post" action="{% url 'teacher_resource_delete' resource.slug %}" onsubmit="return confirm('Delete this resource?');" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+                                    </form>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                 </div>

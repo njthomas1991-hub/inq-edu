@@ -1,0 +1,56 @@
+{% extends "core/base_teacher.html" %}
+
+{% block title %}Edit Resource - Teaching Resources{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a class="btn btn-link px-0 mb-3" href="{% url 'teacher_resource_detail' resource.slug %}"><i class="fas fa-arrow-left"></i> Back to Resource</a>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="h4 mb-4">Edit Teaching Resource</h1>
+            <form method="post">
+                {% csrf_token %}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">Resource Title</label>
+                        {{ form.title }}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.resource_type.id_for_label }}" class="form-label">Type</label>
+                        {{ form.resource_type }}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.key_stage.id_for_label }}" class="form-label">Key Stage</label>
+                        {{ form.key_stage }}
+                    </div>
+                    <div class="col-md-6">
+                        <label for="{{ form.subject.id_for_label }}" class="form-label">Subject</label>
+                        {{ form.subject }}
+                    </div>
+                    <div class="col-12">
+                        <label for="{{ form.excerpt.id_for_label }}" class="form-label">Excerpt</label>
+                        {{ form.excerpt }}
+                    </div>
+                    <div class="col-12">
+                        <label for="{{ form.content.id_for_label }}" class="form-label">Content</label>
+                        {{ form.content }}
+                    </div>
+                    <div class="col-md-4">
+                        <label for="{{ form.status.id_for_label }}" class="form-label">Status</label>
+                        {{ form.status }}
+                    </div>
+                </div>
+                <div class="mt-4 d-flex gap-2">
+                    <button class="btn btn-primary" type="submit">Save Changes</button>
+                    <a href="{% url 'teacher_resource_detail' resource.slug %}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+    {{ form.media }}
+{% endblock %}
+{% endblock %}

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 from .models import (User, Class, ClassStudent, SchoolAnalyticsProfile, 
-                     NewsAnnouncement, HelpTutorial, TeachingResource, ForumPost, ForumReply)
+                     NewsAnnouncement, HelpTutorial, TeachingResource, ForumPost, ForumReply, ResourceComment)
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django_summernote.admin import SummernoteModelAdmin
 
@@ -148,6 +148,52 @@ class TeachingResourceAdmin(SummernoteModelAdmin):
             return obj.author == request.user
         return False
 
+# Resource Comments
+@admin.register(ResourceComment)
+class ResourceCommentAdmin(admin.ModelAdmin):
+    list_display = ('resource', 'author', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('content', 'resource__title')
+    readonly_fields = ('created_at', 'updated_at')
+    
+    fieldsets = (
+        ('Content', {
+            'fields': ('resource', 'content')
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
+    
+    def save_model(self, request, obj, form, change):
+        if not obj.pk:
+            obj.author = request.user
+        super().save_model(request, obj, form, change)
+    
+    def has_module_permission(self, request):
+        return request.user.is_superuser or _is_teacher(request.user)
+    
+    def has_view_permission(self, request, obj=None):
+        return request.user.is_superuser or _is_teacher(request.user)
+    
+    def has_add_permission(self, request):
+        return request.user.is_superuser or _is_teacher(request.user)
+    
+    def has_change_permission(self, request, obj=None):
+        # Superusers can edit all, teachers can edit their own
+        if request.user.is_superuser:
+            return True
+        if _is_teacher(request.user) and obj:
+            return obj.author == request.user
+        return _is_teacher(request.user) and obj is None
+    
+    def has_delete_permission(self, request, obj=None):
+        # Superusers can delete all, teachers can delete their own
+        if request.user.is_superuser:
+            return True
+        if _is_teacher(request.user) and obj:
+            return obj.author == request.user
+        return False
 
 # Forum Reply Inline
 class ForumReplyInline(admin.TabularInline):
