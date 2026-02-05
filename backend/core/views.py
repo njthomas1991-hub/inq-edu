@@ -547,6 +547,30 @@ def teacher_forum_detail_view(request, post_id):
 
 
 @login_required
+def teacher_forum_edit_view(request, post_id):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    post = get_object_or_404(ForumPost, id=post_id)
+
+    if post.author != request.user and not request.user.is_superuser:
+        return HttpResponseForbidden("You can only edit your own discussions")
+
+    if request.method == "POST":
+        form = ForumPostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect("teacher_forum_detail", post_id=post.id)
+    else:
+        form = ForumPostForm(instance=post)
+
+    return render(request, "core/teacher_forum_edit.html", {
+        "post": post,
+        "form": form,
+    })
+
+
+@login_required
 def teacher_forum_delete_view(request, post_id):
     if getattr(request.user, "role", None) != "teacher":
         return HttpResponseForbidden("Teacher access only")
@@ -559,6 +583,50 @@ def teacher_forum_delete_view(request, post_id):
     if request.method == "POST":
         post.delete()
         return redirect("teacher_forum")
+
+    return redirect("teacher_forum_detail", post_id=post.id)
+
+
+@login_required
+def teacher_forum_reply_edit_view(request, post_id, reply_id):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    post = get_object_or_404(ForumPost, id=post_id)
+    reply = get_object_or_404(ForumReply, id=reply_id, post=post)
+
+    if reply.author != request.user and not request.user.is_superuser:
+        return HttpResponseForbidden("You can only edit your own replies")
+
+    if request.method == "POST":
+        form = ForumReplyForm(request.POST, instance=reply)
+        if form.is_valid():
+            form.save()
+            return redirect("teacher_forum_detail", post_id=post.id)
+    else:
+        form = ForumReplyForm(instance=reply)
+
+    return render(request, "core/teacher_forum_reply_edit.html", {
+        "post": post,
+        "reply": reply,
+        "form": form,
+    })
+
+
+@login_required
+def teacher_forum_reply_delete_view(request, post_id, reply_id):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    post = get_object_or_404(ForumPost, id=post_id)
+    reply = get_object_or_404(ForumReply, id=reply_id, post=post)
+
+    if reply.author != request.user and not request.user.is_superuser:
+        return HttpResponseForbidden("You can only delete your own replies")
+
+    if request.method == "POST":
+        reply.delete()
+        return redirect("teacher_forum_detail", post_id=post.id)
 
     return redirect("teacher_forum_detail", post_id=post.id)
 

@@ -41,7 +41,8 @@
                         <div class="d-flex align-items-center gap-2">
                             <small class="text-muted">{{ post.updated_at|date:"M d, Y" }}</small>
                             {% if post.author == request.user or request.user.is_superuser %}
-                                <form method="post" action="{% url 'teacher_forum_delete' post.id %}" onsubmit="return confirm('Delete this discussion?');">
+                                <a href="{% url 'teacher_forum_edit' post.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <form method="post" action="{% url 'teacher_forum_delete' post.id %}" onsubmit="return confirm('Delete this discussion?');" style="display:inline;">
                                     {% csrf_token %}
                                     <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
                                 </form>
