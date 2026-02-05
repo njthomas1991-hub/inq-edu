@@ -62,7 +62,7 @@
 <script>
     $(document).ready(function() {
         var $contentField = $('#id_content');
-        if ($contentField.length) {
+        if ($contentField.length && !$contentField.data('summernote')) {
             $contentField.summernote({
                 height: 250,
                 minHeight: 200,
