@@ -49,22 +49,37 @@
 {% block extra_js %}
 <script>
     $(document).ready(function() {
-        $('#id_content').summernote({
-            height: 300,
-            minHeight: 250,
-            placeholder: 'Start the discussion...',
-            toolbar: [
-                ['style', ['style']],
-                ['font', ['bold', 'underline', 'italic', 'clear']],
-                ['fontname', ['fontname']],
-                ['fontsize', ['fontsize']],
-                ['color', ['color']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['table', ['table']],
-                ['insert', ['link', 'picture']],
-                ['view', ['fullscreen', 'codeview', 'help']]
-            ]
-        });
+        // Initialize Summernote
+        var $contentField = $('#id_content');
+        if ($contentField.length) {
+            $contentField.summernote({
+                height: 300,
+                minHeight: 250,
+                placeholder: 'Start the discussion...',
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'underline', 'italic', 'clear']],
+                    ['fontname', ['fontname']],
+                    ['fontsize', ['fontsize']],
+                    ['color', ['color']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
+                    ['insert', ['link', 'picture']],
+                    ['view', ['fullscreen', 'codeview', 'help']]
+                ]
+            });
+        }
+        
+        // Handle collapse toggle
+        var collapseElement = document.getElementById('forumForm');
+        if (collapseElement) {
+            collapseElement.addEventListener('show.bs.collapse', function () {
+                // Trigger Summernote to focus and layout properly
+                setTimeout(function() {
+                    $contentField.summernote('focus');
+                }, 200);
+            });
+        }
     });
 </script>
 {% endblock %}
