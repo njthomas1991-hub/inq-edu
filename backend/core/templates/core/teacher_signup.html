@@ -1,3 +1,4 @@
+{% load crispy_forms_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,17 +16,19 @@
 
                 <form method="post">
                     {% csrf_token %}
-                    {% for field in form %}
-                        <div class="mb-3">
-                            <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                            {{ field }}
-                            {% if field.errors %}
-                                <div class="text-danger small mt-1">{{ field.errors|striptags }}</div>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                    <button type="submit" class="btn btn-primary w-100">Login</button>
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary w-100">Sign up</button>
                 </form>
+
+                <div class="text-center text-muted small my-3">or</div>
+                <div class="d-grid gap-2 mb-3">
+                    <a class="btn btn-outline-dark" href="/accounts/google/login/">
+                        Continue with Google
+                    </a>
+                    <a class="btn btn-outline-primary" href="/accounts/microsoft/login/">
+                        Continue with Microsoft
+                    </a>
+                </div>
 
                 <div class="text-center mt-3">
                     <a href="/teacher/login/">Already have an account? Login</a>

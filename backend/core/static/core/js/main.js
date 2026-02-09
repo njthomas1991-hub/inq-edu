@@ -58,8 +58,11 @@ const sttControls = document.getElementById('sttControls');
 const startListeningBtn = document.getElementById('startListeningBtn');
 const sttResult = document.getElementById('sttResult');
 
+console.log('Accessibility elements loaded:', { accessibilityToggle, accessibilityPanel, closeAccessibility });
+
 if (accessibilityToggle && accessibilityPanel) {
 	accessibilityToggle.addEventListener('click', () => {
+		console.log('Accessibility toggle clicked');
 		accessibilityPanel.classList.toggle('active');
 		if (accessibilityPanel.classList.contains('active')) {
 			setTimeout(() => {
@@ -68,6 +71,8 @@ if (accessibilityToggle && accessibilityPanel) {
 			}, 100);
 		}
 	});
+} else {
+	console.log('Accessibility toggle or panel not found');
 }
 
 if (closeAccessibility && accessibilityPanel && accessibilityToggle) {

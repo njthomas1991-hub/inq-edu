@@ -166,6 +166,51 @@ html:not([data-theme="dark"]) .btn-light:hover {
     color: var(--theme-text) !important;
 }
 
+/* Center navbar brand on all viewports - Override Bootstrap */
+.navbar-center-wrapper {
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+}
+
+.navbar-brand {
+    margin: 0 !important;
+    white-space: nowrap !important;
+}
+
+.navbar-toggler {
+    position: relative !important;
+    z-index: 10 !important;
+}
+
+.navbar-collapse {
+    justify-content: center !important;
+}
+
+/* On mobile */
+@media (max-width: 991.98px) {
+    .navbar-center-wrapper {
+        position: static !important;
+        transform: none !important;
+        flex-grow: 1 !important;
+        display: flex !important;
+        justify-content: center !important;
+        margin: 0.5rem 0 !important;
+    }
+    
+    .navbar > .container-fluid {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+    }
+    
+    .navbar-brand {
+        margin: 0 !important;
+    }
+}
+
 /* Dropdown theme support */
 .dropdown-menu {
     background-color: var(--theme-bg-2);

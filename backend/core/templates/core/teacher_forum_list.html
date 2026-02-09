@@ -1,4 +1,6 @@
 {% extends "core/base_teacher.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
 
 {% block title %}Community Forum - Teacher Hub{% endblock %}
 
@@ -18,12 +20,14 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <h5 class="card-title">New Forum Post</h5>
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <div class="mb-3">{{ form.title }}</div>
-                    <div class="mb-3">{{ form.content }}</div>
+                    {{ form|crispy }}
                     <button class="btn btn-success" type="submit">Post</button>
                 </form>
+                <p class="small text-muted mt-3 mb-0">
+                    We welcome open and respectful discussion. Please note that this comments section is monitored. Any posts containing offensive language, harassment, hate speech, spam, personal attacks, or inappropriate content may be removed at our discretion.
+                </p>
             </div>
         </div>
     </div>
@@ -32,6 +36,16 @@
         <div class="list-group shadow-sm">
             {% for post in posts %}
                 <div class="list-group-item">
+                    <div class="image-container mb-3">
+                        {% if post.image and "placeholder" in post.image.url %}
+                            <img class="card-img-top" src="{% static 'core/images/default.jpg' %}" alt="placeholder image">
+                        {% elif post.image %}
+                            <img class="card-img-top" src="{{ post.image.url }}" alt="{{ post.title }}">
+                        {% else %}
+                            <img class="card-img-top" src="{% static 'core/images/default.jpg' %}" alt="placeholder image">
+                        {% endif %}
+                        <div class="image-flash"></div>
+                    </div>
                     <div class="d-flex w-100 justify-content-between align-items-start">
                         <h5 class="mb-1">
                             <a class="text-decoration-none" href="{% url 'teacher_forum_detail' post.id %}">
@@ -54,6 +68,47 @@
                 </div>
             {% endfor %}
         </div>
+        
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+                
+                {% for num in page_obj.paginator.page_range %}
+                    {% if page_obj.number == num %}
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
     {% else %}
         <div class="alert alert-info">No discussions yet. Start the first one!</div>
     {% endif %}

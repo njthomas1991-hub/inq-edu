@@ -5,7 +5,10 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q, F
+from django.core.paginator import Paginator
 from django_summernote.widgets import SummernoteWidget
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Row, Column, Field
 from .models import (
     User, Class, ClassStudent,
     NewsAnnouncement, HelpTutorial, TeachingResource,
@@ -28,13 +31,48 @@ class ClassForm(forms.ModelForm):
 
 
 class TeachingResourceForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column('title', css_class='col-md-6'),
+                Column('resource_type', css_class='col-md-6'),
+                css_class='g-3'
+            ),
+            Row(
+                Column('key_stage', css_class='col-md-6'),
+                Column('subject', css_class='col-md-6'),
+                css_class='g-3'
+            ),
+            Row(
+                Column('excerpt', css_class='col-12'),
+                css_class='g-3'
+            ),
+            Row(
+                Column('image', css_class='col-md-6'),
+                Column('file', css_class='col-md-6'),
+                css_class='g-3'
+            ),
+            Row(
+                Column('content', css_class='col-12'),
+                css_class='g-3'
+            ),
+            Row(
+                Column('status', css_class='col-md-4'),
+                css_class='g-3'
+            ),
+        )
+
     class Meta:
         model = TeachingResource
-        fields = ('title', 'content', 'excerpt', 'file', 'resource_type', 'key_stage', 'subject', 'status')
+        fields = ('title', 'content', 'excerpt', 'image', 'file', 'resource_type', 'key_stage', 'subject', 'status')
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Resource title'}),
             'content': SummernoteWidget(attrs={'summernote': {'height': '400'}}),
             'excerpt': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Short summary'}),
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'file': forms.FileInput(attrs={'class': 'form-control', 'accept': '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx'}),
             'resource_type': forms.Select(attrs={'class': 'form-select'}),
             'key_stage': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 4}),
@@ -46,9 +84,10 @@ class TeachingResourceForm(forms.ModelForm):
 class ForumPostForm(forms.ModelForm):
     class Meta:
         model = ForumPost
-        fields = ('title', 'content')
+        fields = ('title', 'image', 'content')
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Discussion title'}),
+            'image': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'content': SummernoteWidget(attrs={'summernote': {'height': '300'}}),
         }
 
@@ -412,8 +451,15 @@ def teacher_news_list_view(request):
     else:
         news_items = NewsAnnouncement.objects.filter(status='published')
 
+    paginator = Paginator(news_items, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    is_paginated = page_obj.has_other_pages()
+
     return render(request, "core/teacher_news_list.html", {
-        "news_items": news_items,
+        "news_items": page_obj,
+        "page_obj": page_obj,
+        "is_paginated": is_paginated,
     })
 
 
@@ -442,8 +488,15 @@ def teacher_help_list_view(request):
     else:
         tutorials = HelpTutorial.objects.filter(status='published')
 
+    paginator = Paginator(tutorials, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    is_paginated = page_obj.has_other_pages()
+
     return render(request, "core/teacher_help_list.html", {
-        "tutorials": tutorials,
+        "tutorials": page_obj,
+        "page_obj": page_obj,
+        "is_paginated": is_paginated,
     })
 
 
@@ -482,8 +535,15 @@ def teacher_resources_list_view(request):
     else:
         form = TeachingResourceForm()
 
+    paginator = Paginator(resources, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    is_paginated = page_obj.has_other_pages()
+
     return render(request, "core/teacher_resources_list.html", {
-        "resources": resources,
+        "resources": page_obj,
+        "page_obj": page_obj,
+        "is_paginated": is_paginated,
         "form": form,
     })
 
@@ -594,10 +654,44 @@ def teacher_forum_list_view(request):
     else:
         form = ForumPostForm()
 
+    paginator = Paginator(posts, 6)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    is_paginated = page_obj.has_other_pages()
+
     return render(request, "core/teacher_forum_list.html", {
-        "posts": posts,
+        "posts": page_obj,
+        "page_obj": page_obj,
+        "is_paginated": is_paginated,
         "form": form,
     })
+
+
+@login_required
+def profile_view(request):
+    user = request.user
+    role = getattr(user, "role", None)
+
+    if role == "teacher":
+        classes_taught = user.classes_taught.all()
+        template_name = "core/teacher_profile.html"
+        context = {
+            "classes_taught": classes_taught,
+            "classes_count": classes_taught.count(),
+        }
+    else:
+        enrollments = user.enrolled_classes.select_related("clazz").all()
+        template_name = "core/student_profile.html"
+        context = {
+            "enrollments": enrollments,
+            "classes_count": enrollments.count(),
+        }
+
+    context.update({
+        "profile_user": user,
+    })
+
+    return render(request, template_name, context)
 
 
 @login_required

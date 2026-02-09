@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 
 import os
+import importlib.util
 import dj_database_url
 from pathlib import Path
 
@@ -24,9 +25,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-# If you want to load environment variables from a file, consider using python-dotenv or similar.
-# if os.path.isfile('env.py'):
-#     import env  # noqa: F401
+# Load environment variables from env.py if present.
+env_path = os.path.join(BASE_DIR.parent, 'env.py')
+if os.path.isfile(env_path):
+    spec = importlib.util.spec_from_file_location('env', env_path)
+    env = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(env)
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-default-change-this-in-production')
 
@@ -48,11 +52,21 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
+    'cloudinary',
+    'django.contrib.sites',
     'rest_framework',
     'corsheaders',
     'core',
     'django_summernote',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.microsoft',
+    'crispy_forms',
+    'crispy_bootstrap5',
 ]
 
 AUTH_USER_MODEL = 'core.User'
@@ -60,6 +74,39 @@ AUTH_USER_MODEL = 'core.User'
 LOGIN_URL = '/teacher/login/'
 LOGIN_REDIRECT_URL = '/teacher/'
 LOGOUT_REDIRECT_URL = '/'
+
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+ACCOUNT_LOGIN_METHODS = {'email', 'username'}
+ACCOUNT_SIGNUP_FIELDS = [
+    'email*',
+    'username*',
+    'password1*',
+    'password2*',
+]
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+ACCOUNT_LOGOUT_REDIRECT_URL = '/'
+ACCOUNT_LOGIN_REDIRECT_URL = '/teacher/'
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+    }
+    ,
+    'microsoft': {
+        'SCOPE': ['User.Read'],
+    }
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -69,6 +116,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]

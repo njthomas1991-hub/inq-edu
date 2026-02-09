@@ -1,3 +1,4 @@
+{% load crispy_forms_tags %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,19 +16,19 @@
 
                 <form method="post">
                     {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="id_username" class="form-label">Username</label>
-                        <input type="text" name="username" class="form-control" id="id_username" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="id_password" class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" id="id_password" required>
-                    </div>
-                    {% if form.errors %}
-                        <div class="alert alert-danger">Invalid credentials. Please try again.</div>
-                    {% endif %}
+                    {{ form|crispy }}
                     <button type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
+
+                <div class="text-center text-muted small my-3">or</div>
+                <div class="d-grid gap-2 mb-3">
+                    <a class="btn btn-outline-dark" href="/accounts/google/login/">
+                        Continue with Google
+                    </a>
+                    <a class="btn btn-outline-primary" href="/accounts/microsoft/login/">
+                        Continue with Microsoft
+                    </a>
+                </div>
             </div>
         </div>
     </div>
