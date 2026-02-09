@@ -12,7 +12,7 @@ from .views import (
     custom_login_view, student_dashboard_view, teacher_forum_delete_view, teacher_forum_edit_view,
     teacher_forum_reply_edit_view, teacher_forum_reply_delete_view, teacher_resource_edit_view,
     teacher_resource_delete_view, teacher_resource_comment_delete_view, profile_view, save_avatar,
-    generate_random_avatar, auto_generate_avatar
+    generate_random_avatar, auto_generate_avatar, get_avatar_image
 )
 
 urlpatterns = [
@@ -64,4 +64,5 @@ urlpatterns = [
     path("avatar/save/", save_avatar, name="save_avatar"),
     path("avatar/generate/", generate_random_avatar, name="generate_random_avatar"),
     path("avatar/auto-generate/", auto_generate_avatar, name="auto_generate_avatar"),
+    path("avatar/image/", get_avatar_image, name="get_avatar_image"),
 ]

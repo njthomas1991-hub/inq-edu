@@ -1,3 +1,27 @@
+"""
+Avatar Generator - Creates cute fuzzy monster avatars with random attributes.
+
+Uses Pillow (PIL) for rendering adorable monsters with:
+- Round fuzzy bodies with customizable shapes and colors
+- Big expressive eyes with shine effects
+- Smiling mouths with cute cheeks
+- Optional fuzzy ears, antennae, glasses, and shoes
+- Persistent storage in Avatar model
+- Base64 PNG output for web display
+
+The generated avatars can be:
+- Saved to database (OneToOneField to User)
+- Rendered as PNG (via avatar_renderer.py)
+- Embedded as base64 in HTML
+- Retrieved via API endpoints
+
+Example:
+    from core.avatar_generator import create_monster_avatar
+    avatar = create_monster_avatar(user=request.user, cute_bias=True)
+    
+The avatar is automatically rendered to PNG by avatar_renderer.avatar_to_base64()
+"""
+
 import random
 from .models import Avatar
 

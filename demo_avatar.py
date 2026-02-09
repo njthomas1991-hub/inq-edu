@@ -8,12 +8,12 @@ import sys
 import django
 
 # Setup Django environment
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backend'))
+sys.path.insert(0, os.path.dirname(__file__))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
 
-from core.avatar_generator import create_monster_avatar, get_random_avatar_data
-from core.models import User
+from backend.core.avatar_generator import create_monster_avatar, get_random_avatar_data
+from django.contrib.auth.models import User
 
 def demo_avatar_generation():
     """Demonstrate avatar generation"""

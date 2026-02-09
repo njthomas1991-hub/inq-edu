@@ -14,7 +14,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
 
 # Import after Django setup
-from core.avatar_generator import create_monster_avatar, get_random_avatar_data
+from backend.core.avatar_generator import create_monster_avatar, get_random_avatar_data
 
 # Test the function
 print("🎨 Testing Monster Avatar Generator\n")

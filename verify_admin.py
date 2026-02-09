@@ -4,11 +4,14 @@ import sys
 import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backend'))
+project_path = os.path.dirname(__file__)
+backend_path = os.path.join(project_path, 'backend')
+sys.path.insert(0, project_path)
+sys.path.insert(0, backend_path)
 
 django.setup()
 
-from core.models import User
+from core.models import User  # noqa: E402
 
 # Check admin user details
 admin = User.objects.filter(username='admin').first()

@@ -546,11 +546,24 @@ class AvatarBuilder {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Avatar saved successfully!');
-                location.reload();
+                // Update the avatar display image if available
+                if (data.image) {
+                    const img = document.querySelector('.avatar-display img');
+                    if (img) {
+                        img.src = 'data:image/png;base64,' + data.image;
+                    }
+                }
+                alert('Avatar saved successfully! 🎉');
+                // Close the modal
+                const modal = bootstrap.Modal.getInstance(document.getElementById('avatarBuilderModal'));
+                if (modal) modal.hide();
             } else {
-                alert('Error saving avatar');
+                alert('Error saving avatar: ' + (data.error || 'Unknown error'));
             }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            alert('Error saving avatar');
         });
     }
 }
