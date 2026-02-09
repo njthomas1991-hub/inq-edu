@@ -18,6 +18,7 @@ from .models import (
     ForumPost, ForumReply, ResourceComment, Avatar
 )
 from .avatar_generator import create_monster_avatar, get_random_avatar_data
+from .avatar_renderer import avatar_to_base64
 import string
 import random
 import json
@@ -741,12 +742,19 @@ def profile_view(request):
 
     # Add avatar context
     avatar_json = None
+    avatar_image = None
     if hasattr(user, 'avatar') and user.avatar:
         avatar_json = json.dumps(user.avatar.to_dict())
+        # Generate base64 image for display
+        try:
+            avatar_image = avatar_to_base64(user.avatar.to_dict(), size=300)
+        except Exception as e:
+            print(f"Error generating avatar image: {e}")
 
     context.update({
         "profile_user": user,
         "avatar_json": avatar_json,
+        "avatar_image": avatar_image,
     })
 
     return render(request, template_name, context)
@@ -867,7 +875,26 @@ def teacher_forum_reply_delete_view(request, post_id, reply_id):
 @login_required
 @require_http_methods(["POST"])
 def save_avatar(request):
-    """Save user's avatar customization"""
+    """
+    Save user's avatar customization and render as PNG image.
+    
+    Uses Pillow to generate a high-quality PNG image from the avatar data
+    and returns it as base64 for immediate display update.
+    
+    Request body (JSON):
+        bodyShape, bodyColor, armStyle, armColor, legStyle, legColor,
+        eyeStyle, eyeColor, mouthStyle, mouthColor, hasTeeth, hasGlasses,
+        hasEars, hasAntennae, hasShoes, shoeColor
+    
+    Response:
+        {
+            'success': True,
+            'message': 'Avatar saved successfully',
+            'image': '<base64-encoded PNG image>'
+        }
+    
+    The image is rendered using Pillow with all avatar customizations.
+    """
     try:
         data = json.loads(request.body)
         
@@ -894,7 +921,14 @@ def save_avatar(request):
         
         avatar.save()
         
-        return JsonResponse({'success': True, 'message': 'Avatar saved successfully'})
+        # Generate and return avatar image using Pillow
+        avatar_image = avatar_to_base64(avatar.to_dict(), size=300)
+        
+        return JsonResponse({
+            'success': True, 
+            'message': 'Avatar saved successfully',
+            'image': avatar_image
+        })
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
@@ -902,7 +936,23 @@ def save_avatar(request):
 @login_required
 @require_http_methods(["GET"])
 def generate_random_avatar(request):
-    """Generate random cute monster avatar data"""
+    """
+    Generate random cute monster avatar data (no save).
+    
+    Returns avatar configuration data without rendering image.
+    Useful for preview before saving.
+    
+    Response:
+        {
+            'success': True,
+            'avatar': {
+                'bodyShape': 'round',
+                'bodyColor': '#FF6B9D',
+                'armStyle': 'short',
+                ... (all avatar fields)
+            }
+        }
+    """
     try:
         avatar_data = get_random_avatar_data()
         return JsonResponse({'success': True, 'avatar': avatar_data})
@@ -913,14 +963,66 @@ def generate_random_avatar(request):
 @login_required
 @require_http_methods(["POST"])
 def auto_generate_avatar(request):
-    """Auto-generate and save a cute monster avatar for the current user"""
+    """
+    Auto-generate and save a cute monster avatar for the current user.
+    
+    Creates a random cute monster avatar, saves it to database, 
+    and renders it as PNG using Pillow.
+    
+    Response:
+        {
+            'success': True,
+            'message': 'Avatar auto-generated successfully',
+            'avatar': { ... avatar data ... },
+            'image': '<base64-encoded PNG image>'
+        }
+    
+    The Pillow-rendered image can be displayed immediately with:
+        <img src="data:image/png;base64,{{ image }}" />
+    """
     try:
         avatar = create_monster_avatar(user=request.user, cute_bias=True)
+        avatar_image = avatar_to_base64(avatar.to_dict(), size=300)
         return JsonResponse({
             'success': True,
             'message': 'Avatar auto-generated successfully',
-            'avatar': avatar.to_dict()
+            'avatar': avatar.to_dict(),
+            'image': avatar_image
         })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+
+@login_required
+@require_http_methods(["GET"])
+def get_avatar_image(request):
+    """
+    Get base64 PNG image of user's current avatar.
+    
+    Renders existing avatar to PNG using Pillow and returns 
+    base64-encoded image for display.
+    
+    Response:
+        {
+            'success': True,
+            'image': '<base64-encoded PNG image>'
+        }
+    
+    Error if no avatar exists:
+        {
+            'success': False,
+            'error': 'No avatar found'
+        }
+    """
+    try:
+        if hasattr(request.user, 'avatar') and request.user.avatar:
+            avatar_image = avatar_to_base64(request.user.avatar.to_dict(), size=300)
+            return JsonResponse({
+                'success': True,
+                'image': avatar_image
+            })
+        else:
+            return JsonResponse({'success': False, 'error': 'No avatar found'}, status=404)
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 

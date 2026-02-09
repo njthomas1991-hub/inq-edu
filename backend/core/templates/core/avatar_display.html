@@ -2,9 +2,18 @@
 
 <!-- Avatar Display Component -->
 <div class="avatar-display" style="text-align: center;">
-    {% if user.avatar %}
+    {% if user.avatar and avatar_image %}
+        <div style="display: inline-block; border-radius: 50%; overflow: hidden; border: 3px solid #dee2e6;">
+            <img src="data:image/png;base64,{{ avatar_image }}" alt="Your Avatar" style="width: 200px; height: 200px; display: block;">
+        </div>
+        <div class="mt-2">
+            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#avatarBuilderModal">
+                <i class="bi bi-palette"></i> Edit Avatar
+            </button>
+        </div>
+    {% elif user.avatar %}
         <div data-avatar="{{ avatar_json }}" style="display: inline-block; border-radius: 50%; overflow: hidden; border: 3px solid #dee2e6;">
-            {% include "core/avatar_renderer.html" with avatar=user.avatar %}
+            <svg id="avatarPreviewStatic" width="200" height="200" style="background: #f8f9fa;"></svg>
         </div>
         <div class="mt-2">
             <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#avatarBuilderModal">
