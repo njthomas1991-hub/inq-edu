@@ -1,0 +1,27 @@
+{% load static %}
+
+<!-- Avatar Display Component -->
+<div class="avatar-display" style="text-align: center;">
+    {% if user.avatar %}
+        <div data-avatar="{{ avatar_json }}" style="display: inline-block; border-radius: 50%; overflow: hidden; border: 3px solid #dee2e6;">
+            {% include "core/avatar_renderer.html" with avatar=user.avatar %}
+        </div>
+        <div class="mt-2">
+            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#avatarBuilderModal">
+                <i class="bi bi-palette"></i> Edit Avatar
+            </button>
+        </div>
+    {% else %}
+        <div style="width: 150px; height: 150px; margin: 0 auto; background: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px dashed #999;">
+            <span style="color: #999; text-align: center;">
+                <div style="font-size: 48px;">👤</div>
+                <small>No Avatar</small>
+            </span>
+        </div>
+        <div class="mt-2">
+            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#avatarBuilderModal">
+                <i class="bi bi-palette"></i> Create Avatar
+            </button>
+        </div>
+    {% endif %}
+</div>

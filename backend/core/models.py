@@ -9,8 +9,9 @@ class User(AbstractUser):
     ROLE_CHOICES = (
         ('teacher', 'Teacher'),
         ('student', 'Student'),
+        ('school_admin', 'School Admin'),
     )
-    role = models.CharField(max_length=10, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
     school = models.CharField(max_length=255, null=True, blank=True)
     plain_password = models.CharField(max_length=100, null=True, blank=True, help_text="Plain text password for display purposes (students only)")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -252,3 +253,97 @@ class ResourceComment(models.Model):
     
     def __str__(self):
         return f"Comment by {self.author.username} on {self.resource.title}"
+
+
+# Avatar Model - Custom monster avatars for users
+class Avatar(models.Model):
+    BODY_SHAPES = (
+        ('round', 'Round'),
+        ('square', 'Square'),
+        ('rectangular', 'Rectangular'),
+        ('oval', 'Oval'),
+    )
+    ARM_STYLES = (
+        ('short', 'Short'),
+        ('long', 'Long'),
+        ('tentacle', 'Tentacle'),
+        ('none', 'None'),
+    )
+    LEG_STYLES = (
+        ('two', 'Two Legs'),
+        ('four', 'Four Legs'),
+        ('none', 'No Legs'),
+    )
+    EYE_STYLES = (
+        ('round', 'Round'),
+        ('oval', 'Oval'),
+        ('closed', 'Closed'),
+        ('star', 'Star'),
+    )
+    MOUTH_STYLES = (
+        ('smile', 'Smile'),
+        ('frown', 'Frown'),
+        ('neutral', 'Neutral'),
+        ('open', 'Open'),
+    )
+    ACCESSORY_CHOICES = (
+        ('none', 'None'),
+        ('yes', 'Yes'),
+    )
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='avatar')
+    
+    # Body customization
+    body_shape = models.CharField(max_length=20, choices=BODY_SHAPES, default='round')
+    body_color = models.CharField(max_length=7, default='#FF6B9D')  # hex color
+    
+    # Limbs
+    arm_style = models.CharField(max_length=20, choices=ARM_STYLES, default='short')
+    arm_color = models.CharField(max_length=7, default='#FF6B9D')
+    leg_style = models.CharField(max_length=20, choices=LEG_STYLES, default='two')
+    leg_color = models.CharField(max_length=7, default='#FF6B9D')
+    
+    # Face features
+    eye_style = models.CharField(max_length=20, choices=EYE_STYLES, default='round')
+    eye_color = models.CharField(max_length=7, default='#000000')
+    mouth_style = models.CharField(max_length=20, choices=MOUTH_STYLES, default='smile')
+    mouth_color = models.CharField(max_length=7, default='#000000')
+    has_teeth = models.BooleanField(default=False)
+    
+    # Accessories
+    has_glasses = models.BooleanField(default=False)
+    has_ears = models.BooleanField(default=False)
+    has_antennae = models.BooleanField(default=False)
+    has_shoes = models.BooleanField(default=False)
+    shoe_color = models.CharField(max_length=7, default='#000000')
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'User Avatar'
+        verbose_name_plural = "User Avatars"
+    
+    def __str__(self):
+        return f"Avatar for {self.user.username}"
+    
+    def to_dict(self):
+        """Convert avatar to dictionary for JavaScript"""
+        return {
+            'bodyShape': self.body_shape,
+            'bodyColor': self.body_color,
+            'armStyle': self.arm_style,
+            'armColor': self.arm_color,
+            'legStyle': self.leg_style,
+            'legColor': self.leg_color,
+            'eyeStyle': self.eye_style,
+            'eyeColor': self.eye_color,
+            'mouthStyle': self.mouth_style,
+            'mouthColor': self.mouth_color,
+            'hasTeeth': self.has_teeth,
+            'hasGlasses': self.has_glasses,
+            'hasEars': self.has_ears,
+            'hasAntennae': self.has_antennae,
+            'hasShoes': self.has_shoes,
+            'shoeColor': self.shoe_color,
+        }

@@ -1,0 +1,569 @@
+{% load static %}
+
+<!-- Avatar Builder Modal -->
+<div class="modal fade" id="avatarBuilderModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-palette"></i> Avatar Builder - Create Your Monster
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Avatar Preview -->
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">Preview</h6>
+                            </div>
+                            <div class="card-body text-center">
+                                <svg id="avatarPreview" width="300" height="400" style="border: 1px solid #ddd; border-radius: 8px; background: #f8f9fa;"></svg>
+                                <div class="mt-3">
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="randomizeAvatar">
+                                        <i class="bi bi-shuffle"></i> Randomize
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Customization Controls -->
+                    <div class="col-md-6">
+                        <div class="card" style="max-height: 600px; overflow-y: auto;">
+                            <div class="card-body">
+                                <h6 class="mb-3">Customize Your Monster</h6>
+
+                                <!-- Body -->
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>Body</strong></label>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <label class="form-label small">Shape</label>
+                                            <select id="bodyShape" class="form-select form-select-sm">
+                                                <option value="round">Round</option>
+                                                <option value="square">Square</option>
+                                                <option value="rectangular">Rectangular</option>
+                                                <option value="oval">Oval</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label small">Color</label>
+                                            <input type="color" id="bodyColor" class="form-control form-control-sm" value="#FF6B9D">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Arms & Legs -->
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>Limbs</strong></label>
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <label class="form-label small">Arms</label>
+                                            <select id="armStyle" class="form-select form-select-sm">
+                                                <option value="short">Short</option>
+                                                <option value="long">Long</option>
+                                                <option value="tentacle">Tentacle</option>
+                                                <option value="none">None</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label small">Legs</label>
+                                            <select id="legStyle" class="form-select form-select-sm">
+                                                <option value="two">Two Legs</option>
+                                                <option value="four">Four Legs</option>
+                                                <option value="none">No Legs</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Eyes & Mouth -->
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>Face Features</strong></label>
+                                    <div class="row g-2 mb-2">
+                                        <div class="col-6">
+                                            <label class="form-label small">Eyes</label>
+                                            <select id="eyeStyle" class="form-select form-select-sm">
+                                                <option value="round">Round</option>
+                                                <option value="oval">Oval</option>
+                                                <option value="closed">Closed</option>
+                                                <option value="star">Star</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label small">Mouth</label>
+                                            <select id="mouthStyle" class="form-select form-select-sm">
+                                                <option value="smile">Smile</option>
+                                                <option value="frown">Frown</option>
+                                                <option value="neutral">Neutral</option>
+                                                <option value="open">Open</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="hasTeeth">
+                                        <label class="form-check-label" for="hasTeeth">Add Teeth</label>
+                                    </div>
+                                </div>
+
+                                <!-- Accessories -->
+                                <div class="mb-3">
+                                    <label class="form-label"><strong>Accessories</strong></label>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="hasGlasses">
+                                        <label class="form-check-label" for="hasGlasses">Glasses</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="hasEars">
+                                        <label class="form-check-label" for="hasEars">Ears</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="hasAntennae">
+                                        <label class="form-check-label" for="hasAntennae">Antennae</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input type="checkbox" class="form-check-input" id="hasShoes">
+                                        <label class="form-check-label" for="hasShoes">Shoes</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveAvatarBtn">Save Avatar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+class AvatarBuilder {
+    constructor() {
+        this.avatarData = {
+            bodyShape: 'round',
+            bodyColor: '#FF6B9D',
+            armStyle: 'short',
+            armColor: '#FF6B9D',
+            legStyle: 'two',
+            legColor: '#FF6B9D',
+            eyeStyle: 'round',
+            eyeColor: '#000000',
+            mouthStyle: 'smile',
+            mouthColor: '#000000',
+            hasTeeth: false,
+            hasGlasses: false,
+            hasEars: false,
+            hasAntennae: false,
+            hasShoes: false,
+            shoeColor: '#000000',
+        };
+        this.init();
+    }
+
+    init() {
+        // Load existing avatar data if available
+        const existingData = document.querySelector('[data-avatar]');
+        if (existingData) {
+            this.avatarData = JSON.parse(existingData.dataset.avatar);
+        }
+
+        this.setupEventListeners();
+        this.loadFormValues();
+        this.renderAvatar();
+    }
+
+    setupEventListeners() {
+        // All controls update avatar on change
+        ['bodyShape', 'bodyColor', 'armStyle', 'legStyle', 'eyeStyle', 'mouthStyle'].forEach(id => {
+            document.getElementById(id)?.addEventListener('change', () => this.updateAndRender());
+        });
+
+        ['hasTeeth', 'hasGlasses', 'hasEars', 'hasAntennae', 'hasShoes'].forEach(id => {
+            document.getElementById(id)?.addEventListener('change', () => this.updateAndRender());
+        });
+
+        document.getElementById('randomizeAvatar')?.addEventListener('click', () => this.randomize());
+        document.getElementById('saveAvatarBtn')?.addEventListener('click', () => this.save());
+    }
+
+    loadFormValues() {
+        document.getElementById('bodyShape').value = this.avatarData.bodyShape;
+        document.getElementById('bodyColor').value = this.avatarData.bodyColor;
+        document.getElementById('armStyle').value = this.avatarData.armStyle;
+        document.getElementById('legStyle').value = this.avatarData.legStyle;
+        document.getElementById('eyeStyle').value = this.avatarData.eyeStyle;
+        document.getElementById('mouthStyle').value = this.avatarData.mouthStyle;
+        document.getElementById('hasTeeth').checked = this.avatarData.hasTeeth;
+        document.getElementById('hasGlasses').checked = this.avatarData.hasGlasses;
+        document.getElementById('hasEars').checked = this.avatarData.hasEars;
+        document.getElementById('hasAntennae').checked = this.avatarData.hasAntennae;
+        document.getElementById('hasShoes').checked = this.avatarData.hasShoes;
+    }
+
+    updateAndRender() {
+        this.avatarData.bodyShape = document.getElementById('bodyShape').value;
+        this.avatarData.bodyColor = document.getElementById('bodyColor').value;
+        this.avatarData.armStyle = document.getElementById('armStyle').value;
+        this.avatarData.legStyle = document.getElementById('legStyle').value;
+        this.avatarData.eyeStyle = document.getElementById('eyeStyle').value;
+        this.avatarData.mouthStyle = document.getElementById('mouthStyle').value;
+        this.avatarData.hasTeeth = document.getElementById('hasTeeth').checked;
+        this.avatarData.hasGlasses = document.getElementById('hasGlasses').checked;
+        this.avatarData.hasEars = document.getElementById('hasEars').checked;
+        this.avatarData.hasAntennae = document.getElementById('hasAntennae').checked;
+        this.avatarData.hasShoes = document.getElementById('hasShoes').checked;
+        this.renderAvatar();
+    }
+
+    renderAvatar() {
+        const svg = document.getElementById('avatarPreview');
+        svg.innerHTML = '';
+
+        const d = this.avatarData;
+
+        // Draw body
+        this.drawBody(svg, d);
+
+        // Draw limbs
+        this.drawLimbs(svg, d);
+
+        // Draw face
+        this.drawFace(svg, d);
+
+        // Draw accessories
+        this.drawAccessories(svg, d);
+    }
+
+    drawBody(svg, d) {
+        let body;
+        const cx = 150, cy = 140;
+        const color = d.bodyColor;
+
+        switch(d.bodyShape) {
+            case 'square':
+                body = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                body.setAttribute('x', cx - 60);
+                body.setAttribute('y', cy - 70);
+                body.setAttribute('width', 120);
+                body.setAttribute('height', 140);
+                body.setAttribute('fill', color);
+                body.setAttribute('rx', 5);
+                break;
+            case 'oval':
+                body = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                body.setAttribute('cx', cx);
+                body.setAttribute('cy', cy);
+                body.setAttribute('rx', 55);
+                body.setAttribute('ry', 75);
+                body.setAttribute('fill', color);
+                break;
+            case 'rectangular':
+                body = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                body.setAttribute('x', cx - 50);
+                body.setAttribute('y', cy - 80);
+                body.setAttribute('width', 100);
+                body.setAttribute('height', 160);
+                body.setAttribute('fill', color);
+                break;
+            case 'round':
+            default:
+                body = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                body.setAttribute('cx', cx);
+                body.setAttribute('cy', cy);
+                body.setAttribute('r', 65);
+                body.setAttribute('fill', color);
+        }
+
+        svg.appendChild(body);
+    }
+
+    drawLimbs(svg, d) {
+        const cx = 150, cy = 140;
+        const color = d.armColor;
+
+        // Arms
+        if (d.armStyle !== 'none') {
+            if (d.armStyle === 'short') {
+                // Left arm
+                this.createLine(svg, cx - 60, cy - 20, cx - 90, cy - 10, color, 8);
+                // Right arm
+                this.createLine(svg, cx + 60, cy - 20, cx + 90, cy - 10, color, 8);
+            } else if (d.armStyle === 'long') {
+                // Left arm
+                this.createLine(svg, cx - 60, cy, cx - 110, cy + 20, color, 8);
+                // Right arm
+                this.createLine(svg, cx + 60, cy, cx + 110, cy + 20, color, 8);
+            } else if (d.armStyle === 'tentacle') {
+                // Tentacle arms - curved
+                this.createPath(svg, `M ${cx - 60} ${cy} Q ${cx - 100} ${cy - 30} ${cx - 110} ${cy}`, color, 8);
+                this.createPath(svg, `M ${cx + 60} ${cy} Q ${cx + 100} ${cy - 30} ${cx + 110} ${cy}`, color, 8);
+            }
+        }
+
+        // Legs
+        if (d.legStyle === 'two') {
+            this.createLine(svg, cx - 30, cy + 75, cx - 30, cy + 130, d.legColor, 12);
+            this.createLine(svg, cx + 30, cy + 75, cx + 30, cy + 130, d.legColor, 12);
+        } else if (d.legStyle === 'four') {
+            this.createLine(svg, cx - 40, cy + 65, cx - 40, cy + 130, d.legColor, 10);
+            this.createLine(svg, cx - 10, cy + 75, cx - 10, cy + 130, d.legColor, 10);
+            this.createLine(svg, cx + 10, cy + 75, cx + 10, cy + 130, d.legColor, 10);
+            this.createLine(svg, cx + 40, cy + 65, cx + 40, cy + 130, d.legColor, 10);
+        }
+    }
+
+    drawFace(svg, d) {
+        const cx = 150, cy = 120;
+
+        // Eyes
+        this.drawEyes(svg, cx - 30, cy - 10, d.eyeStyle, d.eyeColor);
+        this.drawEyes(svg, cx + 30, cy - 10, d.eyeStyle, d.eyeColor);
+
+        // Mouth
+        this.drawMouth(svg, cx, cy + 25, d.mouthStyle, d.mouthColor, d.hasTeeth);
+    }
+
+    drawEyes(svg, x, y, style, color) {
+        let eye;
+        
+        switch(style) {
+            case 'oval':
+                eye = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                eye.setAttribute('cx', x);
+                eye.setAttribute('cy', y);
+                eye.setAttribute('rx', 12);
+                eye.setAttribute('ry', 18);
+                eye.setAttribute('fill', color);
+                break;
+            case 'closed':
+                eye = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                eye.setAttribute('d', `M ${x - 12} ${y} Q ${x} ${y + 8} ${x + 12} ${y}`);
+                eye.setAttribute('stroke', color);
+                eye.setAttribute('stroke-width', 2);
+                eye.setAttribute('fill', 'none');
+                break;
+            case 'star':
+                eye = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                const points = this.createStarPoints(x, y, 5, 15, 8);
+                eye.setAttribute('points', points);
+                eye.setAttribute('fill', color);
+                break;
+            case 'round':
+            default:
+                eye = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                eye.setAttribute('cx', x);
+                eye.setAttribute('cy', y);
+                eye.setAttribute('r', 12);
+                eye.setAttribute('fill', color);
+        }
+
+        svg.appendChild(eye);
+    }
+
+    drawMouth(svg, x, y, style, color, hasTeeth) {
+        let mouth;
+
+        switch(style) {
+            case 'smile':
+                mouth = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                mouth.setAttribute('d', `M ${x - 20} ${y} Q ${x} ${y + 15} ${x + 20} ${y}`);
+                mouth.setAttribute('stroke', color);
+                mouth.setAttribute('stroke-width', 3);
+                mouth.setAttribute('fill', 'none');
+                break;
+            case 'frown':
+                mouth = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                mouth.setAttribute('d', `M ${x - 20} ${y} Q ${x} ${y - 15} ${x + 20} ${y}`);
+                mouth.setAttribute('stroke', color);
+                mouth.setAttribute('stroke-width', 3);
+                mouth.setAttribute('fill', 'none');
+                break;
+            case 'neutral':
+                mouth = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                mouth.setAttribute('x1', x - 20);
+                mouth.setAttribute('y1', y);
+                mouth.setAttribute('x2', x + 20);
+                mouth.setAttribute('y2', y);
+                mouth.setAttribute('stroke', color);
+                mouth.setAttribute('stroke-width', 3);
+                break;
+            case 'open':
+                mouth = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse');
+                mouth.setAttribute('cx', x);
+                mouth.setAttribute('cy', y);
+                mouth.setAttribute('rx', 15);
+                mouth.setAttribute('ry', 12);
+                mouth.setAttribute('fill', color);
+        }
+
+        svg.appendChild(mouth);
+
+        if (hasTeeth && style === 'open') {
+            for (let i = -12; i <= 12; i += 6) {
+                const tooth = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                tooth.setAttribute('x', x + i);
+                tooth.setAttribute('y', y - 3);
+                tooth.setAttribute('width', 4);
+                tooth.setAttribute('height', 8);
+                tooth.setAttribute('fill', '#FFFFFF');
+                svg.appendChild(tooth);
+            }
+        }
+    }
+
+    drawAccessories(svg, d) {
+        const cx = 150, cy = 120;
+
+        // Glasses
+        if (d.hasGlasses) {
+            this.createCircle(svg, cx - 25, cy - 10, 14, 'none', '#333333', 2);
+            this.createCircle(svg, cx + 25, cy - 10, 14, 'none', '#333333', 2);
+            this.createLine(svg, cx - 11, cy - 10, cx + 11, cy - 10, '#333333', 2);
+        }
+
+        // Ears
+        if (d.hasEars) {
+            this.createCircle(svg, cx - 70, cy - 30, 20, d.bodyColor);
+            this.createCircle(svg, cx + 70, cy - 30, 20, d.bodyColor);
+        }
+
+        // Antennae
+        if (d.hasAntennae) {
+            this.createLine(svg, cx - 40, cy - 75, cx - 50, cy - 120, '#666666', 4);
+            this.createLine(svg, cx + 40, cy - 75, cx + 50, cy - 120, '#666666', 4);
+            this.createCircle(svg, cx - 50, cy - 120, 8, '#666666');
+            this.createCircle(svg, cx + 50, cy - 120, 8, '#666666');
+        }
+
+        // Shoes
+        if (d.hasShoes) {
+            this.createRect(svg, cx - 35, cy + 130, 18, 12, d.shoeColor);
+            this.createRect(svg, cx + 17, cy + 130, 18, 12, d.shoeColor);
+        }
+    }
+
+    // Helper methods
+    createLine(svg, x1, y1, x2, y2, color, width) {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+        line.setAttribute('stroke', color);
+        line.setAttribute('stroke-width', width);
+        line.setAttribute('stroke-linecap', 'round');
+        svg.appendChild(line);
+    }
+
+    createCircle(svg, x, y, r, fill = '#000', stroke = 'none', strokeWidth = 0) {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', x);
+        circle.setAttribute('cy', y);
+        circle.setAttribute('r', r);
+        circle.setAttribute('fill', fill);
+        if (stroke !== 'none') {
+            circle.setAttribute('stroke', stroke);
+            circle.setAttribute('stroke-width', strokeWidth);
+        }
+        svg.appendChild(circle);
+    }
+
+    createRect(svg, x, y, w, h, color) {
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('x', x);
+        rect.setAttribute('y', y);
+        rect.setAttribute('width', w);
+        rect.setAttribute('height', h);
+        rect.setAttribute('fill', color);
+        rect.setAttribute('rx', 3);
+        svg.appendChild(rect);
+    }
+
+    createPath(svg, d, stroke, width) {
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', d);
+        path.setAttribute('stroke', stroke);
+        path.setAttribute('stroke-width', width);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke-linecap', 'round');
+        svg.appendChild(path);
+    }
+
+    createStarPoints(cx, cy, numPoints, outerR, innerR) {
+        const points = [];
+        for (let i = 0; i < numPoints * 2; i++) {
+            const angle = (i * Math.PI) / numPoints;
+            const r = i % 2 === 0 ? outerR : innerR;
+            const x = cx + r * Math.cos(angle - Math.PI / 2);
+            const y = cy + r * Math.sin(angle - Math.PI / 2);
+            points.push(`${x},${y}`);
+        }
+        return points.join(' ');
+    }
+
+    randomize() {
+        const shapes = ['round', 'square', 'rectangular', 'oval'];
+        const colors = ['#FF6B9D', '#FF9E64', '#FFD93D', '#6BCB77', '#4D96FF', '#A78BFA'];
+        
+        this.avatarData = {
+            bodyShape: shapes[Math.floor(Math.random() * shapes.length)],
+            bodyColor: colors[Math.floor(Math.random() * colors.length)],
+            armStyle: ['short', 'long', 'tentacle', 'none'][Math.floor(Math.random() * 4)],
+            armColor: colors[Math.floor(Math.random() * colors.length)],
+            legStyle: ['two', 'four', 'none'][Math.floor(Math.random() * 3)],
+            legColor: colors[Math.floor(Math.random() * colors.length)],
+            eyeStyle: ['round', 'oval', 'closed', 'star'][Math.floor(Math.random() * 4)],
+            eyeColor: colors[Math.floor(Math.random() * colors.length)],
+            mouthStyle: ['smile', 'frown', 'neutral', 'open'][Math.floor(Math.random() * 4)],
+            mouthColor: colors[Math.floor(Math.random() * colors.length)],
+            hasTeeth: Math.random() > 0.7,
+            hasGlasses: Math.random() > 0.7,
+            hasEars: Math.random() > 0.6,
+            hasAntennae: Math.random() > 0.7,
+            hasShoes: Math.random() > 0.6,
+            shoeColor: colors[Math.floor(Math.random() * colors.length)],
+        };
+        
+        this.loadFormValues();
+        this.renderAvatar();
+    }
+
+    save() {
+        // Send avatar data to server
+        fetch('{% url "save_avatar" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify(this.avatarData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Avatar saved successfully!');
+                location.reload();
+            } else {
+                alert('Error saving avatar');
+            }
+        });
+    }
+}
+
+// Initialize when modal opens
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('avatarBuilderModal');
+    if (modal) {
+        modal.addEventListener('show.bs.modal', () => {
+            if (!window.avatarBuilder) {
+                window.avatarBuilder = new AvatarBuilder();
+            }
+        });
+    }
+});
+</script>
