@@ -1,5 +1,6 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
+from allauth.account import views as allauth_views
 from .views import (
     home_page_view, about_page_view, kindlewick_page_view, questopia_page_view, pricing_page_view,
     teacher_hub_view, contact_page_view, wonderworld_page_view, hello, teacher_dashboard_view,
@@ -10,7 +11,7 @@ from .views import (
     teacher_resource_detail_view, teacher_forum_list_view, teacher_forum_detail_view,
     custom_login_view, student_dashboard_view, teacher_forum_delete_view, teacher_forum_edit_view,
     teacher_forum_reply_edit_view, teacher_forum_reply_delete_view, teacher_resource_edit_view,
-    teacher_resource_delete_view, teacher_resource_comment_delete_view
+    teacher_resource_delete_view, teacher_resource_comment_delete_view, profile_view
 )
 
 urlpatterns = [
@@ -23,12 +24,20 @@ urlpatterns = [
     path("teacher-hub/", teacher_hub_view, name="teacher_hub"),
     path("contact/", contact_page_view, name="contact"),
     path("api/hello/", hello),
-    path("teacher/signup/", teacher_signup_view, name="signup"),
+    path(
+        "teacher/signup/",
+        allauth_views.SignupView.as_view(template_name="core/teacher_signup.html"),
+        name="signup",
+    ),
     path("student/signup/", student_signup_view, name="student_signup"),
     path("student/signup/guided/", student_signup_with_details_view, name="student_signup_guided"),
     path("api/create-student/", create_student_account_view, name="create_student"),
     path("student/", student_dashboard_view, name="student_dashboard"),
-    path("teacher/login/", custom_login_view, name="teacher_login"),
+    path(
+        "teacher/login/",
+        allauth_views.LoginView.as_view(template_name="core/teacher_login.html"),
+        name="teacher_login",
+    ),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("teacher/", teacher_dashboard_view, name="teacher_dashboard"),
     path("teacher/class/add/", add_class_view, name="add_class"),
@@ -50,4 +59,5 @@ urlpatterns = [
     path("teacher/forum/<int:post_id>/delete/", teacher_forum_delete_view, name="teacher_forum_delete"),
     path("teacher/forum/<int:post_id>/reply/<int:reply_id>/edit/", teacher_forum_reply_edit_view, name="teacher_forum_reply_edit"),
     path("teacher/forum/<int:post_id>/reply/<int:reply_id>/delete/", teacher_forum_reply_delete_view, name="teacher_forum_reply_delete"),
+    path("profile/", profile_view, name="profile"),
 ]

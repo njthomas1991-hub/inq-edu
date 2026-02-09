@@ -1,4 +1,5 @@
 {% extends "core/base_teacher.html" %}
+{% load crispy_forms_tags %}
 
 {% block title %}Edit Discussion - Community Forum{% endblock %}
 
@@ -9,16 +10,9 @@
     <div class="card shadow-sm">
         <div class="card-body">
             <h1 class="h4 mb-4">Edit Discussion</h1>
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                <div class="mb-3">
-                    <label for="{{ form.title.id_for_label }}" class="form-label">Discussion Title</label>
-                    {{ form.title }}
-                </div>
-                <div class="mb-3">
-                    <label for="{{ form.content.id_for_label }}" class="form-label">Content</label>
-                    {{ form.content }}
-                </div>
+                {{ form|crispy }}
                 <div class="d-flex gap-2">
                     <button class="btn btn-primary" type="submit">Save Changes</button>
                     <a href="{% url 'teacher_forum_detail' post.id %}" class="btn btn-secondary">Cancel</a>

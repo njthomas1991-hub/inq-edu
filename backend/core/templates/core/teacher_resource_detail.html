@@ -1,4 +1,5 @@
 {% extends "core/base_teacher.html" %}
+{% load crispy_forms_tags %}
 
 {% block title %}{{ resource.title }} - Teaching Resource{% endblock %}
 
@@ -72,9 +73,12 @@
             <h5 class="card-title">Add a Comment</h5>
             <form method="post">
                 {% csrf_token %}
-                <div class="mb-3">{{ comment_form.content }}</div>
+                {{ comment_form|crispy }}
                 <button class="btn btn-primary" type="submit">Post Comment</button>
             </form>
+            <p class="small text-muted mt-3 mb-0">
+                We welcome open and respectful discussion. Please note that this comments section is monitored. Any posts containing offensive language, harassment, hate speech, spam, personal attacks, or inappropriate content may be removed at our discretion.
+            </p>
         </div>
     </div>
 </div>

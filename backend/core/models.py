@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.utils.text import slugify
+from cloudinary.models import CloudinaryField
 
 # User Model - Teachers and Students
 class User(AbstractUser):
@@ -112,6 +113,7 @@ class HelpTutorial(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='help_posts')
     content = models.TextField()
     excerpt = models.TextField(max_length=300, blank=True, help_text="Brief summary shown in listings")
+    image = models.ImageField(upload_to='help_tutorials/', blank=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
     featured = models.BooleanField(default=False, help_text="Show on homepage")
     order = models.IntegerField(default=0, help_text="Display order (lower numbers first)")
@@ -155,6 +157,7 @@ class TeachingResource(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='teaching_resources')
     content = models.TextField(blank=True)
     excerpt = models.TextField(max_length=300, blank=True, help_text="Brief summary shown in listings")
+    image = models.ImageField(upload_to='teaching_resources/images/', blank=True, null=True)
     file = models.FileField(upload_to='teaching_resources/', blank=True, null=True, help_text="Upload PDF, Word, Excel files")
     resource_type = models.CharField(max_length=20, choices=RESOURCE_TYPE_CHOICES, default='other')
     key_stage = models.IntegerField(null=True, blank=True, help_text="Key Stage (1-4)")
@@ -197,6 +200,7 @@ class ForumPost(models.Model):
     title = models.CharField(max_length=255)
     author = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='forum_posts')
     content = models.TextField()
+    image = models.ImageField(upload_to='forum_posts/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     is_pinned = models.BooleanField(default=False, help_text="Pin to top of forum")
