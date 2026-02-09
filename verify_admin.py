@@ -11,7 +11,7 @@ sys.path.insert(0, backend_path)
 
 django.setup()
 
-from core.models import User  # noqa: E402
+from backend.core.models import User  # noqa: E402
 
 # Check admin user details
 admin = User.objects.filter(username='admin').first()
