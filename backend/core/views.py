@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -6,16 +6,68 @@ from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q, F
 from django.core.paginator import Paginator
+from django.views.decorators.http import require_http_methods
 from django_summernote.widgets import SummernoteWidget
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Field
+from allauth.account.forms import SignupForm
+from allauth.account.adapter import DefaultAccountAdapter
 from .models import (
     User, Class, ClassStudent,
     NewsAnnouncement, HelpTutorial, TeachingResource,
-    ForumPost, ForumReply, ResourceComment
+    ForumPost, ForumReply, ResourceComment, Avatar
 )
+from .avatar_generator import create_monster_avatar, get_random_avatar_data
 import string
 import random
+import json
+
+
+class CustomSignupForm(SignupForm):
+    """Custom signup form with role selection"""
+    ROLE_DESCRIPTIONS = {
+        'teacher': 'A teacher who creates and manages classes and students.',
+        'student': 'A student who participates in classes and activities.',
+        'school_admin': 'This role is for the person who manages the school\'s information. As a School Admin, you can view and track teachers, classes, and students linked to your school. Choose this role if you need full oversight of your school\'s data.',
+    }
+    
+    role = forms.ChoiceField(
+        choices=User.ROLE_CHOICES,
+        widget=forms.RadioSelect(attrs={'class': 'role-radio'}),
+        required=True,
+        label='I am a',
+        initial='teacher'
+    )
+    first_name = forms.CharField(max_length=150, required=False, label='First Name')
+    last_name = forms.CharField(max_length=150, required=False, label='Last Name')
+    school = forms.CharField(max_length=255, required=False, label='School')
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Add role descriptions to help text
+        self.fields['role'].help_text = 'Select your role'
+    
+    def save(self, request):
+        user = super(CustomSignupForm, self).save(request)
+        user.role = self.cleaned_data['role']
+        user.first_name = self.cleaned_data.get('first_name', '')
+        user.last_name = self.cleaned_data.get('last_name', '')
+        user.school = self.cleaned_data.get('school', '')
+        user.is_staff = user.role in ['teacher', 'school_admin']
+        user.save()
+        return user
+
+
+class CustomAccountAdapter(DefaultAccountAdapter):
+    """Custom adapter to redirect based on user role"""
+    def get_signup_redirect_url(self, request):
+        user = request.user
+        if user.is_authenticated:
+            if user.role == 'student':
+                return '/student/'
+            elif user.role == 'school_admin':
+                return '/teacher/'  # School admins use teacher dashboard
+        return '/teacher/'
 
 
 class ClassForm(forms.ModelForm):
@@ -687,8 +739,14 @@ def profile_view(request):
             "classes_count": enrollments.count(),
         }
 
+    # Add avatar context
+    avatar_json = None
+    if hasattr(user, 'avatar') and user.avatar:
+        avatar_json = json.dumps(user.avatar.to_dict())
+
     context.update({
         "profile_user": user,
+        "avatar_json": avatar_json,
     })
 
     return render(request, template_name, context)
@@ -804,5 +862,67 @@ def teacher_forum_reply_delete_view(request, post_id, reply_id):
         return redirect("teacher_forum_detail", post_id=post.id)
 
     return redirect("teacher_forum_detail", post_id=post.id)
+
+
+@login_required
+@require_http_methods(["POST"])
+def save_avatar(request):
+    """Save user's avatar customization"""
+    try:
+        data = json.loads(request.body)
+        
+        # Get or create avatar
+        avatar, created = Avatar.objects.get_or_create(user=request.user)
+        
+        # Update avatar fields from request data
+        avatar.body_shape = data.get('bodyShape', 'round')
+        avatar.body_color = data.get('bodyColor', '#FF6B9D')
+        avatar.arm_style = data.get('armStyle', 'short')
+        avatar.arm_color = data.get('armColor', '#FF6B9D')
+        avatar.leg_style = data.get('legStyle', 'two')
+        avatar.leg_color = data.get('legColor', '#FF6B9D')
+        avatar.eye_style = data.get('eyeStyle', 'round')
+        avatar.eye_color = data.get('eyeColor', '#000000')
+        avatar.mouth_style = data.get('mouthStyle', 'smile')
+        avatar.mouth_color = data.get('mouthColor', '#000000')
+        avatar.has_teeth = data.get('hasTeeth', False)
+        avatar.has_glasses = data.get('hasGlasses', False)
+        avatar.has_ears = data.get('hasEars', False)
+        avatar.has_antennae = data.get('hasAntennae', False)
+        avatar.has_shoes = data.get('hasShoes', False)
+        avatar.shoe_color = data.get('shoeColor', '#000000')
+        
+        avatar.save()
+        
+        return JsonResponse({'success': True, 'message': 'Avatar saved successfully'})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+
+@login_required
+@require_http_methods(["GET"])
+def generate_random_avatar(request):
+    """Generate random cute monster avatar data"""
+    try:
+        avatar_data = get_random_avatar_data()
+        return JsonResponse({'success': True, 'avatar': avatar_data})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+
+@login_required
+@require_http_methods(["POST"])
+def auto_generate_avatar(request):
+    """Auto-generate and save a cute monster avatar for the current user"""
+    try:
+        avatar = create_monster_avatar(user=request.user, cute_bias=True)
+        return JsonResponse({
+            'success': True,
+            'message': 'Avatar auto-generated successfully',
+            'avatar': avatar.to_dict()
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
 
 

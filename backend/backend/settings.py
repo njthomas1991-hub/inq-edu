@@ -43,6 +43,16 @@ ALLOWED_HOSTS = [
     '.herokuapp.com'
 ]
 
+# CSRF Configuration
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://localhost:3000',
+]
+CSRF_COOKIE_SECURE = False  # Set to True in production
+CSRF_COOKIE_HTTPONLY = False
+SESSION_COOKIE_SECURE = False  # Set to True in production
+
 
 # Application definition
 
@@ -89,10 +99,19 @@ ACCOUNT_SIGNUP_FIELDS = [
     'password1*',
     'password2*',
 ]
-ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # No email verification required
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_LOGIN_REDIRECT_URL = '/teacher/'
+ACCOUNT_SIGNUP_REDIRECT_URL = '/teacher/'  # Redirect to home page after registration
+ACCOUNT_SESSION_REMEMBER = True  # Keep users logged in
+ACCOUNT_FORMS = {
+    'signup': 'core.views.CustomSignupForm',
+}
+ACCOUNT_ADAPTER = 'core.views.CustomAccountAdapter'
+
+# Email settings for development
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Prints emails to console during development
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
@@ -134,9 +153,11 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.csrf',
             ],
         },
     },

@@ -11,7 +11,8 @@ from .views import (
     teacher_resource_detail_view, teacher_forum_list_view, teacher_forum_detail_view,
     custom_login_view, student_dashboard_view, teacher_forum_delete_view, teacher_forum_edit_view,
     teacher_forum_reply_edit_view, teacher_forum_reply_delete_view, teacher_resource_edit_view,
-    teacher_resource_delete_view, teacher_resource_comment_delete_view, profile_view
+    teacher_resource_delete_view, teacher_resource_comment_delete_view, profile_view, save_avatar,
+    generate_random_avatar, auto_generate_avatar
 )
 
 urlpatterns = [
@@ -60,4 +61,7 @@ urlpatterns = [
     path("teacher/forum/<int:post_id>/reply/<int:reply_id>/edit/", teacher_forum_reply_edit_view, name="teacher_forum_reply_edit"),
     path("teacher/forum/<int:post_id>/reply/<int:reply_id>/delete/", teacher_forum_reply_delete_view, name="teacher_forum_reply_delete"),
     path("profile/", profile_view, name="profile"),
+    path("avatar/save/", save_avatar, name="save_avatar"),
+    path("avatar/generate/", generate_random_avatar, name="generate_random_avatar"),
+    path("avatar/auto-generate/", auto_generate_avatar, name="auto_generate_avatar"),
 ]
