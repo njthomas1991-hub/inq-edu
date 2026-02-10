@@ -166,6 +166,11 @@ html:not([data-theme="dark"]) .btn-light:hover {
     color: var(--theme-text) !important;
 }
 
+/* Ensure consistent navbar height across all screen sizes */
+.navbar {
+    min-height: 4rem !important;
+}
+
 /* Center navbar brand on all viewports - Override Bootstrap */
 .navbar-center-wrapper {
     position: absolute !important;
@@ -173,6 +178,7 @@ html:not([data-theme="dark"]) .btn-light:hover {
     transform: translateX(-50%) !important;
     top: 50% !important;
     transform: translate(-50%, -50%) !important;
+    padding: 0.5rem 0 !important;
 }
 
 .navbar-brand {
@@ -197,7 +203,9 @@ html:not([data-theme="dark"]) .btn-light:hover {
         flex-grow: 1 !important;
         display: flex !important;
         justify-content: center !important;
-        margin: 0.5rem 0 !important;
+        margin: 0 !important;
+        padding: 0.5rem 0 !important;
+    }
     }
     
     .navbar > .container,
