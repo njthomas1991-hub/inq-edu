@@ -36,10 +36,13 @@
                         </div>
                         <form method="post" class="mt-2">
                             {% csrf_token %}
-                            <textarea class="form-control" name="bio" rows="3" maxlength="500" placeholder="Add a short bio...">{{ profile_user.bio|default:"" }}</textarea>
+                            <textarea class="form-control" name="bio" rows="3" maxlength="500" placeholder="Add a short bio..." readonly>{{ profile_user.bio|default:"" }}</textarea>
                             <div class="d-flex gap-2 mt-2">
                                 <button type="submit" name="bio_action" value="save" class="btn btn-sm btn-outline-primary">
                                     Save Bio
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="this.closest('form').querySelector('textarea').removeAttribute('readonly'); this.closest('form').querySelector('textarea').focus();">
+                                    Edit Bio
                                 </button>
                                 <button type="submit" name="bio_action" value="clear" class="btn btn-sm btn-outline-secondary">
                                     Clear Bio
