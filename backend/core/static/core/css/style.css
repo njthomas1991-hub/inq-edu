@@ -200,6 +200,7 @@ html:not([data-theme="dark"]) .btn-light:hover {
         margin: 0.5rem 0 !important;
     }
     
+    .navbar > .container,
     .navbar > .container-fluid {
         display: flex !important;
         flex-wrap: wrap !important;
