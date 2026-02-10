@@ -724,10 +724,43 @@ def teacher_forum_list_view(request):
 def profile_view(request):
     user = request.user
     role = getattr(user, "role", None)
+    activity_log = []
+
+    if request.method == "POST":
+        action = request.POST.get("bio_action")
+        if action == "save":
+            bio = (request.POST.get("bio") or "").strip()
+            user.bio = bio if bio else None
+            user.save(update_fields=["bio"])
+        elif action == "clear":
+            user.bio = None
+            user.save(update_fields=["bio"])
+
+        return redirect("profile")
+
+    def add_activity(message, timestamp):
+        if timestamp:
+            activity_log.append({
+                "message": message,
+                "timestamp": timestamp,
+            })
 
     if role == "teacher":
         classes_taught = user.classes_taught.all()
         template_name = "core/teacher_profile.html"
+
+        for clazz in classes_taught.order_by("-created_at")[:6]:
+            add_activity(f"Created class {clazz.name}", clazz.created_at)
+
+        for resource in TeachingResource.objects.filter(author=user).order_by("-created_at")[:6]:
+            add_activity(f"Published resource {resource.title}", resource.created_at)
+
+        for post in ForumPost.objects.filter(author=user).order_by("-created_at")[:6]:
+            add_activity(f"Posted to forum {post.title}", post.created_at)
+
+        for announcement in NewsAnnouncement.objects.filter(author=user).order_by("-created_at")[:6]:
+            add_activity(f"Shared announcement {announcement.title}", announcement.created_at)
+
         context = {
             "classes_taught": classes_taught,
             "classes_count": classes_taught.count(),
@@ -735,17 +768,40 @@ def profile_view(request):
     else:
         enrollments = user.enrolled_classes.select_related("clazz").all()
         template_name = "core/student_profile.html"
+
+        for enrollment in enrollments.order_by("-date_joined")[:8]:
+            add_activity(f"Joined class {enrollment.clazz.name}", enrollment.date_joined)
+
         context = {
             "enrollments": enrollments,
             "classes_count": enrollments.count(),
         }
 
+    activity_log = sorted(activity_log, key=lambda item: item["timestamp"], reverse=True)
+    activity_log = activity_log[:8]
+
     context.update({
         "profile_user": user,
         "avatar": getattr(user, 'avatar', None),
+        "activity_log": activity_log,
     })
 
     return render(request, template_name, context)
+
+
+@login_required
+def account_settings_view(request):
+    user = request.user
+    role = getattr(user, "role", None)
+
+    if role == "teacher":
+        template_name = "core/account_settings_teacher.html"
+    else:
+        template_name = "core/account_settings_student.html"
+
+    return render(request, template_name, {
+        "profile_user": user,
+    })
 
 
 @login_required
