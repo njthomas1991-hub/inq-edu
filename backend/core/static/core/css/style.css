@@ -219,6 +219,11 @@ header > div.bg-light {
     height: 59px !important;
 }
 
+/* Dashboard navbar height to match header spacing */
+.dashboard-navbar {
+    height: 58px !important;
+}
+
 /* Center navbar brand on all viewports - Override Bootstrap */
 .navbar-center-wrapper {
     position: absolute !important;
