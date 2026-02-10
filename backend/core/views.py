@@ -902,11 +902,13 @@ def save_user_avatar(request):
         
         # Update avatar traits - accept both camelCase and snake_case
         avatar.body_type = data.get('body_type') or data.get('bodyType', avatar.body_type)
+        avatar.body_color = data.get('body_color') or data.get('bodyColor', avatar.body_color)
         avatar.eye_type = data.get('eye_type') or data.get('eyeType', avatar.eye_type)
         avatar.mouth_type = data.get('mouth_type') or data.get('mouthType', avatar.mouth_type)
-        avatar.accessory = data.get('accessory', avatar.accessory)
-        avatar.primary_color = data.get('primary_color') or data.get('primaryColor', avatar.primary_color)
-        avatar.accent_color = data.get('accent_color') or data.get('accentColor', avatar.accent_color)
+        avatar.head_decoration = data.get('head_decoration') or data.get('headDecoration', avatar.head_decoration)
+        avatar.decoration_color = data.get('decoration_color') or data.get('decorationColor', avatar.decoration_color)
+        avatar.pattern = data.get('pattern', avatar.pattern)
+        avatar.pattern_color = data.get('pattern_color') or data.get('patternColor', avatar.pattern_color)
         
         avatar.save()
         
@@ -936,12 +938,20 @@ def randomize_avatar(request):
         body_choices = [choice[0] for choice in Avatar.BODY_TYPES]
         eye_choices = [choice[0] for choice in Avatar.EYE_TYPES]
         mouth_choices = [choice[0] for choice in Avatar.MOUTH_TYPES]
-        accessory_choices = [choice[0] for choice in Avatar.ACCESSORY_TYPES]
+        decoration_choices = [choice[0] for choice in Avatar.DECORATION_TYPES]
+        pattern_choices = [choice[0] for choice in Avatar.PATTERN_TYPES]
+        
+        colors = ['#FF6B9D', '#FFB347', '#FF1493', '#FF69B4', '#87CEFA', 
+                  '#98D8C8', '#F7DC6F', '#BB8FCE', '#F8B88B', '#95E1D3']
         
         avatar.body_type = rand.choice(body_choices)
+        avatar.body_color = rand.choice(colors)
         avatar.eye_type = rand.choice(eye_choices)
         avatar.mouth_type = rand.choice(mouth_choices)
-        avatar.accessory = rand.choice(accessory_choices)
+        avatar.head_decoration = rand.choice(decoration_choices)
+        avatar.decoration_color = rand.choice(colors)
+        avatar.pattern = rand.choice(pattern_choices)
+        avatar.pattern_color = rand.choice(colors)
         
         avatar.save()
         
