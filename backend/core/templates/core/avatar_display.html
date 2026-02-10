@@ -293,21 +293,53 @@ function renderAvatar() {
 renderAvatar();
 {% endif %}
 
-// Listen for modal open and load avatar customizer
-document.getElementById('avatarCustomizerModal').addEventListener('show.bs.modal', function() {
-    const container = document.getElementById('avatarCustomizerContainer');
-    if (container.querySelector('.avatar-customizer-form')) {
-        return; // Already loaded
-    }
-    
-    // Fetch current avatar data
-    fetch('/api/avatar/', {
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken')
+// Helper function to get CSRF cookie
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
         }
-    })
-    .then(response => response.json())
-    .then(data => {
+    }
+    return cookieValue;
+}
+
+// Listen for modal open and load avatar customizer
+const avatarModal = document.getElementById('avatarCustomizerModal');
+if (avatarModal) {
+    avatarModal.addEventListener('show.bs.modal', function() {
+        const container = document.getElementById('avatarCustomizerContainer');
+        if (!container) {
+            console.error('Avatar customizer container not found');
+            return;
+        }
+        
+        if (container.querySelector('.avatar-customizer-form')) {
+            return; // Already loaded
+        }
+        
+        console.log('Modal opened, fetching avatar data...');
+        
+        // Fetch current avatar data
+        fetch('/api/avatar/', {
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => {
+            console.log('Avatar API response:', response.status);
+            if (!response.ok) {
+                throw new Error('Failed to fetch avatar data: ' + response.status);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Avatar data loaded:', data);
         // Create customizer form
         const html = `
             <div class="avatar-customizer-form">
@@ -401,15 +433,23 @@ document.getElementById('avatarCustomizerModal').addEventListener('show.bs.modal
         
         // Add change listeners to all form inputs for live preview
         ['bodyType', 'eyeType', 'mouthType', 'accessory', 'primaryColor', 'accentColor'].forEach(id => {
-            document.getElementById(id).addEventListener('change', updatePreview);
-            document.getElementById(id).addEventListener('input', updatePreview);
+            const element = document.getElementById(id);
+            if (element) {
+                element.addEventListener('change', updatePreview);
+                element.addEventListener('input', updatePreview);
+            } else {
+                console.warn('Element not found:', id);
+            }
         });
     })
     .catch(error => {
         console.error('Error loading avatar data:', error);
-        container.innerHTML = '<div class="alert alert-danger">Error loading avatar customizer</div>';
+        container.innerHTML = '<div class="alert alert-danger"><strong>Error loading avatar customizer:</strong><br>' + error.message + '</div>';
     });
-});
+    });
+} else {
+    console.error('Avatar customizer modal element not found in DOM');
+}
 
 function saveAvatar(e) {
     e.preventDefault();
@@ -730,21 +770,6 @@ function updatePreview() {
         rightArm,
         accessory
     };
-}
-
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
 }
 </script>
 
