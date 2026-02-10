@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.utils.text import slugify
-from cloudinary.models import CloudinaryField
+# Cloudinary removed - not used in new avatar system
 
 # User Model - Teachers and Students
 class User(AbstractUser):

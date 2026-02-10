@@ -62,9 +62,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage',
+    # 'cloudinary_storage',  # Disabled - causes Python 3.14 compatibility issues
     'django.contrib.staticfiles',
-    'cloudinary',
+    # 'cloudinary',  # Disabled - not used in new PixiJS avatar system
     'django.contrib.sites',
     'rest_framework',
     'corsheaders',
