@@ -235,7 +235,8 @@
 
             drawBody(type, color) {
                 const graphics = new PIXI.Graphics();
-                graphics.beginFill(parseInt(color.replace('#', ''), 16));
+                const safeColor = color || '#FF6B9D';
+                graphics.beginFill(parseInt(safeColor.replace('#', ''), 16));
                 
                 const centerX = this.app.view.width / 2;
                 const centerY = this.app.view.height / 2;
@@ -285,7 +286,8 @@
                 const graphics = new PIXI.Graphics();
                 const centerX = this.app.view.width / 2;
                 const centerY = this.app.view.height / 2;
-                const color = parseInt(patternColor.replace('#', ''), 16);
+                const safeColor = patternColor || '#FF1493';
+                const color = parseInt(safeColor.replace('#', ''), 16);
 
                 if (patternType === 'spots') {
                     graphics.beginFill(color, 0.4);
@@ -488,7 +490,8 @@
                 const graphics = new PIXI.Graphics();
                 const centerX = this.app.view.width / 2;
                 const centerY = this.app.view.height / 2;
-                const fillColor = parseInt(color.replace('#', ''), 16);
+                const safeColor = color || '#FFB347';
+                const fillColor = parseInt(safeColor.replace('#', ''), 16);
 
                 graphics.beginFill(fillColor);
 
@@ -578,13 +581,25 @@
                 // Clear previous monster
                 this.monster.removeChildren();
 
+                // Add defaults for missing fields
+                const data = {
+                    bodyType: avatarData.bodyType || 'blob',
+                    bodyColor: avatarData.bodyColor || '#FF6B9D',
+                    eyeType: avatarData.eyeType || 'big_round',
+                    mouthType: avatarData.mouthType || 'happy',
+                    headDecoration: avatarData.headDecoration || 'horns',
+                    decorationColor: avatarData.decorationColor || '#FFB347',
+                    pattern: avatarData.pattern || 'solid',
+                    patternColor: avatarData.patternColor || '#FF1493'
+                };
+
                 // Draw in layers
                 const arms = this.drawArms();
-                const body = this.drawBody(avatarData.bodyType, avatarData.bodyColor);
-                const pattern = this.drawPattern(avatarData.bodyType, avatarData.pattern, avatarData.patternColor);
-                const eyes = this.drawEyes(avatarData.eyeType);
-                const mouth = this.drawMouth(avatarData.mouthType);
-                const decoration = this.drawDecoration(avatarData.headDecoration, avatarData.decorationColor);
+                const body = this.drawBody(data.bodyType, data.bodyColor);
+                const pattern = this.drawPattern(data.bodyType, data.pattern, data.patternColor);
+                const eyes = this.drawEyes(data.eyeType);
+                const mouth = this.drawMouth(data.mouthType);
+                const decoration = this.drawDecoration(data.headDecoration, data.decorationColor);
 
                 this.monster.addChild(arms);
                 this.monster.addChild(body);
