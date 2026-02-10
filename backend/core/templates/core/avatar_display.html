@@ -167,7 +167,14 @@ function renderAvatar() {
                 break;
             case 'crown':
                 graphics.beginFill(0xFFD700);
-                graphics.drawStar(0, -50, 5, 20, 15);
+                // Draw crown as a simple shape
+                graphics.moveTo(-20, -40);
+                graphics.lineTo(-10, -55);
+                graphics.lineTo(0, -45);
+                graphics.lineTo(10, -55);
+                graphics.lineTo(20, -40);
+                graphics.lineTo(0, -35);
+                graphics.closePath();
                 graphics.endFill();
                 break;
             case 'glasses':
@@ -685,7 +692,14 @@ function updatePreview() {
                 break;
             case 'crown':
                 graphics.beginFill(0xFFD700);
-                graphics.drawStar(0, -60, 5, 25, 18);
+                // Draw crown as a simple shape (preview version)
+                graphics.moveTo(-25, -50);
+                graphics.lineTo(-12, -68);
+                graphics.lineTo(0, -55);
+                graphics.lineTo(12, -68);
+                graphics.lineTo(25, -50);
+                graphics.lineTo(0, -45);
+                graphics.closePath();
                 graphics.endFill();
                 break;
             case 'glasses':
