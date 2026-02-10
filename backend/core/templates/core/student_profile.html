@@ -4,52 +4,69 @@
 
 {% block content %}
 <div class="container py-4">
-    <div class="d-flex align-items-center justify-content-between mb-4">
-        <div>
-            <h1 class="h3 mb-1">Profile</h1>
-            <p class="text-muted mb-0">Manage your account details.</p>
-        </div>
-        <span class="badge bg-primary">Classes: {{ classes_count }}</span>
-    </div>
+    <h1 class="h3 mb-4">Profile</h1>
 
-    <div class="row g-4">
-        <div class="col-lg-6">
+    <!-- Avatar and Profile Info Row -->
+    <div class="row g-4 mb-4">
+        <!-- Avatar Section (Left) -->
+        <div class="col-md-4">
+            {% include "core/avatar_display.html" %}
+        </div>
+        
+        <!-- Account Information (Right) -->
+        <div class="col-md-8">
             <div class="card shadow-sm h-100">
                 <div class="card-body">
-                    <h5 class="card-title">Account</h5>
-                    <div class="mb-2"><strong>Name:</strong> {{ profile_user.get_full_name|default:profile_user.username }}</div>
-                    <div class="mb-2"><strong>Username:</strong> {{ profile_user.username }}</div>
-                    <div class="mb-2"><strong>Email:</strong> {{ profile_user.email|default:"Not set" }}</div>
-                    <div class="mb-2"><strong>Role:</strong> {{ profile_user.get_role_display|default:"Student" }}</div>
-                    <div class="mb-0"><strong>School:</strong> {{ profile_user.school|default:"Not set" }}</div>
+                    <h5 class="card-title mb-3">Account Information</h5>
+                    <div class="mb-3">
+                        <strong>Name:</strong> {{ profile_user.get_full_name|default:profile_user.username }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Username:</strong> {{ profile_user.username }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Email:</strong> {{ profile_user.email|default:"Not set" }}
+                    </div>
+                    <div class="mb-3">
+                        <strong>Role:</strong> {{ profile_user.get_role_display|default:"Student" }}
+                    </div>
+                    <div class="mb-0">
+                        <strong>School:</strong> {{ profile_user.school|default:"Not set" }}
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="col-lg-6">
-            <div class="card shadow-sm h-100">
+    </div>
+
+    <!-- Classes Section (Centered Below) -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
                 <div class="card-body">
-                    <h5 class="card-title">My Classes</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title mb-0">My Classes</h5>
+                        <span class="badge bg-primary">{{ classes_count }} Class{{ classes_count|pluralize:"es" }}</span>
+                    </div>
                     {% if enrollments %}
-                        <ul class="list-group list-group-flush">
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
                             {% for enrollment in enrollments %}
-                                <li class="list-group-item">
-                                    <strong>{{ enrollment.clazz.name }}</strong>
-                                    <span class="text-muted">· {{ enrollment.clazz.subject }} · KS{{ enrollment.clazz.year_ks }}</span>
-                                </li>
+                                <div class="col">
+                                    <div class="card h-100 border">
+                                        <div class="card-body">
+                                            <h6 class="card-title">{{ enrollment.clazz.name }}</h6>
+                                            <p class="card-text text-muted mb-0">
+                                                {{ enrollment.clazz.subject }} · KS{{ enrollment.clazz.year_ks }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
                             {% endfor %}
-                        </ul>
+                        </div>
                     {% else %}
-                        <div class="alert alert-info mb-0">No enrolled classes yet.</div>
+                        <div class="alert alert-info mb-0 text-center">No enrolled classes yet.</div>
                     {% endif %}
                 </div>
             </div>
         </div>
-        <!-- Avatar Section -->
-        <div class="col-lg-6">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
-                    {% include "core/avatar_display.html" %}
-                </div>
-            </div>
-        </div>
     </div>
+</div>
