@@ -66,3 +66,10 @@ Thumbs.db
 # Build outputs
 /frontend/build/
 /backend/staticfiles/
+# Demo and test files
+demo_*.png
+demo_*.jpg
+*_avatar_*.png
+random_avatar*.png
+test_avatar*.png
+cute_monster*.png
