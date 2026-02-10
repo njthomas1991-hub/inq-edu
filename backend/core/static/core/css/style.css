@@ -155,6 +155,11 @@ html:not([data-theme="dark"]) .btn-light:hover {
     color: #000000 !important;
 }
 
+/* Header top bar - consistent height on all screens */
+header > div.bg-light {
+    height: 58px !important;
+}
+
 /* Navbar theme support */
 .navbar-light {
     background-color: var(--theme-bg-2) !important;
