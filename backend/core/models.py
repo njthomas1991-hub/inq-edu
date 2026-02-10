@@ -257,51 +257,68 @@ class ResourceComment(models.Model):
 
 # Avatar Model - PixiJS sprite-based monster avatars
 class Avatar(models.Model):
+    """ClassDojo-style monster avatar"""
+    
     BODY_TYPES = (
-        ('round_blue', 'Round Blue'),
-        ('round_pink', 'Round Pink'),
-        ('round_green', 'Round Green'),
-        ('round_yellow', 'Round Yellow'),
-        ('square_purple', 'Square Purple'),
-        ('square_orange', 'Square Orange'),
+        ('blob', 'Blob'),
+        ('round', 'Round'),
+        ('tall', 'Tall'),
+        ('wide', 'Wide'),
+        ('pear', 'Pear'),
+        ('bean', 'Bean'),
     )
     
     EYE_TYPES = (
-        ('big_happy', 'Big Happy'),
-        ('big_sleepy', 'Big Sleepy'),
-        ('small_angry', 'Small Angry'),
-        ('round_confused', 'Round Confused'),
-        ('star_sparkly', 'Star Sparkly'),
+        ('big_round', 'Big Round'),
+        ('small_dots', 'Small Dots'),
+        ('one_eye', 'One Eye'),
+        ('sleepy', 'Sleepy'),
+        ('googly', 'Googly'),
+        ('angry', 'Angry'),
     )
     
     MOUTH_TYPES = (
-        ('smile', 'Smile'),
-        ('grin', 'Big Grin'),
-        ('open', 'Open'),
-        ('neutral', 'Neutral'),
-        ('tongue', 'Tongue Out'),
+        ('happy', 'Happy'),
+        ('toothy', 'Toothy'),
+        ('small', 'Small'),
+        ('big_smile', 'Big Smile'),
+        ('oh', 'Oh'),
+        ('silly', 'Silly'),
     )
     
-    ACCESSORY_TYPES = (
+    DECORATION_TYPES = (
         ('none', 'None'),
-        ('cap', 'Cap'),
-        ('hat', 'Hat'),
-        ('crown', 'Crown'),
-        ('glasses', 'Glasses'),
-        ('bow', 'Bow'),
+        ('horns', 'Horns'),
+        ('antennae', 'Antennae'),
+        ('spikes', 'Spikes'),
+        ('ears', 'Ears'),
+        ('mohawk', 'Mohawk'),
+    )
+    
+    PATTERN_TYPES = (
+        ('solid', 'Solid'),
+        ('spots', 'Spots'),
+        ('stripes', 'Stripes'),
+        ('gradient', 'Gradient'),
     )
     
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='avatar')
     
-    # Trait selections
-    body_type = models.CharField(max_length=20, choices=BODY_TYPES, default='round_blue')
-    eye_type = models.CharField(max_length=20, choices=EYE_TYPES, default='big_happy')
-    mouth_type = models.CharField(max_length=20, choices=MOUTH_TYPES, default='smile')
-    accessory = models.CharField(max_length=20, choices=ACCESSORY_TYPES, default='none')
+    # Body
+    body_type = models.CharField(max_length=20, choices=BODY_TYPES, default='blob')
+    body_color = models.CharField(max_length=7, default='#FF6B9D', help_text='Hex color')
     
-    # Optional: custom colors (hex)
-    primary_color = models.CharField(max_length=7, default='#FF6B9D', help_text='Hex color')
-    accent_color = models.CharField(max_length=7, default='#FFB347', help_text='Hex color')
+    # Facial features
+    eye_type = models.CharField(max_length=20, choices=EYE_TYPES, default='big_round')
+    mouth_type = models.CharField(max_length=20, choices=MOUTH_TYPES, default='happy')
+    
+    # Head decorations (horns, antennae, etc)
+    head_decoration = models.CharField(max_length=20, choices=DECORATION_TYPES, default='horns')
+    decoration_color = models.CharField(max_length=7, default='#FFB347', help_text='Hex color')
+    
+    # Pattern/texture
+    pattern = models.CharField(max_length=20, choices=PATTERN_TYPES, default='solid')
+    pattern_color = models.CharField(max_length=7, default='#FF1493', help_text='Hex color for spots/stripes')
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -319,9 +336,11 @@ class Avatar(models.Model):
             'id': self.id,
             'userId': self.user.id,
             'bodyType': self.body_type,
+            'bodyColor': self.body_color,
             'eyeType': self.eye_type,
             'mouthType': self.mouth_type,
-            'accessory': self.accessory,
-            'primaryColor': self.primary_color,
-            'accentColor': self.accent_color,
+            'headDecoration': self.head_decoration,
+            'decorationColor': self.decoration_color,
+            'pattern': self.pattern,
+            'patternColor': self.pattern_color,
         }
