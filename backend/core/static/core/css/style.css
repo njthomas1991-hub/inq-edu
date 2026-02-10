@@ -168,6 +168,13 @@ header > div.bg-light > div:first-child {
     transform: translateX(-50%) !important;
 }
 
+/* Position login/logout section on the right */
+header > div.bg-light > div:last-child {
+    position: absolute !important;
+    right: 1rem !important;
+    white-space: nowrap !important;
+}
+
 /* Navbar theme support */
 .navbar-light {
     background-color: var(--theme-bg-2) !important;
