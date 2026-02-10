@@ -17,22 +17,53 @@
             {% endif %}
         </div>
         
-        <button class="btn btn-primary btn-sm mt-3" onclick="openAvatarCustomizer()">
+        <button class="btn btn-primary btn-sm mt-3" data-bs-toggle="modal" data-bs-target="#avatarCustomizerModal">
             🎨 Customize Avatar
         </button>
     {% else %}
         <p class="text-muted">No avatar yet. Create one!</p>
-        <button class="btn btn-primary btn-sm" onclick="openAvatarCustomizer()">
+        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#avatarCustomizerModal">
             ✨ Create Avatar
         </button>
     {% endif %}
+</div>
+
+<!-- Avatar Customizer Modal -->
+<div class="modal fade" id="avatarCustomizerModal" tabindex="-1" aria-labelledby="avatarCustomizerLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="avatarCustomizerLabel">🎨 Customize Your Avatar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="avatarCustomizerContainer">
+                    <!-- Avatar Customizer will load here -->
+                    <div class="text-center">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <!-- Include PixiJS and Avatar Rendering Script -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.2.4/pixi.min.js"></script>
 <script>
 {% if avatar %}
-(function() {
+function renderAvatar() {
+    if (!window.PIXI) {
+        console.warn('PixiJS still loading, retrying...');
+        setTimeout(renderAvatar, 200);
+        return;
+    }
+    
+    const PIXI = window.PIXI;
+    console.log('PixiJS available, starting avatar render');
+
     // Avatar data from Django
     const avatarData = {
         bodyType: '{{ avatar.body_type }}',
@@ -96,6 +127,13 @@
                 graphics.moveTo(-8, 0);
                 graphics.lineTo(8, 0);
                 break;
+            case 'tongue':
+                graphics.beginFill(0xFF1493);
+                graphics.drawEllipse(0, 10, 6, 10);
+                graphics.endFill();
+                graphics.lineStyle(2, 0x000000);
+                graphics.arc(0, 0, 10, Math.PI, 0);
+                break;
             default:
                 graphics.arc(0, 0, 10, Math.PI, 0);
         }
@@ -139,20 +177,44 @@
                 graphics.moveTo(0, -5);
                 graphics.lineTo(0, -5);
                 break;
+            case 'bow':
+                graphics.beginFill(0xFF69B4);
+                graphics.drawCircle(-15, -45, 8);
+                graphics.drawCircle(15, -45, 8);
+                graphics.endFill();
+                graphics.lineStyle(2, 0xFF1493);
+                graphics.moveTo(-15, -45);
+                graphics.lineTo(15, -45);
+                break;
         }
         
         return graphics;
     }
 
     // Initialize PIXI
+    const container = document.getElementById('avatar-container');
+    if (!container) {
+        console.error('Avatar container not found');
+        return;
+    }
+    
     const app = new PIXI.Application({
         width: 200,
         height: 200,
         backgroundAlpha: 0,
-        antialias: true
+        antialias: true,
+        resolution: 1
     });
 
-    document.getElementById('avatar-container').appendChild(app.view);
+    // Clear container and add canvas
+    container.innerHTML = '';
+    const canvas = app.view;
+    canvas.style.width = '200px';
+    canvas.style.height = '200px';
+    canvas.style.display = 'block';
+    container.appendChild(canvas);
+    console.log('Canvas appended, starting rendering');
+
 
     // Create monster container
     const monster = new PIXI.Container();
@@ -223,12 +285,466 @@
         leftArm.rotation = Math.sin(time * 1.5) * 0.4 - 0.2;
         rightArm.rotation = Math.sin(time * 1.5 + Math.PI) * 0.4 + 0.2;
     });
-})();
+    
+    console.log('Avatar rendering complete');
+}
+
+// Call render function immediately
+renderAvatar();
 {% endif %}
 
-function openAvatarCustomizer() {
-    // Open the React frontend avatar customizer in a new window or modal
-    window.open('http://localhost:3000', '_blank');
+// Listen for modal open and load avatar customizer
+document.getElementById('avatarCustomizerModal').addEventListener('show.bs.modal', function() {
+    const container = document.getElementById('avatarCustomizerContainer');
+    if (container.querySelector('.avatar-customizer-form')) {
+        return; // Already loaded
+    }
+    
+    // Fetch current avatar data
+    fetch('/api/avatar/', {
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Create customizer form
+        const html = `
+            <div class="avatar-customizer-form">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="mb-3">Live Preview</h6>
+                        <div id="avatarPreviewContainer" style="width: 250px; height: 250px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 16px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center;">
+                            <!-- Live preview will render here -->
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="mb-3">Customize</h6>
+                        <form id="avatarForm">
+                            <div class="mb-3">
+                                <label class="form-label">Body Type</label>
+                                <select class="form-select form-select-sm" name="body_type" id="bodyType">
+                                    <option value="round_blue" ${data.bodyType === 'round_blue' ? 'selected' : ''}>Round Blue</option>
+                                    <option value="round_pink" ${data.bodyType === 'round_pink' ? 'selected' : ''}>Round Pink</option>
+                                    <option value="round_green" ${data.bodyType === 'round_green' ? 'selected' : ''}>Round Green</option>
+                                    <option value="round_yellow" ${data.bodyType === 'round_yellow' ? 'selected' : ''}>Round Yellow</option>
+                                    <option value="square_purple" ${data.bodyType === 'square_purple' ? 'selected' : ''}>Square Purple</option>
+                                    <option value="square_orange" ${data.bodyType === 'square_orange' ? 'selected' : ''}>Square Orange</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Eye Type</label>
+                                <select class="form-select form-select-sm" name="eye_type" id="eyeType">
+                                    <option value="big_happy" ${data.eyeType === 'big_happy' ? 'selected' : ''}>Big Happy</option>
+                                    <option value="big_sleepy" ${data.eyeType === 'big_sleepy' ? 'selected' : ''}>Big Sleepy</option>
+                                    <option value="small_angry" ${data.eyeType === 'small_angry' ? 'selected' : ''}>Small Angry</option>
+                                    <option value="round_confused" ${data.eyeType === 'round_confused' ? 'selected' : ''}>Round Confused</option>
+                                    <option value="star_sparkly" ${data.eyeType === 'star_sparkly' ? 'selected' : ''}>Star Sparkly</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Mouth Type</label>
+                                <select class="form-select form-select-sm" name="mouth_type" id="mouthType">
+                                    <option value="smile" ${data.mouthType === 'smile' ? 'selected' : ''}>Smile</option>
+                                    <option value="grin" ${data.mouthType === 'grin' ? 'selected' : ''}>Big Grin</option>
+                                    <option value="open" ${data.mouthType === 'open' ? 'selected' : ''}>Open</option>
+                                    <option value="neutral" ${data.mouthType === 'neutral' ? 'selected' : ''}>Neutral</option>
+                                    <option value="tongue" ${data.mouthType === 'tongue' ? 'selected' : ''}>Tongue Out</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Accessory</label>
+                                <select class="form-select form-select-sm" name="accessory" id="accessory">
+                                    <option value="none" ${data.accessory === 'none' ? 'selected' : ''}>None</option>
+                                    <option value="cap" ${data.accessory === 'cap' ? 'selected' : ''}>Cap</option>
+                                    <option value="hat" ${data.accessory === 'hat' ? 'selected' : ''}>Hat</option>
+                                    <option value="crown" ${data.accessory === 'crown' ? 'selected' : ''}>Crown</option>
+                                    <option value="glasses" ${data.accessory === 'glasses' ? 'selected' : ''}>Glasses</option>
+                                    <option value="bow" ${data.accessory === 'bow' ? 'selected' : ''}>Bow</option>
+                                </select>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <label class="form-label">Primary Color</label>
+                                    <input type="color" class="form-control form-control-color w-100" name="primary_color" id="primaryColor" value="${data.primaryColor}" title="Choose primary color">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label">Accent Color</label>
+                                    <input type="color" class="form-control form-control-color w-100" name="accent_color" id="accentColor" value="${data.accentColor}" title="Choose accent color">
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex gap-2 justify-content-between mt-4">
+                                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-info btn-sm" onclick="randomizeAvatar()">🎲 Randomize</button>
+                                    <button type="submit" class="btn btn-primary btn-sm">💾 Save Avatar</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.innerHTML = html;
+        
+        // Initialize live preview
+        initAvatarPreview(data);
+        
+        // Attach form submit handler
+        document.getElementById('avatarForm').addEventListener('submit', saveAvatar);
+        
+        // Add change listeners to all form inputs for live preview
+        ['bodyType', 'eyeType', 'mouthType', 'accessory', 'primaryColor', 'accentColor'].forEach(id => {
+            document.getElementById(id).addEventListener('change', updatePreview);
+            document.getElementById(id).addEventListener('input', updatePreview);
+        });
+    })
+    .catch(error => {
+        console.error('Error loading avatar data:', error);
+        container.innerHTML = '<div class="alert alert-danger">Error loading avatar customizer</div>';
+    });
+});
+
+function saveAvatar(e) {
+    e.preventDefault();
+    
+    const formData = {
+        body_type: document.getElementById('bodyType').value,
+        eye_type: document.getElementById('eyeType').value,
+        mouth_type: document.getElementById('mouthType').value,
+        accessory: document.getElementById('accessory').value,
+        primary_color: document.getElementById('primaryColor').value,
+        accent_color: document.getElementById('accentColor').value
+    };
+    
+    fetch('/api/avatar/save/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to save avatar');
+        }
+        return response.json();
+    })
+    .then(data => {
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('avatarCustomizerModal'));
+        modal.hide();
+        
+        // Reload page to see updated avatar
+        setTimeout(() => {
+            window.location.reload();
+        }, 500);
+    })
+    .catch(error => {
+        console.error('Error saving avatar:', error);
+        alert('Error saving avatar. Please try again.');
+    });
+}
+
+function randomizeAvatar() {
+    fetch('/api/avatar/randomize/', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Update form fields with randomized values
+        // API returns camelCase keys from avatar.to_dict()
+        document.getElementById('bodyType').value = data.bodyType;
+        document.getElementById('eyeType').value = data.eyeType;
+        document.getElementById('mouthType').value = data.mouthType;
+        document.getElementById('accessory').value = data.accessory;
+        document.getElementById('primaryColor').value = data.primaryColor;
+        document.getElementById('accentColor').value = data.accentColor;
+        
+        // Update preview
+        updatePreview();
+    })
+    .catch(error => console.error('Error randomizing avatar:', error));
+}
+
+// Avatar preview globals
+let previewApp = null;
+let previewMonster = null;
+let previewParts = {};
+
+function initAvatarPreview(data) {
+    if (!window.PIXI) {
+        console.error('PixiJS not loaded for preview');
+        return;
+    }
+    
+    const PIXI = window.PIXI;
+    const container = document.getElementById('avatarPreviewContainer');
+    
+    if (!container) {
+        console.error('Preview container not found');
+        return;
+    }
+    
+    // Create PIXI app for preview
+    previewApp = new PIXI.Application({
+        width: 250,
+        height: 250,
+        backgroundAlpha: 0,
+        antialias: true,
+        resolution: 1
+    });
+    
+    container.innerHTML = '';
+    container.appendChild(previewApp.view);
+    
+    // Create monster container
+    previewMonster = new PIXI.Container();
+    previewMonster.x = 125;
+    previewMonster.y = 125;
+    previewApp.stage.addChild(previewMonster);
+    
+    // Initial render
+    updatePreview();
+    
+    // Add animation
+    let time = 0;
+    previewApp.ticker.add(() => {
+        if (!previewMonster || !previewParts.eyesContainer) return;
+        
+        time += 0.01;
+        
+        // Breathing/bouncing effect
+        previewMonster.scale.y = 1 + Math.sin(time * 2) * 0.03;
+        previewMonster.rotation = Math.sin(time * 1.5) * 0.02;
+        
+        // Eyes blinking
+        const blinkCycle = (Math.sin(time * 0.5) + 1) / 2;
+        previewParts.eyesContainer.scale.y = blinkCycle > 0.9 || blinkCycle < 0.1 ? 0.1 : 1;
+        
+        // Arms wave
+        if (previewParts.leftArm && previewParts.rightArm) {
+            previewParts.leftArm.rotation = Math.sin(time * 1.5) * 0.4 - 0.2;
+            previewParts.rightArm.rotation = Math.sin(time * 1.5 + Math.PI) * 0.4 + 0.2;
+        }
+    });
+}
+
+function updatePreview() {
+    if (!previewApp || !previewMonster || !window.PIXI) return;
+    
+    const PIXI = window.PIXI;
+    
+    // Get current form values
+    const avatarData = {
+        bodyType: document.getElementById('bodyType').value,
+        eyeType: document.getElementById('eyeType').value,
+        mouthType: document.getElementById('mouthType').value,
+        accessory: document.getElementById('accessory').value,
+        primaryColor: document.getElementById('primaryColor').value,
+        accentColor: document.getElementById('accentColor').value
+    };
+    
+    // Helper to convert hex to color
+    function hexToColor(hex) {
+        return parseInt(hex.replace('#', ''), 16);
+    }
+    
+    // Create graphics functions (same as main avatar)
+    function createBodyGraphic(color) {
+        const graphics = new PIXI.Graphics();
+        graphics.beginFill(color);
+        graphics.drawCircle(0, 0, 50);
+        graphics.endFill();
+        return graphics;
+    }
+    
+    function createEyeGraphic() {
+        const graphics = new PIXI.Graphics();
+        graphics.beginFill(0xFFFFFF);
+        graphics.drawCircle(0, 0, 15);
+        graphics.endFill();
+        graphics.beginFill(0x000000);
+        graphics.drawCircle(0, 0, 8);
+        graphics.endFill();
+        graphics.beginFill(0xFFFFFF);
+        graphics.drawCircle(-3, -3, 3);
+        graphics.endFill();
+        return graphics;
+    }
+    
+    function createMouthGraphic(type) {
+        const graphics = new PIXI.Graphics();
+        graphics.lineStyle(3, 0x000000);
+        
+        switch (type) {
+            case 'smile':
+                graphics.arc(0, 0, 15, Math.PI, 0);
+                break;
+            case 'grin':
+                graphics.arc(0, 0, 20, Math.PI, 0);
+                break;
+            case 'open':
+                graphics.beginFill(0xFF69B4);
+                graphics.drawEllipse(0, 5, 10, 15);
+                graphics.endFill();
+                graphics.lineStyle(3, 0x000000);
+                graphics.drawEllipse(0, 5, 10, 15);
+                break;
+            case 'neutral':
+                graphics.moveTo(-10, 0);
+                graphics.lineTo(10, 0);
+                break;
+            case 'tongue':
+                graphics.beginFill(0xFF1493);
+                graphics.drawEllipse(0, 15, 8, 12);
+                graphics.endFill();
+                graphics.lineStyle(3, 0x000000);
+                graphics.arc(0, 0, 15, Math.PI, 0);
+                break;
+            default:
+                graphics.arc(0, 0, 15, Math.PI, 0);
+        }
+        
+        return graphics;
+    }
+    
+    function createAccessoryGraphic(type) {
+        if (type === 'none') return null;
+        
+        const graphics = new PIXI.Graphics();
+        
+        switch (type) {
+            case 'cap':
+                graphics.beginFill(0xFF0000);
+                graphics.moveTo(-35, -50);
+                graphics.lineTo(35, -50);
+                graphics.lineTo(25, -60);
+                graphics.lineTo(-25, -60);
+                graphics.closePath();
+                graphics.endFill();
+                break;
+            case 'hat':
+                graphics.beginFill(0x8B4513);
+                graphics.moveTo(-45, -55);
+                graphics.lineTo(45, -55);
+                graphics.lineTo(40, -75);
+                graphics.lineTo(-40, -75);
+                graphics.closePath();
+                graphics.endFill();
+                break;
+            case 'crown':
+                graphics.beginFill(0xFFD700);
+                graphics.drawStar(0, -60, 5, 25, 18);
+                graphics.endFill();
+                break;
+            case 'glasses':
+                graphics.lineStyle(4, 0x000000);
+                graphics.drawCircle(-12, -5, 10);
+                graphics.drawCircle(12, -5, 10);
+                graphics.moveTo(0, -5);
+                graphics.lineTo(0, -5);
+                break;
+            case 'bow':
+                graphics.beginFill(0xFF69B4);
+                graphics.drawCircle(-20, -55, 10);
+                graphics.drawCircle(20, -55, 10);
+                graphics.endFill();
+                graphics.lineStyle(3, 0xFF1493);
+                graphics.moveTo(-20, -55);
+                graphics.lineTo(20, -55);
+                break;
+        }
+        
+        return graphics;
+    }
+    
+    // Clear existing monster parts
+    previewMonster.removeChildren();
+    previewParts = {};
+    
+    // Create new parts
+    const primaryColor = hexToColor(avatarData.primaryColor);
+    const accentColor = hexToColor(avatarData.accentColor);
+    
+    // Body
+    const body = createBodyGraphic(primaryColor);
+    body.y = 5;
+    
+    // Eyes
+    const eyesContainer = new PIXI.Container();
+    eyesContainer.y = -20;
+    const leftEye = createEyeGraphic();
+    leftEye.x = -20;
+    const rightEye = createEyeGraphic();
+    rightEye.x = 20;
+    eyesContainer.addChild(leftEye, rightEye);
+    
+    // Mouth
+    const mouth = createMouthGraphic(avatarData.mouthType);
+    mouth.y = 25;
+    
+    // Arms
+    const armsContainer = new PIXI.Container();
+    const leftArm = new PIXI.Graphics();
+    leftArm.beginFill(accentColor);
+    leftArm.drawCircle(0, 0, 10);
+    leftArm.endFill();
+    leftArm.x = -60;
+    leftArm.y = 0;
+    
+    const rightArm = new PIXI.Graphics();
+    rightArm.beginFill(accentColor);
+    rightArm.drawCircle(0, 0, 10);
+    rightArm.endFill();
+    rightArm.x = 60;
+    rightArm.y = 0;
+    
+    armsContainer.addChild(leftArm, rightArm);
+    
+    // Accessory
+    const accessory = createAccessoryGraphic(avatarData.accessory);
+    
+    // Add all parts to monster
+    previewMonster.addChild(body, eyesContainer, mouth, armsContainer);
+    if (accessory) {
+        previewMonster.addChild(accessory);
+    }
+    
+    // Store references for animation
+    previewParts = {
+        body,
+        eyesContainer,
+        mouth,
+        leftArm,
+        rightArm,
+        accessory
+    };
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
 }
 </script>
 
@@ -247,11 +763,16 @@ function openAvatarCustomizer() {
     overflow: hidden;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     margin: 0 auto;
-    max-width: 200px;
+    width: 200px;
+    height: 200px;
+    min-width: 200px;
+    min-height: 200px;
 }
 
 #avatar-container canvas {
     display: block;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .avatar-info {

@@ -885,14 +885,11 @@ def save_user_avatar(request):
     """
     Save user's avatar traits.
     
-    Request body (JSON):
+    Request body (JSON) - accepts both camelCase and snake_case:
         {
-            'bodyType': 'round_blue',
-            'eyeType': 'big_happy',
-            'mouthType': 'smile',
-            'accessory': 'cap',
-            'primaryColor': '#FF6B9D',
-            'accentColor': '#FFB347'
+            'bodyType': 'round_blue',  OR  'body_type': 'round_blue'
+            'eyeType': 'big_happy',    OR  'eye_type': 'big_happy'
+            ...
         }
     
     Returns:
@@ -903,13 +900,13 @@ def save_user_avatar(request):
         
         avatar, created = Avatar.objects.get_or_create(user=request.user)
         
-        # Update avatar traits
-        avatar.body_type = data.get('bodyType', avatar.body_type)
-        avatar.eye_type = data.get('eyeType', avatar.eye_type)
-        avatar.mouth_type = data.get('mouthType', avatar.mouth_type)
+        # Update avatar traits - accept both camelCase and snake_case
+        avatar.body_type = data.get('body_type') or data.get('bodyType', avatar.body_type)
+        avatar.eye_type = data.get('eye_type') or data.get('eyeType', avatar.eye_type)
+        avatar.mouth_type = data.get('mouth_type') or data.get('mouthType', avatar.mouth_type)
         avatar.accessory = data.get('accessory', avatar.accessory)
-        avatar.primary_color = data.get('primaryColor', avatar.primary_color)
-        avatar.accent_color = data.get('accentColor', avatar.accent_color)
+        avatar.primary_color = data.get('primary_color') or data.get('primaryColor', avatar.primary_color)
+        avatar.accent_color = data.get('accent_color') or data.get('accentColor', avatar.accent_color)
         
         avatar.save()
         
