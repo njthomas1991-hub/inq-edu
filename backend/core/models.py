@@ -255,95 +255,73 @@ class ResourceComment(models.Model):
         return f"Comment by {self.author.username} on {self.resource.title}"
 
 
-# Avatar Model - Custom monster avatars for users
+# Avatar Model - PixiJS sprite-based monster avatars
 class Avatar(models.Model):
-    BODY_SHAPES = (
-        ('round', 'Round'),
-        ('square', 'Square'),
-        ('rectangular', 'Rectangular'),
-        ('oval', 'Oval'),
+    BODY_TYPES = (
+        ('round_blue', 'Round Blue'),
+        ('round_pink', 'Round Pink'),
+        ('round_green', 'Round Green'),
+        ('round_yellow', 'Round Yellow'),
+        ('square_purple', 'Square Purple'),
+        ('square_orange', 'Square Orange'),
     )
-    ARM_STYLES = (
-        ('short', 'Short'),
-        ('long', 'Long'),
-        ('tentacle', 'Tentacle'),
-        ('none', 'None'),
+    
+    EYE_TYPES = (
+        ('big_happy', 'Big Happy'),
+        ('big_sleepy', 'Big Sleepy'),
+        ('small_angry', 'Small Angry'),
+        ('round_confused', 'Round Confused'),
+        ('star_sparkly', 'Star Sparkly'),
     )
-    LEG_STYLES = (
-        ('two', 'Two Legs'),
-        ('four', 'Four Legs'),
-        ('none', 'No Legs'),
-    )
-    EYE_STYLES = (
-        ('round', 'Round'),
-        ('oval', 'Oval'),
-        ('closed', 'Closed'),
-        ('star', 'Star'),
-    )
-    MOUTH_STYLES = (
+    
+    MOUTH_TYPES = (
         ('smile', 'Smile'),
-        ('frown', 'Frown'),
-        ('neutral', 'Neutral'),
+        ('grin', 'Big Grin'),
         ('open', 'Open'),
+        ('neutral', 'Neutral'),
+        ('tongue', 'Tongue Out'),
     )
-    ACCESSORY_CHOICES = (
+    
+    ACCESSORY_TYPES = (
         ('none', 'None'),
-        ('yes', 'Yes'),
+        ('cap', 'Cap'),
+        ('hat', 'Hat'),
+        ('crown', 'Crown'),
+        ('glasses', 'Glasses'),
+        ('bow', 'Bow'),
     )
     
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='avatar')
     
-    # Body customization
-    body_shape = models.CharField(max_length=20, choices=BODY_SHAPES, default='round')
-    body_color = models.CharField(max_length=7, default='#FF6B9D')  # hex color
+    # Trait selections
+    body_type = models.CharField(max_length=20, choices=BODY_TYPES, default='round_blue')
+    eye_type = models.CharField(max_length=20, choices=EYE_TYPES, default='big_happy')
+    mouth_type = models.CharField(max_length=20, choices=MOUTH_TYPES, default='smile')
+    accessory = models.CharField(max_length=20, choices=ACCESSORY_TYPES, default='none')
     
-    # Limbs
-    arm_style = models.CharField(max_length=20, choices=ARM_STYLES, default='short')
-    arm_color = models.CharField(max_length=7, default='#FF6B9D')
-    leg_style = models.CharField(max_length=20, choices=LEG_STYLES, default='two')
-    leg_color = models.CharField(max_length=7, default='#FF6B9D')
-    
-    # Face features
-    eye_style = models.CharField(max_length=20, choices=EYE_STYLES, default='round')
-    eye_color = models.CharField(max_length=7, default='#000000')
-    mouth_style = models.CharField(max_length=20, choices=MOUTH_STYLES, default='smile')
-    mouth_color = models.CharField(max_length=7, default='#000000')
-    has_teeth = models.BooleanField(default=False)
-    
-    # Accessories
-    has_glasses = models.BooleanField(default=False)
-    has_ears = models.BooleanField(default=False)
-    has_antennae = models.BooleanField(default=False)
-    has_shoes = models.BooleanField(default=False)
-    shoe_color = models.CharField(max_length=7, default='#000000')
+    # Optional: custom colors (hex)
+    primary_color = models.CharField(max_length=7, default='#FF6B9D', help_text='Hex color')
+    accent_color = models.CharField(max_length=7, default='#FFB347', help_text='Hex color')
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         verbose_name = 'User Avatar'
-        verbose_name_plural = "User Avatars"
+        verbose_name_plural = 'User Avatars'
     
     def __str__(self):
         return f"Avatar for {self.user.username}"
     
     def to_dict(self):
-        """Convert avatar to dictionary for JavaScript"""
+        """Convert avatar to dictionary for frontend"""
         return {
-            'bodyShape': self.body_shape,
-            'bodyColor': self.body_color,
-            'armStyle': self.arm_style,
-            'armColor': self.arm_color,
-            'legStyle': self.leg_style,
-            'legColor': self.leg_color,
-            'eyeStyle': self.eye_style,
-            'eyeColor': self.eye_color,
-            'mouthStyle': self.mouth_style,
-            'mouthColor': self.mouth_color,
-            'hasTeeth': self.has_teeth,
-            'hasGlasses': self.has_glasses,
-            'hasEars': self.has_ears,
-            'hasAntennae': self.has_antennae,
-            'hasShoes': self.has_shoes,
-            'shoeColor': self.shoe_color,
+            'id': self.id,
+            'userId': self.user.id,
+            'bodyType': self.body_type,
+            'eyeType': self.eye_type,
+            'mouthType': self.mouth_type,
+            'accessory': self.accessory,
+            'primaryColor': self.primary_color,
+            'accentColor': self.accent_color,
         }

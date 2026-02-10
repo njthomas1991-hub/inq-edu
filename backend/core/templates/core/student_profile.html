@@ -44,19 +44,16 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <div class="row g-4 mt-0">
+        <!-- Avatar Section -->
         <div class="col-lg-6">
             <div class="card shadow-sm h-100">
                 <div class="card-body">
-                    <h5 class="card-title">Avatar</h5>
-                    {% include "core/avatar_display.html" with user=profile_user avatar_json=avatar_json %}
+                    {% include "core/avatar_display.html" %}
                 </div>
             </div>
         </div>
     </div>
 
-    {% include "core/avatar_builder.html" %}
+    {% include "core/templates/nav.html" %}
 </div>
 {% endblock %}
