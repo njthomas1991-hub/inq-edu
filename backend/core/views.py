@@ -720,6 +720,7 @@ def teacher_forum_list_view(request):
 
 
 @login_required
+@login_required
 def profile_view(request):
     user = request.user
     role = getattr(user, "role", None)

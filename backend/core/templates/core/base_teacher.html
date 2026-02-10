@@ -16,6 +16,9 @@
     <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{% static 'core/css/style.css' %}">>
+    <!-- PIXI.js for avatar rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7/dist/pixi.min.js"></script>
+</head>
 </head>
 <body class="bg-light">
 <!-- Skip to Main Content Link (for keyboard users) -->
@@ -255,13 +258,18 @@
                 </ul>
                 <ul class="navbar-nav">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-user-circle"></i> {% if user.is_authenticated %}{{ user.get_full_name|default:user.username }}{% else %}Account{% endif %}
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if user.is_authenticated %}
+                                {% include "core/avatar_navbar.html" %}
+                            {% else %}
+                                <i class="fas fa-user-circle"></i>
+                            {% endif %}
+                            {% if user.is_authenticated %}{{ user.get_full_name|default:user.username }}{% else %}Account{% endif %}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             {% if user.is_authenticated %}
-                                <li><a class="dropdown-item" href="{% url 'teacher_dashboard' %}"><i class="fas fa-chart-line"></i> My Dashboard</a></li>
                                 <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user"></i> Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-cog"></i> Account Settings</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
                                     <form method="post" action="{% url 'logout' %}" style="margin: 0;">

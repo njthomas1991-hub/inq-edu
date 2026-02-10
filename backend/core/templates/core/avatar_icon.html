@@ -1,0 +1,459 @@
+{% load static %}
+<!-- Avatar Icon Component (Small) -->
+<div id="avatarIcon" style="width: 60px; height: 60px; display: inline-block; vertical-align: middle;">
+    <!-- Avatar will render here -->
+</div>
+
+<script>
+// Load PixiJS if not already loaded
+if (typeof PIXI === 'undefined') {
+    const script = document.createElement('script');
+    script.src = 'https://pixijs.download/release/pixi.min.js';
+    script.onload = initAvatarIcon;
+    document.head.appendChild(script);
+} else {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAvatarIcon);
+    } else {
+        initAvatarIcon();
+    }
+}
+
+function initAvatarIcon() {
+    // Get avatar data from API
+    fetch('/api/avatar/')
+        .then(response => response.json())
+        .then(avatarData => {
+            console.log('Avatar icon data loaded:', avatarData);
+            renderAvatarIcon(avatarData);
+        })
+        .catch(error => {
+            console.error('Error loading avatar icon:', error);
+        });
+
+    async function renderAvatarIcon(avatarData) {
+        const container = document.getElementById('avatarIcon');
+        if (!container) {
+            console.error('Avatar icon container not found');
+            return;
+        }
+
+        container.innerHTML = '';
+
+        // Use MonsterRenderer class for consistent rendering (same as profile display)
+        const app = new PIXI.Application({
+            width: 120,
+            height: 160,
+            backgroundColor: 0xF5F7FA,
+            antialias: true
+        });
+        const renderer = new MonsterRenderer(app, 120, 160);
+        await renderer.init(container, 120, 160);
+        renderer.render(avatarData);
+        
+        // Apply styling to match profile avatar look
+        const canvas = renderer.app.canvas || renderer.app.view;
+        if (canvas) {
+            canvas.style.maxWidth = '100%';
+            canvas.style.height = 'auto';
+            canvas.style.borderRadius = '15px';
+            canvas.style.boxShadow = '0 8px 32px rgba(0,0,0,0.1)';
+        }
+    }
+}
+
+// Full MonsterRenderer matching avatar_display.html
+class MonsterRenderer {
+    constructor(app, width = 300, height = 400) {
+        this.app = app;
+        this.width = width;
+        this.height = height;
+        this.monster = new PIXI.Container();
+        this.app.stage.addChild(this.monster);
+    }
+    
+    async init(container, width = 300, height = 400) {
+        this.width = width;
+        this.height = height;
+        // App is already initialized via constructor with config
+        const canvas = this.app.canvas || this.app.view;
+        if (!canvas) {
+            throw new Error('Could not get canvas from PIXI app');
+        }
+        container.appendChild(canvas);
+        
+        // Set canvas size attributes
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Ensure canvas is properly sized with CSS
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        canvas.style.display = 'block';
+        
+        return this;
+    }
+
+    drawBody(type, color) {
+        const graphics = new PIXI.Graphics();
+        const safeColor = color || '#FF6B9D';
+        graphics.beginFill(parseInt(safeColor.replace('#', ''), 16));
+        
+        const centerX = this.width / 2;
+        const centerY = this.height / 2;
+
+        switch(type) {
+            case 'blob':
+                // Irregular blob shape (ClassDojo style)
+                graphics.moveTo(centerX, centerY - 80);
+                graphics.bezierCurveTo(centerX + 90, centerY - 70, centerX + 100, centerY + 20, centerX + 80, centerY + 90);
+                graphics.bezierCurveTo(centerX + 50, centerY + 110, centerX - 50, centerY + 110, centerX - 80, centerY + 90);
+                graphics.bezierCurveTo(centerX - 100, centerY + 20, centerX - 90, centerY - 70, centerX, centerY - 80);
+                break;
+            case 'round':
+                graphics.drawCircle(centerX, centerY, 90);
+                break;
+            case 'tall':
+                graphics.drawEllipse(centerX, centerY, 60, 110);
+                break;
+            case 'wide':
+                graphics.drawEllipse(centerX, centerY, 110, 70);
+                break;
+            case 'pear':
+                graphics.moveTo(centerX, centerY - 70);
+                graphics.bezierCurveTo(centerX + 60, centerY - 60, centerX + 70, centerY, centerX + 90, centerY + 60);
+                graphics.bezierCurveTo(centerX + 80, centerY + 100, centerX - 80, centerY + 100, centerX - 90, centerY + 60);
+                graphics.bezierCurveTo(centerX - 70, centerY, centerX - 60, centerY - 60, centerX, centerY - 70);
+                break;
+            case 'bean':
+                graphics.moveTo(centerX - 20, centerY - 90);
+                graphics.bezierCurveTo(centerX + 70, centerY - 80, centerX + 80, centerY - 20, centerX + 60, centerY + 50);
+                graphics.bezierCurveTo(centerX + 50, centerY + 90, centerX - 50, centerY + 90, centerX - 60, centerY + 50);
+                graphics.bezierCurveTo(centerX - 80, centerY - 20, centerX - 70, centerY - 80, centerX - 20, centerY - 90);
+                break;
+        }
+        graphics.endFill();
+        
+        return graphics;
+    }
+
+    drawPattern(bodyType, patternType, patternColor) {
+        if (patternType === 'solid') return null;
+
+        const graphics = new PIXI.Graphics();
+        const centerX = this.width / 2;
+        const centerY = this.height / 2;
+        const safeColor = patternColor || '#FF1493';
+        const color = parseInt(safeColor.replace('#', ''), 16);
+
+        if (patternType === 'spots') {
+            graphics.beginFill(color, 0.4);
+            // Draw random-ish spots
+            graphics.drawCircle(centerX - 30, centerY - 20, 15);
+            graphics.drawCircle(centerX + 40, centerY - 10, 20);
+            graphics.drawCircle(centerX - 20, centerY + 30, 18);
+            graphics.drawCircle(centerX + 20, centerY + 40, 12);
+            graphics.endFill();
+        } else if (patternType === 'stripes') {
+            graphics.beginFill(color, 0.3);
+            for (let i = -80; i < 80; i += 30) {
+                graphics.drawRect(centerX - 100, centerY + i, 200, 15);
+            }
+            graphics.endFill();
+        } else if (patternType === 'gradient') {
+            // Create gradient overlay effect with circles
+            graphics.beginFill(color, 0.15);
+            graphics.drawCircle(centerX, centerY - 50, 60);
+            graphics.endFill();
+            
+            graphics.beginFill(color, 0.1);
+            graphics.drawCircle(centerX, centerY, 80);
+            graphics.endFill();
+            
+            graphics.beginFill(color, 0.05);
+            graphics.drawCircle(centerX, centerY + 40, 70);
+            graphics.endFill();
+        }
+
+        return graphics;
+    }
+
+    drawEyes(type) {
+        const container = new PIXI.Container();
+        const centerX = this.width / 2;
+        const centerY = this.height / 2;
+
+        if (type === 'one_eye') {
+            const eye = this.createEye(60, 60);
+            eye.x = centerX;
+            eye.y = centerY - 20;
+            container.addChild(eye);
+        } else if (type === 'big_round') {
+            const leftEye = this.createEye(50, 50);
+            leftEye.x = centerX - 40;
+            leftEye.y = centerY - 30;
+            
+            const rightEye = this.createEye(50, 50);
+            rightEye.x = centerX + 40;
+            rightEye.y = centerY - 30;
+            
+            container.addChild(leftEye, rightEye);
+        } else if (type === 'small_dots') {
+            const leftEye = this.createEye(20, 20);
+            leftEye.x = centerX - 30;
+            leftEye.y = centerY - 20;
+            
+            const rightEye = this.createEye(20, 20);
+            rightEye.x = centerX + 30;
+            rightEye.y = centerY - 20;
+            
+            container.addChild(leftEye, rightEye);
+        } else if (type === 'sleepy') {
+            const leftEye = this.createSleepyEye();
+            leftEye.x = centerX - 35;
+            leftEye.y = centerY - 25;
+            
+            const rightEye = this.createSleepyEye();
+            rightEye.x = centerX + 35;
+            rightEye.y = centerY - 25;
+            
+            container.addChild(leftEye, rightEye);
+        } else if (type === 'googly') {
+            const leftEye = this.createGooglyEye();
+            leftEye.x = centerX - 40;
+            leftEye.y = centerY - 30;
+            
+            const rightEye = this.createGooglyEye();
+            rightEye.x = centerX + 40;
+            rightEye.y = centerY - 30;
+            
+            container.addChild(leftEye, rightEye);
+        } else if (type === 'angry') {
+            const leftEye = this.createAngryEye();
+            leftEye.x = centerX - 40;
+            leftEye.y = centerY - 30;
+            
+            const rightEye = this.createAngryEye();
+            rightEye.x = centerX + 40;
+            rightEye.y = centerY - 30;
+            
+            container.addChild(leftEye, rightEye);
+        }
+
+        return container;
+    }
+
+    createEye(width, height) {
+        const eye = new PIXI.Graphics();
+        eye.beginFill(0xFFFFFF);
+        eye.drawEllipse(0, 0, width / 2, height / 2);
+        eye.endFill();
+        
+        eye.beginFill(0x000000);
+        eye.drawCircle(0, 0, width / 4);
+        eye.endFill();
+        
+        eye.beginFill(0xFFFFFF);
+        eye.drawCircle(width / 8, -width / 8, width / 10);
+        eye.endFill();
+        
+        return eye;
+    }
+
+    createSleepyEye() {
+        const eye = new PIXI.Graphics();
+        eye.lineStyle(4, 0x000000);
+        eye.arc(0, 0, 18, 0, Math.PI);
+        return eye;
+    }
+
+    createGooglyEye() {
+        const eye = new PIXI.Graphics();
+        eye.beginFill(0xFFFFFF);
+        eye.drawCircle(0, 0, 25);
+        eye.endFill();
+        
+        eye.lineStyle(3, 0x000000);
+        eye.drawCircle(0, 0, 25);
+        
+        // Offset pupil
+        eye.beginFill(0x000000);
+        eye.drawCircle(8, 5, 12);
+        eye.endFill();
+        
+        return eye;
+    }
+
+    createAngryEye() {
+        const eye = new PIXI.Graphics();
+        eye.beginFill(0xFFFFFF);
+        eye.drawEllipse(0, 0, 20, 15);
+        eye.endFill();
+        
+        eye.beginFill(0xFF0000);
+        eye.drawCircle(0, 0, 10);
+        eye.endFill();
+        
+        // Angry eyebrow
+        eye.lineStyle(4, 0x000000);
+        eye.moveTo(-25, -20);
+        eye.lineTo(5, -15);
+        
+        return eye;
+    }
+
+    drawMouth(type) {
+        const graphics = new PIXI.Graphics();
+        const centerX = this.width / 2;
+        const centerY = this.height / 2;
+
+        graphics.lineStyle(4, 0x000000);
+
+        switch(type) {
+            case 'happy':
+                graphics.beginFill(0x000000);
+                graphics.arc(centerX, centerY + 30, 40, 0, Math.PI);
+                graphics.endFill();
+                break;
+            case 'toothy':
+                graphics.beginFill(0x000000);
+                graphics.arc(centerX, centerY + 30, 45, 0, Math.PI);
+                graphics.endFill();
+                // Teeth
+                graphics.beginFill(0xFFFFFF);
+                for (let i = -30; i <= 30; i += 15) {
+                    graphics.drawRect(centerX + i - 5, centerY + 30, 10, 15);
+                }
+                graphics.endFill();
+                break;
+            case 'small':
+                graphics.beginFill(0x000000);
+                graphics.drawCircle(centerX, centerY + 35, 15);
+                graphics.endFill();
+                break;
+            case 'big_smile':
+                graphics.lineStyle(6, 0x000000);
+                graphics.arc(centerX, centerY + 20, 60, 0, Math.PI);
+                break;
+            case 'oh':
+                graphics.beginFill(0x000000);
+                graphics.drawEllipse(centerX, centerY + 40, 20, 30);
+                graphics.endFill();
+                break;
+            case 'silly':
+                graphics.beginFill(0x000000);
+                graphics.arc(centerX, centerY + 30, 35, 0, Math.PI);
+                graphics.endFill();
+                // Tongue
+                graphics.beginFill(0xFF69B4);
+                graphics.drawEllipse(centerX, centerY + 55, 20, 15);
+                graphics.endFill();
+                break;
+        }
+
+        return graphics;
+    }
+
+    drawDecoration(type, color) {
+        if (type === 'none') return null;
+
+        const graphics = new PIXI.Graphics();
+        const centerX = this.width / 2;
+        const centerY = this.height / 2;
+        const safeColor = color || '#FFB347';
+        const fillColor = parseInt(safeColor.replace('#', ''), 16);
+
+        graphics.beginFill(fillColor);
+
+        switch(type) {
+            case 'horns':
+                // Left horn
+                graphics.moveTo(centerX - 60, centerY - 80);
+                graphics.lineTo(centerX - 80, centerY - 120);
+                graphics.lineTo(centerX - 40, centerY - 90);
+                graphics.closePath();
+                
+                // Right horn
+                graphics.moveTo(centerX + 60, centerY - 80);
+                graphics.lineTo(centerX + 80, centerY - 120);
+                graphics.lineTo(centerX + 40, centerY - 90);
+                graphics.closePath();
+                break;
+            case 'antennae':
+                graphics.drawCircle(centerX - 50, centerY - 110, 12);
+                graphics.drawCircle(centerX + 50, centerY - 110, 12);
+                graphics.lineStyle(4, fillColor);
+                graphics.moveTo(centerX - 50, centerY - 98);
+                graphics.lineTo(centerX - 40, centerY - 70);
+                graphics.moveTo(centerX + 50, centerY - 98);
+                graphics.lineTo(centerX + 40, centerY - 70);
+                break;
+            case 'spikes':
+                for (let i = -70; i <= 70; i += 20) {
+                    graphics.moveTo(centerX + i - 8, centerY - 80);
+                    graphics.lineTo(centerX + i, centerY - 110);
+                    graphics.lineTo(centerX + i + 8, centerY - 80);
+                    graphics.closePath();
+                }
+                break;
+            case 'ears':
+                graphics.drawEllipse(centerX - 90, centerY - 40, 20, 35);
+                graphics.drawEllipse(centerX + 90, centerY - 40, 20, 35);
+                break;
+            case 'mohawk':
+                for (let i = -40; i <= 40; i += 15) {
+                    graphics.moveTo(centerX + i - 6, centerY - 80);
+                    graphics.lineTo(centerX + i, centerY - 130 + Math.abs(i) / 2);
+                    graphics.lineTo(centerX + i + 6, centerY - 80);
+                    graphics.closePath();
+                }
+                break;
+        }
+
+        graphics.endFill();
+        return graphics;
+    }
+
+    drawArms() {
+        // Arms removed for cleaner look
+        return new PIXI.Container();
+    }
+
+    render(avatarData) {
+        // Clear previous monster
+        this.monster.removeChildren();
+
+        // Add defaults for missing fields
+        const data = {
+            bodyType: avatarData.bodyType || 'blob',
+            bodyColor: avatarData.bodyColor || '#FF6B9D',
+            eyeType: avatarData.eyeType || 'big_round',
+            mouthType: avatarData.mouthType || 'happy',
+            headDecoration: avatarData.headDecoration || 'horns',
+            decorationColor: avatarData.decorationColor || '#FFB347',
+            pattern: avatarData.pattern || 'solid',
+            patternColor: avatarData.patternColor || '#FF1493'
+        };
+
+        // Draw in layers
+        const arms = this.drawArms();
+        const body = this.drawBody(data.bodyType, data.bodyColor);
+        const pattern = this.drawPattern(data.bodyType, data.pattern, data.patternColor);
+        const eyes = this.drawEyes(data.eyeType);
+        const mouth = this.drawMouth(data.mouthType);
+        const decoration = this.drawDecoration(data.headDecoration, data.decorationColor);
+
+        this.monster.addChild(arms);
+        this.monster.addChild(body);
+        if (pattern) this.monster.addChild(pattern);
+        this.monster.addChild(eyes);
+        this.monster.addChild(mouth);
+        if (decoration) this.monster.addChild(decoration);
+
+        // Breathing animation
+        this.app.ticker.add(() => {
+            this.monster.scale.y = 1 + Math.sin(Date.now() / 800) * 0.03;
+        });
+    }
+}
+</script>
