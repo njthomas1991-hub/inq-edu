@@ -158,6 +158,14 @@ html:not([data-theme="dark"]) .btn-light:hover {
 /* Header top bar - consistent height on all screens */
 header > div.bg-light {
     height: 58px !important;
+    position: relative !important;
+}
+
+/* Center the title in the header */
+header > div.bg-light > div:first-child {
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
 }
 
 /* Navbar theme support */
