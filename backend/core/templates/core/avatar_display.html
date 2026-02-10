@@ -254,6 +254,19 @@
                     graphics.drawRect(centerX - 100, centerY + i, 200, 15);
                 }
                 graphics.endFill();
+            } else if (patternType === 'gradient') {
+                // Create gradient overlay effect with circles
+                graphics.beginFill(color, 0.15);
+                graphics.drawCircle(centerX, centerY - 50, 60);
+                graphics.endFill();
+                
+                graphics.beginFill(color, 0.1);
+                graphics.drawCircle(centerX, centerY, 80);
+                graphics.endFill();
+                
+                graphics.beginFill(color, 0.05);
+                graphics.drawCircle(centerX, centerY + 40, 70);
+                graphics.endFill();
             }
 
             return graphics;
