@@ -216,6 +216,7 @@
             {% if user.is_authenticated %}
                 <span class="me-2">Welcome, {{ user.username }}</span>
                 <a class="link-primary me-2" href="{% url 'profile' %}">Profile</a>
+                <a class="link-primary me-2" href="{% url 'account_settings' %}">Account Settings</a>
                 <form method="post" action="{% url 'logout' %}" style="display: inline; margin: 0;">
                     {% csrf_token %}
                     <button type="submit" class="link-primary" style="background: none; border: none; cursor: pointer; text-decoration: underline; padding: 0; font: inherit;">
@@ -269,7 +270,7 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown2">
                         <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
-                        <li><a class="dropdown-item" href="{% url 'profile' %}">Account Settings</a></li>
+                        <li><a class="dropdown-item" href="{% url 'account_settings' %}">Account Settings</a></li>
                         <li><hr class="dropdown-divider"></li>
                         <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
                     </ul>
