@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import (
     User, Teacher, Student, Class, ClassStudent, GameSession, GameResult,
-    Achievement, StudentAchievement, TeacherNote, StudentMetrics, ClassMetrics, TeacherMetrics
+    Achievement, StudentAchievement, TeacherNote, StudentMetrics, ClassMetrics, TeacherMetrics, Avatar
 )
 
 class UserSerializer(serializers.ModelSerializer):
@@ -68,3 +68,9 @@ class TeacherMetricsSerializer(serializers.ModelSerializer):
     class Meta:
         model = TeacherMetrics
         fields = '__all__'
+
+class AvatarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Avatar
+        fields = '__all__'
+        read_only_fields = ('id', 'created_at', 'updated_at')

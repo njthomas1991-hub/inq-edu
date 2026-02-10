@@ -1,15 +1,29 @@
 {
   "name": "myproject",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "InqEd Avatar Panel with Phaser.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
     "eslint": "^9.39.2",
@@ -17,5 +31,19 @@
     "globals": "^17.1.0",
     "prettier": "^3.8.1",
     "typescript-eslint": "^8.54.0"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.7",
+    "@react-three/postprocessing": "^3.0.4",
+    "gsap": "^3.14.2",
+    "phaser": "^3.90.0",
+    "pixi.js": "^8.16.0",
+    "prop-types": "^15.8.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "react-scripts": "^5.0.1",
+    "react-three-fiber": "^6.0.13",
+    "three": "^0.182.0",
+    "web-vitals": "^5.1.0"
   }
 }
