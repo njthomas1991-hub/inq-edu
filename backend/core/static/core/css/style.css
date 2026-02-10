@@ -168,7 +168,7 @@ html:not([data-theme="dark"]) .btn-light:hover {
 
 /* Ensure consistent navbar height across all screen sizes */
 .navbar {
-    min-height: 4rem !important;
+    height: 59px !important;
 }
 
 /* Center navbar brand on all viewports - Override Bootstrap */
