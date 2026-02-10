@@ -161,18 +161,46 @@ header > div.bg-light {
     position: relative !important;
 }
 
-/* Center the title in the header */
-header > div.bg-light > div:first-child {
-    position: absolute !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
+/* On small screens, use flexbox layout to avoid overlaps */
+@media (max-width: 767.98px) {
+    header > div.bg-light {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+    
+    header > div.bg-light > div:first-child {
+        position: relative !important;
+        left: auto !important;
+        transform: none !important;
+        order: 1 !important;
+    }
+    
+    header > div.bg-light > div:last-child {
+        position: relative !important;
+        right: auto !important;
+        white-space: normal !important;
+        order: 2 !important;
+        font-size: 0.875rem !important;
+    }
 }
 
-/* Position login/logout section on the right */
-header > div.bg-light > div:last-child {
-    position: absolute !important;
-    right: 1rem !important;
-    white-space: nowrap !important;
+/* On medium+ screens, use absolute positioning for precise centering */
+@media (min-width: 768px) {
+    /* Center the title in the header */
+    header > div.bg-light > div:first-child {
+        position: absolute !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+    }
+
+    /* Position login/logout section on the right */
+    header > div.bg-light > div:last-child {
+        position: absolute !important;
+        right: 1rem !important;
+        white-space: nowrap !important;
+    }
 }
 
 /* Navbar theme support */
