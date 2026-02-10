@@ -228,10 +228,6 @@
             }
             graphics.endFill();
             
-            // Add shadow/outline
-            graphics.lineStyle(4, 0x000000, 0.2);
-            graphics.drawCircle(centerX, centerY + 5, 90);
-            
             return graphics;
         }
 
@@ -500,36 +496,8 @@
         }
 
         drawArms() {
-            const container = new PIXI.Container();
-            const centerX = this.app.view.width / 2;
-            const centerY = this.app.view.height / 2;
-
-            // Left arm
-            const leftArm = new PIXI.Graphics();
-            leftArm.lineStyle(20, 0x000000, 0.1);
-            leftArm.beginFill(0x000000, 0.15);
-            leftArm.drawEllipse(centerX - 100, centerY + 10, 15, 40);
-            leftArm.endFill();
-            
-            // Hand
-            leftArm.beginFill(0x000000, 0.15);
-            leftArm.drawCircle(centerX - 100, centerY + 50, 18);
-            leftArm.endFill();
-
-            // Right arm
-            const rightArm = new PIXI.Graphics();
-            rightArm.lineStyle(20, 0x000000, 0.1);
-            rightArm.beginFill(0x000000, 0.15);
-            rightArm.drawEllipse(centerX + 100, centerY + 10, 15, 40);
-            rightArm.endFill();
-            
-            // Hand
-            rightArm.beginFill(0x000000, 0.15);
-            rightArm.drawCircle(centerX + 100, centerY + 50, 18);
-            rightArm.endFill();
-
-            container.addChild(leftArm, rightArm);
-            return container;
+            // Arms removed for cleaner look
+            return new PIXI.Container();
         }
 
         render(avatarData) {
