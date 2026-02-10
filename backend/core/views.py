@@ -870,11 +870,29 @@ def get_user_avatar(request):
     Returns the avatar traits or creates a default avatar if none exists.
     """
     try:
-        avatar, created = Avatar.objects.get_or_create(user=request.user)
-        return JsonResponse({
-            'success': True,
-            'avatar': avatar.to_dict()
-        })
+        avatar, created = Avatar.objects.get_or_create(
+            user=request.user,
+            defaults={
+                'body_type': 'blob',
+                'body_color': '#FF6B9D',
+                'eye_type': 'big_round',
+                'mouth_type': 'happy',
+                'head_decoration': 'horns',
+                'decoration_color': '#FFB347',
+                'pattern': 'solid',
+                'pattern_color': '#FF1493'
+            }
+        )
+        
+        # Ensure all fields have values (for old records)
+        avatar_dict = avatar.to_dict()
+        avatar_dict.setdefault('bodyColor', '#FF6B9D')
+        avatar_dict.setdefault('decorationColor', '#FFB347')
+        avatar_dict.setdefault('patternColor', '#FF1493')
+        avatar_dict.setdefault('pattern', 'solid')
+        avatar_dict.setdefault('headDecoration', 'horns')
+        
+        return JsonResponse(avatar_dict)
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
