@@ -1326,3 +1326,262 @@ def school_admin_activity_log_view(request):
     }
     
     return render(request, "core/school_admin_activity_log.html", context)
+
+
+# Kindlewick API Endpoints
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import (
+    UserSerializer, AvatarSerializer, KindlewickGameProgressSerializer, 
+    KindlewickGameSessionSerializer, KindlewickGameProgressAdminSerializer,
+    KindlewickGameSessionAdminSerializer
+)
+from .models import KindlewickGameProgress, KindlewickGameSession, User
+from django.utils import timezone
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def current_user_api(request):
+    """Get current logged-in user info"""
+    user = request.user
+    avatar = getattr(user, 'avatar', None)
+    
+    user_data = UserSerializer(user).data
+    user_data['avatar'] = AvatarSerializer(avatar).data if avatar else None
+    
+    return Response(user_data)
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def kindlewick_progress_list(request):
+    """Get or update Kindlewick game progress for current user"""
+    if request.method == 'GET':
+        # Get all progress for current student
+        if request.user.role != 'student':
+            return Response({'error': 'Only students can access their progress'}, 
+                          status=status.HTTP_403_FORBIDDEN)
+        
+        progress = KindlewickGameProgress.objects.filter(user=request.user)
+        serializer = KindlewickGameProgressSerializer(progress, many=True)
+        return Response(serializer.data)
+    
+    elif request.method == 'POST':
+        # Create or update progress
+        if request.user.role != 'student':
+            return Response({'error': 'Only students can update progress'}, 
+                          status=status.HTTP_403_FORBIDDEN)
+        
+        game_type = request.data.get('game_type')
+        
+        # Get or create progress record
+        progress, created = KindlewickGameProgress.objects.get_or_create(
+            user=request.user,
+            game_type=game_type
+        )
+        
+        # Update fields from request
+        if 'current_level' in request.data:
+            progress.current_level = request.data['current_level']
+        if 'score' in request.data:
+            progress.score = request.data['score']
+        if 'tokens_earned' in request.data:
+            progress.tokens_earned = request.data['tokens_earned']
+        if 'total_playtime' in request.data:
+            progress.total_playtime = request.data['total_playtime']
+        if 'completed' in request.data:
+            progress.completed = request.data['completed']
+        
+        progress.save()
+        serializer = KindlewickGameProgressSerializer(progress)
+        return Response(serializer.data, status=status.HTTP_200_OK if not created else status.HTTP_201_CREATED)
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def kindlewick_sessions(request):
+    """Get game sessions or create a new session"""
+    if request.method == 'GET':
+        if request.user.role != 'student':
+            return Response({'error': 'Only students can access their sessions'}, 
+                          status=status.HTTP_403_FORBIDDEN)
+        
+        sessions = KindlewickGameSession.objects.filter(user=request.user).order_by('-created_at')[:50]
+        serializer = KindlewickGameSessionSerializer(sessions, many=True)
+        return Response(serializer.data)
+    
+    elif request.method == 'POST':
+        if request.user.role != 'student':
+            return Response({'error': 'Only students can create sessions'}, 
+                          status=status.HTTP_403_FORBIDDEN)
+        
+        game_type = request.data.get('game_type')
+        level = request.data.get('level', 1)
+        
+        session = KindlewickGameSession.objects.create(
+            user=request.user,
+            game_type=game_type,
+            level=level,
+            session_data=request.data.get('session_data', {})
+        )
+        
+        serializer = KindlewickGameSessionSerializer(session)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+@permission_classes([IsAuthenticated])
+def kindlewick_session_detail(request, session_id):
+    """Get, update, or finish a game session"""
+    try:
+        session = KindlewickGameSession.objects.get(id=session_id)
+    except KindlewickGameSession.DoesNotExist:
+        return Response({'error': 'Session not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    # Check permission
+    if session.user != request.user and request.user.role != 'teacher':
+        return Response({'error': 'Permission denied'}, status=status.HTTP_403_FORBIDDEN)
+    
+    if request.method == 'GET':
+        serializer = KindlewickGameSessionSerializer(session)
+        return Response(serializer.data)
+    
+    elif request.method == 'PUT':
+        # Update session data
+        if 'score' in request.data:
+            session.score = request.data['score']
+        if 'tokens_earned' in request.data:
+            session.tokens_earned = request.data['tokens_earned']
+        if 'playtime' in request.data:
+            session.playtime = request.data['playtime']
+        if 'completed' in request.data:
+            session.completed = request.data['completed']
+        if 'session_data' in request.data:
+            session.session_data = request.data['session_data']
+        
+        if session.completed and not session.finished_at:
+            session.finished_at = timezone.now()
+        
+        session.save()
+        
+        # Update overall progress
+        if session.completed:
+            progress, _ = KindlewickGameProgress.objects.get_or_create(
+                user=session.user,
+                game_type=session.game_type
+            )
+            progress.current_level = max(progress.current_level, session.level)
+            progress.score += session.score
+            progress.tokens_earned += session.tokens_earned
+            progress.total_playtime += session.playtime
+            progress.save()
+        
+        serializer = KindlewickGameSessionSerializer(session)
+        return Response(serializer.data)
+    
+    elif request.method == 'DELETE':
+        session.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def kindlewick_teacher_progress(request):
+    """Teacher view: Kindlewick progress for students in their classes."""
+    if request.user.role != 'teacher':
+        return Response({'error': 'Teacher access only'}, status=status.HTTP_403_FORBIDDEN)
+
+    class_id = request.query_params.get('class_id')
+    student_id = request.query_params.get('student_id')
+    limit = int(request.query_params.get('limit', 200))
+
+    students = User.objects.filter(enrolled_classes__clazz__teacher=request.user).distinct()
+    if class_id:
+        students = students.filter(enrolled_classes__clazz_id=class_id)
+    if student_id:
+        students = students.filter(id=student_id)
+
+    progress = KindlewickGameProgress.objects.filter(user__in=students).select_related('user').order_by('-last_played')[:limit]
+    serializer = KindlewickGameProgressAdminSerializer(progress, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def kindlewick_teacher_sessions(request):
+    """Teacher view: Kindlewick sessions for students in their classes."""
+    if request.user.role != 'teacher':
+        return Response({'error': 'Teacher access only'}, status=status.HTTP_403_FORBIDDEN)
+
+    class_id = request.query_params.get('class_id')
+    student_id = request.query_params.get('student_id')
+    limit = int(request.query_params.get('limit', 200))
+
+    students = User.objects.filter(enrolled_classes__clazz__teacher=request.user).distinct()
+    if class_id:
+        students = students.filter(enrolled_classes__clazz_id=class_id)
+    if student_id:
+        students = students.filter(id=student_id)
+
+    sessions = KindlewickGameSession.objects.filter(user__in=students).select_related('user').order_by('-created_at')[:limit]
+    serializer = KindlewickGameSessionAdminSerializer(sessions, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def kindlewick_school_admin_progress(request):
+    """School admin view: Kindlewick progress for students in the admin's school."""
+    if request.user.role != 'school_admin':
+        return Response({'error': 'School admin access only'}, status=status.HTTP_403_FORBIDDEN)
+
+    if not request.user.school:
+        return Response({'error': 'School association required'}, status=status.HTTP_403_FORBIDDEN)
+
+    class_id = request.query_params.get('class_id')
+    student_id = request.query_params.get('student_id')
+    teacher_id = request.query_params.get('teacher_id')
+    limit = int(request.query_params.get('limit', 300))
+
+    students = User.objects.filter(enrolled_classes__clazz__teacher__school=request.user.school).distinct()
+    if teacher_id:
+        students = students.filter(enrolled_classes__clazz__teacher_id=teacher_id)
+    if class_id:
+        students = students.filter(enrolled_classes__clazz_id=class_id)
+    if student_id:
+        students = students.filter(id=student_id)
+
+    progress = KindlewickGameProgress.objects.filter(user__in=students).select_related('user').order_by('-last_played')[:limit]
+    serializer = KindlewickGameProgressAdminSerializer(progress, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def kindlewick_school_admin_sessions(request):
+    """School admin view: Kindlewick sessions for students in the admin's school."""
+    if request.user.role != 'school_admin':
+        return Response({'error': 'School admin access only'}, status=status.HTTP_403_FORBIDDEN)
+
+    if not request.user.school:
+        return Response({'error': 'School association required'}, status=status.HTTP_403_FORBIDDEN)
+
+    class_id = request.query_params.get('class_id')
+    student_id = request.query_params.get('student_id')
+    teacher_id = request.query_params.get('teacher_id')
+    limit = int(request.query_params.get('limit', 300))
+
+    students = User.objects.filter(enrolled_classes__clazz__teacher__school=request.user.school).distinct()
+    if teacher_id:
+        students = students.filter(enrolled_classes__clazz__teacher_id=teacher_id)
+    if class_id:
+        students = students.filter(enrolled_classes__clazz_id=class_id)
+    if student_id:
+        students = students.filter(id=student_id)
+
+    sessions = KindlewickGameSession.objects.filter(user__in=students).select_related('user').order_by('-created_at')[:limit]
+    serializer = KindlewickGameSessionAdminSerializer(sessions, many=True)
+    return Response(serializer.data)
