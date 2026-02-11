@@ -210,9 +210,9 @@
 <div id="ariaLiveRegion" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
 <header class="mb-3">
-    <div class="bg-light py-2 px-3 d-flex flex-column flex-md-row justify-content-center justify-content-md-between align-items-center small gap-2">
-        <div class="fw-semibold">Inclusive Quest Education</div>
-        <div>
+    <div class="bg-light py-2 px-3 d-flex flex-column flex-md-row justify-content-center align-items-center small gap-2 header-container">
+        <div class="fw-semibold header-title">Inclusive Quest Education</div>
+        <div class="header-actions">
             {% if user.is_authenticated %}
                 <span class="me-2">Welcome, {{ user.username }}</span>
                 <a class="link-primary me-2" href="{% url 'profile' %}">Profile</a>

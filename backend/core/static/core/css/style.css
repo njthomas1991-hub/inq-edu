@@ -170,14 +170,16 @@ header > div.bg-light {
         align-items: center !important;
     }
     
-    header > div.bg-light > div:first-child {
+    header > div.bg-light > div:first-child,
+    header > div.header-title {
         position: relative !important;
         left: auto !important;
         transform: none !important;
         order: 1 !important;
     }
     
-    header > div.bg-light > div:last-child {
+    header > div.bg-light > div:last-child,
+    header > div.header-actions {
         position: relative !important;
         right: auto !important;
         white-space: normal !important;
@@ -186,35 +188,48 @@ header > div.bg-light {
     }
 }
 
-/* On medium+ screens, use absolute positioning for precise centering */
-@media (min-width: 768px) {
-    /* Center the title in the header */
-    header > div.bg-light > div:first-child {
-        position: absolute !important;
-        left: 50% !important;
-        transform: translateX(-50%) !important;
+/* On medium screens (768px - 1199px), center title and position right section */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+    header > div.header-container {
+        display: flex !important;
+        justify-content: center !important;
+        position: relative !important;
     }
-
-    /* Position login/logout section on the right */
-    header > div.bg-light > div:last-child {
-        position: absolute !important;
-        right: 1rem !important;
+    
+    header > div.header-title {
+        flex: 1 !important;
+        text-align: center !important;
+        position: static !important;
+    }
+    
+    header > div.header-actions {
+        flex-shrink: 0 !important;
+        position: static !important;
         white-space: nowrap !important;
     }
 }
 
-/* On large+ screens, move title to left to prevent overlap with welcome message */
+/* On large+ screens, use absolute positioning to prevent any overlap */
 @media (min-width: 1200px) {
-    header > div.bg-light > div:first-child {
+    header > div.header-container {
+        display: block !important;
+    }
+    
+    header > div.header-title {
         position: absolute !important;
         left: 1rem !important;
         top: 50% !important;
         transform: translateY(-50%) !important;
+        margin: 0 !important;
     }
     
-    header > div.bg-light > div:last-child {
+    header > div.header-actions {
+        position: absolute !important;
+        right: 1rem !important;
         top: 50% !important;
         transform: translateY(-50%) !important;
+        white-space: nowrap !important;
+        margin: 0 !important;
     }
 }
 
