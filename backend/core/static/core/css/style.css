@@ -157,7 +157,7 @@ html:not([data-theme="dark"]) .btn-light:hover {
 
 /* Header top bar - consistent height on all screens */
 header > div.bg-light {
-    height: 58px !important;
+    height: 70px !important;
     position: relative !important;
 }
 
@@ -208,7 +208,13 @@ header > div.bg-light {
     header > div.bg-light > div:first-child {
         position: absolute !important;
         left: 1rem !important;
-        transform: none !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+    }
+    
+    header > div.bg-light > div:last-child {
+        top: 50% !important;
+        transform: translateY(-50%) !important;
     }
 }
 
