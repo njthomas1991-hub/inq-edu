@@ -41,6 +41,7 @@
 
                 <form method="post">
                     {% csrf_token %}
+                    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value|default:'' }}">
                     
                     {# Manually render role field with tooltips #}
                     <div class="mb-3">
@@ -88,7 +89,12 @@
                 </div>
 
                 <div class="text-center mt-3">
-                    <a href="/teacher/login/">Already have an account? Login</a>
+                    <div class="text-muted small mb-2">Already have an account?</div>
+                    <div class="btn-group" role="group" aria-label="Login options">
+                        <a class="btn btn-outline-secondary btn-sm" href="/teacher/login/?role=student">Student Login</a>
+                        <a class="btn btn-outline-secondary btn-sm" href="/teacher/login/?role=teacher">Teacher Login</a>
+                        <a class="btn btn-outline-secondary btn-sm" href="/teacher/login/?role=school_admin">School Admin Login</a>
+                    </div>
                 </div>
             </div>
         </div>

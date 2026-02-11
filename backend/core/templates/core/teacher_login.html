@@ -11,11 +11,21 @@
     <div class="container py-5" style="max-width: 520px;">
         <div class="card shadow-sm">
             <div class="card-body p-4">
-                <h2 class="mb-3">Login</h2>
-                <p class="text-muted">Sign in to access your account.</p>
+                <h2 class="mb-3" id="loginHeading">Login</h2>
+                <p class="text-muted" id="loginSubheading">Sign in to access your account.</p>
+
+                <div class="mb-3">
+                    <label class="form-label">I am a</label>
+                    <div class="btn-group w-100" role="group" aria-label="Choose role">
+                        <button type="button" class="btn btn-outline-primary role-choice" data-role="student" data-next="/student/">Student</button>
+                        <button type="button" class="btn btn-outline-primary role-choice" data-role="teacher" data-next="/teacher-hub/">Teacher</button>
+                        <button type="button" class="btn btn-outline-primary role-choice" data-role="school_admin" data-next="/admin/">School Admin</button>
+                    </div>
+                </div>
 
                 <form method="post">
                     {% csrf_token %}
+                    <input type="hidden" name="{{ redirect_field_name }}" id="redirectField" value="{{ redirect_field_value|default:'' }}">
                     {{ form|crispy }}
                     <button type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
@@ -32,5 +42,45 @@
             </div>
         </div>
     </div>
+    <script>
+        (function () {
+            var roleButtons = document.querySelectorAll(".role-choice");
+            var redirectField = document.getElementById("redirectField");
+            var heading = document.getElementById("loginHeading");
+            var subheading = document.getElementById("loginSubheading");
+
+            function setActive(button) {
+                roleButtons.forEach(function (btn) {
+                    btn.classList.remove("active");
+                });
+                button.classList.add("active");
+                if (redirectField) {
+                    redirectField.value = button.getAttribute("data-next") || "";
+                }
+                var roleLabel = button.textContent.trim();
+                heading.textContent = roleLabel + " Login";
+                subheading.textContent = "Sign in to access your " + roleLabel.toLowerCase() + " account.";
+            }
+
+            if (roleButtons.length) {
+                var params = new URLSearchParams(window.location.search);
+                var roleParam = params.get("role");
+                var matched = Array.prototype.find.call(roleButtons, function (btn) {
+                    return btn.getAttribute("data-role") === roleParam;
+                });
+
+                if (matched) {
+                    setActive(matched);
+                } else {
+                    setActive(roleButtons[1]);
+                }
+                roleButtons.forEach(function (button) {
+                    button.addEventListener("click", function () {
+                        setActive(button);
+                    });
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

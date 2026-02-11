@@ -4,6 +4,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
+from django.urls import reverse
 from django.db.models import Q, F
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_http_methods
@@ -66,8 +67,17 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             if user.role == 'student':
                 return '/student/'
             elif user.role == 'school_admin':
-                return '/teacher/'  # School admins use teacher dashboard
-        return '/teacher/'
+                return '/admin/'
+        return '/teacher-hub/'
+
+    def get_login_redirect_url(self, request):
+        user = request.user
+        if user.is_authenticated:
+            if getattr(user, "role", None) == "student":
+                return reverse("student_dashboard")
+            if getattr(user, "role", None) == "school_admin":
+                return reverse("admin:index")
+        return reverse("teacher_hub")
 
 
 class ClassForm(forms.ModelForm):
@@ -230,8 +240,10 @@ def custom_login_view(request):
                 # Redirect based on role
                 if user.role == 'student':
                     return redirect('student_dashboard')
+                elif user.role == 'school_admin':
+                    return redirect('admin:index')
                 else:  # teacher
-                    return redirect('teacher_dashboard')
+                    return redirect('teacher_hub')
     else:
         form = AuthenticationForm()
     
