@@ -68,7 +68,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
                 return '/student/'
             elif user.role == 'school_admin':
                 return '/admin/'
-        return '/teacher-hub/'
+        return '/teacher/'
 
     def get_login_redirect_url(self, request):
         user = request.user
@@ -77,7 +77,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
                 return reverse("student_dashboard")
             if getattr(user, "role", None) == "school_admin":
                 return reverse("admin:index")
-        return reverse("teacher_hub")
+        return reverse("teacher_dashboard")
 
 
 class ClassForm(forms.ModelForm):
@@ -243,7 +243,7 @@ def custom_login_view(request):
                 elif user.role == 'school_admin':
                     return redirect('admin:index')
                 else:  # teacher
-                    return redirect('teacher_hub')
+                    return redirect('teacher_dashboard')
     else:
         form = AuthenticationForm()
     

@@ -82,7 +82,7 @@ INSTALLED_APPS = [
 AUTH_USER_MODEL = 'core.User'
 
 LOGIN_URL = '/teacher/login/'
-LOGIN_REDIRECT_URL = '/teacher-hub/'
+LOGIN_REDIRECT_URL = '/teacher/'
 LOGOUT_REDIRECT_URL = '/'
 
 SITE_ID = 1
@@ -102,8 +102,8 @@ ACCOUNT_SIGNUP_FIELDS = [
 ACCOUNT_EMAIL_VERIFICATION = 'none'  # No email verification required
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
-ACCOUNT_LOGIN_REDIRECT_URL = '/teacher-hub/'
-ACCOUNT_SIGNUP_REDIRECT_URL = '/teacher-hub/'  # Redirect to home page after registration
+ACCOUNT_LOGIN_REDIRECT_URL = '/teacher/'
+ACCOUNT_SIGNUP_REDIRECT_URL = '/teacher/'  # Redirect to home page after registration
 ACCOUNT_SESSION_REMEMBER = True  # Keep users logged in
 ACCOUNT_FORMS = {
     'signup': 'core.views.CustomSignupForm',
