@@ -407,6 +407,38 @@ def teacher_dashboard_view(request):
 
 
 @login_required
+def teacher_analytics_view(request):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    classes = request.user.classes_taught.all().prefetch_related("students")
+    total_students = sum(clazz.students.count() for clazz in classes)
+
+    subject_counts = {}
+    key_stage_counts = {}
+    for clazz in classes:
+        subject_label = clazz.get_subject_display()
+        subject_counts[subject_label] = subject_counts.get(subject_label, 0) + 1
+        key_stage_label = clazz.key_stage_label
+        key_stage_counts[key_stage_label] = key_stage_counts.get(key_stage_label, 0) + 1
+
+    subject_breakdown = [
+        {"label": label, "count": count} for label, count in subject_counts.items()
+    ]
+    key_stage_breakdown = [
+        {"label": label, "count": count} for label, count in key_stage_counts.items()
+    ]
+
+    return render(request, "core/teacher_analytics.html", {
+        "classes": classes,
+        "classes_count": classes.count(),
+        "total_students": total_students,
+        "subject_breakdown": subject_breakdown,
+        "key_stage_breakdown": key_stage_breakdown,
+    })
+
+
+@login_required
 def class_detail_view(request, class_id):
     if getattr(request.user, "role", None) != "teacher":
         return HttpResponseForbidden("Teacher access only")
@@ -422,6 +454,44 @@ def class_detail_view(request, class_id):
         "class_obj": class_obj,
         "students": students,
         "teacher_classes": teacher_classes,
+    })
+
+
+@login_required
+def class_analytics_view(request, class_id):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    class_obj = get_object_or_404(Class, id=class_id)
+    if class_obj.teacher_id != request.user.id:
+        return HttpResponseForbidden("You don't have access to this class")
+
+    enrollments = ClassStudent.objects.filter(clazz=class_obj).select_related("student")
+    total_students = enrollments.count()
+
+    return render(request, "core/class_analytics.html", {
+        "class_obj": class_obj,
+        "students": enrollments,
+        "total_students": total_students,
+    })
+
+
+@login_required
+def student_analytics_view(request, class_id, student_id):
+    if getattr(request.user, "role", None) != "teacher":
+        return HttpResponseForbidden("Teacher access only")
+
+    class_obj = get_object_or_404(Class, id=class_id)
+    if class_obj.teacher_id != request.user.id:
+        return HttpResponseForbidden("You don't have access to this class")
+
+    enrollment = get_object_or_404(ClassStudent, clazz=class_obj, student_id=student_id)
+    student = enrollment.student
+
+    return render(request, "core/student_analytics.html", {
+        "class_obj": class_obj,
+        "student": student,
+        "enrollment": enrollment,
     })
 
 

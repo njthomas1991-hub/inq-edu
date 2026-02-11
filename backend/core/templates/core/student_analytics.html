@@ -1,0 +1,102 @@
+{% extends "core/base_teacher.html" %}
+
+{% block title %}Student Analytics - {{ student.get_full_name|default:student.username }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <h2 class="mb-1">{{ student.get_full_name|default:student.username }}</h2>
+            <p class="text-muted mb-0">{{ class_obj.name }} · {{ class_obj.subject_label }} · {{ class_obj.key_stage_label }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{% url 'class_detail' class_obj.id %}" class="btn btn-outline-secondary btn-sm">Student List</a>
+            <a href="{% url 'class_analytics' class_obj.id %}" class="btn btn-outline-secondary btn-sm">Class Analytics</a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-muted small">Sessions</div>
+                    <div class="display-6 fw-semibold">0</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-muted small">Accuracy</div>
+                    <div class="display-6 fw-semibold">0%</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-muted small">Average Time</div>
+                    <div class="display-6 fw-semibold">0s</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-muted small">Mastery</div>
+                    <div class="display-6 fw-semibold">0%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <strong>Skill Breakdown</strong>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="border rounded p-3 text-center">
+                                <div class="text-muted small">Reading</div>
+                                <div class="fw-semibold">0%</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-3 text-center">
+                                <div class="text-muted small">Writing</div>
+                                <div class="fw-semibold">0%</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-3 text-center">
+                                <div class="text-muted small">Number</div>
+                                <div class="fw-semibold">0%</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border rounded p-3 text-center">
+                                <div class="text-muted small">Problem Solving</div>
+                                <div class="fw-semibold">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="small text-muted mt-3">Skill tracking appears after gameplay data is collected.</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <strong>Session Timeline</strong>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info mb-0">No gameplay sessions recorded yet.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
