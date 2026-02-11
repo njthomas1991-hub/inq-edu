@@ -1,0 +1,72 @@
+{% extends "core/base_school_admin.html" %}
+
+{% block title %}Classes - School Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5"><i class="bi bi-journal-text"></i> Classes</h1>
+            <p class="text-muted">All classes in {{ school_name }}</p>
+        </div>
+    </div>
+
+    <!-- Classes List -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-list-ul"></i> All Classes ({{ classes.count }})</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% if classes %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Class Name</th>
+                                        <th>Subject</th>
+                                        <th>Key Stage</th>
+                                        <th>Teacher</th>
+                                        <th>Students</th>
+                                        <th>Created</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for class in classes %}
+                                        <tr>
+                                            <td><strong>{{ class.name }}</strong></td>
+                                            <td>
+                                                <span class="badge bg-primary">{{ class.subject_label }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary">{{ class.key_stage_label }}</span>
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'school_admin_staff' %}#teacher-{{ class.teacher.id }}" 
+                                                   class="text-decoration-none">
+                                                    <i class="bi bi-person-circle"></i>
+                                                    {{ class.teacher.get_full_name|default:class.teacher.username }}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">{{ class.student_count }} student{{ class.student_count|pluralize }}</span>
+                                            </td>
+                                            <td>{{ class.created_at|date:"M d, Y" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="p-4 text-center text-muted">
+                            <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                            <p class="mt-3">No classes created yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

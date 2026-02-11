@@ -2,6 +2,7 @@ from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib import messages
 from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -67,7 +68,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             if user.role == 'student':
                 return '/student/'
             elif user.role == 'school_admin':
-                return '/admin/'
+                return '/school-admin/'
         return '/teacher/'
 
     def get_login_redirect_url(self, request):
@@ -76,7 +77,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
             if getattr(user, "role", None) == "student":
                 return reverse("student_dashboard")
             if getattr(user, "role", None) == "school_admin":
-                return reverse("admin:index")
+                return reverse("school_admin_dashboard")
         return reverse("teacher_dashboard")
 
 
@@ -379,6 +380,7 @@ def create_student_account_view(request):
                 try:
                     class_obj = Class.objects.get(id=class_id)
                     ClassStudent.objects.create(student=user, clazz=class_obj)
+                    messages.success(request, f'Student account "{username}" created and added to class successfully!')
                     # Redirect back to class detail page
                     return redirect('class_detail', class_id=class_id)
                 except Class.DoesNotExist:
@@ -510,9 +512,12 @@ def remove_student_view(request, class_id, student_id):
             return HttpResponseForbidden("You don't have access to this class")
         
         # Remove the student from the class
+        student = get_object_or_404(User, id=student_id)
         ClassStudent.objects.filter(clazz=class_obj, student_id=student_id).delete()
+        messages.success(request, f'Student "{student.get_full_name() or student.username}" removed from class successfully.')
         
     except Class.DoesNotExist:
+        messages.error(request, 'Class not found.')
         return HttpResponseForbidden("Class not found")
     
     return redirect('class_detail', class_id=class_id)
@@ -568,7 +573,10 @@ def add_class_view(request):
             class_obj = form.save(commit=False)
             class_obj.teacher = request.user
             class_obj.save()
+            messages.success(request, f'Class "{class_obj.name}" created successfully!')
             return redirect("teacher_dashboard")
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = ClassForm()
 
@@ -665,7 +673,10 @@ def teacher_resources_list_view(request):
             resource.author = request.user
             resource.save()
             form.save_m2m()
+            messages.success(request, f'Resource "{resource.title}" created successfully!')
             return redirect("teacher_resources")
+        else:
+            messages.error(request, 'Please correct the errors in the form.')
     else:
         form = TeachingResourceForm()
 
@@ -702,6 +713,7 @@ def teacher_resource_detail_view(request, slug):
             comment.author = request.user
             comment.resource = resource
             comment.save()
+            messages.success(request, 'Comment added successfully.')
             return redirect("teacher_resource_detail", slug=resource.slug)
     else:
         comment_form = ResourceCommentForm()
@@ -726,7 +738,10 @@ def teacher_resource_edit_view(request, slug):
         form = TeachingResourceForm(request.POST, request.FILES, instance=resource)
         if form.is_valid():
             form.save()
+            messages.success(request, f'Resource "{resource.title}" updated successfully.')
             return redirect("teacher_resource_detail", slug=resource.slug)
+        else:
+            messages.error(request, 'Please correct the errors in the form.')
     else:
         form = TeachingResourceForm(instance=resource)
 
@@ -747,7 +762,9 @@ def teacher_resource_delete_view(request, slug):
         return HttpResponseForbidden("You can only delete your own resources")
 
     if request.method == "POST":
+        resource_title = resource.title
         resource.delete()
+        messages.success(request, f'Resource "{resource_title}" deleted successfully.')
         return redirect("teacher_resources")
 
     return redirect("teacher_resource_detail", slug=slug)
@@ -766,6 +783,7 @@ def teacher_resource_comment_delete_view(request, slug, comment_id):
 
     if request.method == "POST":
         comment.delete()
+        messages.success(request, 'Comment deleted successfully.')
         return redirect("teacher_resource_detail", slug=resource.slug)
 
     return redirect("teacher_resource_detail", slug=resource.slug)
@@ -784,7 +802,10 @@ def teacher_forum_list_view(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
+            messages.success(request, f'Discussion "{post.title}" created successfully!')
             return redirect("teacher_forum")
+        else:
+            messages.error(request, 'Please correct the errors in the form.')
     else:
         form = ForumPostForm()
 
@@ -927,7 +948,10 @@ def teacher_forum_edit_view(request, post_id):
         form = ForumPostForm(request.POST, instance=post)
         if form.is_valid():
             form.save()
+            messages.success(request, f'Discussion "{post.title}" updated successfully.')
             return redirect("teacher_forum_detail", post_id=post.id)
+        else:
+            messages.error(request, 'Please correct the errors in the form.')
     else:
         form = ForumPostForm(instance=post)
 
@@ -948,7 +972,9 @@ def teacher_forum_delete_view(request, post_id):
         return HttpResponseForbidden("You can only delete your own discussions")
 
     if request.method == "POST":
+        post_title = post.title
         post.delete()
+        messages.success(request, f'Discussion "{post_title}" deleted successfully.')
         return redirect("teacher_forum")
 
     return redirect("teacher_forum_detail", post_id=post.id)
@@ -1121,4 +1147,182 @@ def randomize_avatar(request):
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 
+# ==================== SCHOOL ADMIN VIEWS ====================
 
+@login_required
+def school_admin_dashboard_view(request):
+    """School admin dashboard showing overview of staff, classes, and students"""
+    if getattr(request.user, "role", None) != "school_admin":
+        return HttpResponseForbidden("School admin access only")
+    
+    if not request.user.school:
+        return HttpResponseForbidden("You are not associated with a school")
+    
+    # Get all teachers in the same school
+    teachers = User.objects.filter(role='teacher', school=request.user.school).order_by('first_name', 'last_name')
+    
+    # Get all classes taught by teachers in this school
+    classes = Class.objects.filter(teacher__school=request.user.school).select_related('teacher').order_by('-created_at')
+    
+    # Get total students across all classes
+    total_students = ClassStudent.objects.filter(clazz__teacher__school=request.user.school).values('student').distinct().count()
+    
+    # Recent activity (last 10 classes created)
+    recent_classes = classes[:10]
+    
+    context = {
+        'teachers_count': teachers.count(),
+        'classes_count': classes.count(),
+        'total_students': total_students,
+        'recent_classes': recent_classes,
+    }
+    
+    return render(request, "core/school_admin_dashboard.html", context)
+
+
+@login_required
+def school_admin_staff_view(request):
+    """List all teachers registered to the same school"""
+    if getattr(request.user, "role", None) != "school_admin":
+        return HttpResponseForbidden("School admin access only")
+    
+    if not request.user.school:
+        return HttpResponseForbidden("You are not associated with a school")
+    
+    # Get all teachers in the same school
+    teachers = User.objects.filter(
+        role='teacher', 
+        school=request.user.school
+    ).prefetch_related('classes_taught').order_by('first_name', 'last_name')
+    
+    # Add class count for each teacher
+    for teacher in teachers:
+        teacher.class_count = teacher.classes_taught.count()
+    
+    context = {
+        'teachers': teachers,
+        'school_name': request.user.school,
+    }
+    
+    return render(request, "core/school_admin_staff.html", context)
+
+
+@login_required
+def school_admin_classes_view(request):
+    """List all classes with links to teachers"""
+    if getattr(request.user, "role", None) != "school_admin":
+        return HttpResponseForbidden("School admin access only")
+    
+    if not request.user.school:
+        return HttpResponseForbidden("You are not associated with a school")
+    
+    # Get all classes taught by teachers in this school
+    classes = Class.objects.filter(
+        teacher__school=request.user.school
+    ).select_related('teacher').prefetch_related('students').order_by('-created_at')
+    
+    # Add student count for each class
+    for clazz in classes:
+        clazz.student_count = clazz.students.count()
+    
+    context = {
+        'classes': classes,
+        'school_name': request.user.school,
+    }
+    
+    return render(request, "core/school_admin_classes.html", context)
+
+
+@login_required
+def school_admin_analytics_view(request):
+    """School-wide analytics dashboard"""
+    if getattr(request.user, "role", None) != "school_admin":
+        return HttpResponseForbidden("School admin access only")
+    
+    if not request.user.school:
+        return HttpResponseForbidden("You are not associated with a school")
+    
+    # Get all classes in this school
+    classes = Class.objects.filter(teacher__school=request.user.school).select_related('teacher')
+    
+    # Analytics by subject
+    subject_counts = {}
+    key_stage_counts = {}
+    
+    for clazz in classes:
+        subject_label = clazz.get_subject_display()
+        subject_counts[subject_label] = subject_counts.get(subject_label, 0) + 1
+        key_stage_label = clazz.key_stage_label
+        key_stage_counts[key_stage_label] = key_stage_counts.get(key_stage_label, 0) + 1
+    
+    subject_breakdown = [
+        {"label": label, "count": count} for label, count in subject_counts.items()
+    ]
+    key_stage_breakdown = [
+        {"label": label, "count": count} for label, count in key_stage_counts.items()
+    ]
+    
+    # Total students
+    total_students = ClassStudent.objects.filter(clazz__teacher__school=request.user.school).values('student').distinct().count()
+    
+    context = {
+        'classes': classes,
+        'classes_count': classes.count(),
+        'total_students': total_students,
+        'subject_breakdown': subject_breakdown,
+        'key_stage_breakdown': key_stage_breakdown,
+        'school_name': request.user.school,
+    }
+    
+    return render(request, "core/school_admin_analytics.html", context)
+
+
+@login_required
+def school_admin_activity_log_view(request):
+    """Activity log showing recent classes created and students joined"""
+    if getattr(request.user, "role", None) != "school_admin":
+        return HttpResponseForbidden("School admin access only")
+    
+    if not request.user.school:
+        return HttpResponseForbidden("You are not associated with a school")
+    
+    # Get recent classes created
+    recent_classes = Class.objects.filter(
+        teacher__school=request.user.school
+    ).select_related('teacher').order_by('-created_at')[:20]
+    
+    # Get recent student enrollments
+    recent_enrollments = ClassStudent.objects.filter(
+        clazz__teacher__school=request.user.school
+    ).select_related('student', 'clazz', 'clazz__teacher').order_by('-date_joined')[:20]
+    
+    # Combine into chronological activity log
+    activity_log = []
+    
+    for clazz in recent_classes:
+        activity_log.append({
+            'type': 'class_created',
+            'timestamp': clazz.created_at,
+            'class': clazz,
+            'teacher': clazz.teacher,
+        })
+    
+    for enrollment in recent_enrollments:
+        activity_log.append({
+            'type': 'student_joined',
+            'timestamp': enrollment.date_joined,
+            'student': enrollment.student,
+            'class': enrollment.clazz,
+            'teacher': enrollment.clazz.teacher,
+        })
+    
+    # Sort by timestamp descending
+    activity_log.sort(key=lambda x: x['timestamp'], reverse=True)
+    activity_log = activity_log[:30]  # Limit to 30 most recent activities
+    
+    context = {
+        'activity_log': activity_log,
+        'school_name': request.user.school,
+    }
+    
+    return render(request, "core/school_admin_activity_log.html", context)

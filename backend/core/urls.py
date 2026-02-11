@@ -13,7 +13,9 @@ from .views import (
     teacher_forum_reply_edit_view, teacher_forum_reply_delete_view, teacher_resource_edit_view,
     teacher_resource_delete_view, teacher_resource_comment_delete_view, profile_view,
     account_settings_view, get_user_avatar, save_user_avatar, randomize_avatar,
-    teacher_analytics_view, class_analytics_view, student_analytics_view
+    teacher_analytics_view, class_analytics_view, student_analytics_view,
+    school_admin_dashboard_view, school_admin_staff_view, school_admin_classes_view,
+    school_admin_analytics_view, school_admin_activity_log_view
 )
 
 urlpatterns = [
@@ -69,4 +71,10 @@ urlpatterns = [
     path("api/avatar/", get_user_avatar, name="get_avatar"),
     path("api/avatar/save/", save_user_avatar, name="save_avatar"),
     path("api/avatar/randomize/", randomize_avatar, name="randomize_avatar"),
+    # School Admin URLs
+    path("school-admin/", school_admin_dashboard_view, name="school_admin_dashboard"),
+    path("school-admin/staff/", school_admin_staff_view, name="school_admin_staff"),
+    path("school-admin/classes/", school_admin_classes_view, name="school_admin_classes"),
+    path("school-admin/analytics/", school_admin_analytics_view, name="school_admin_analytics"),
+    path("school-admin/activity/", school_admin_activity_log_view, name="school_admin_activity_log"),
 ]

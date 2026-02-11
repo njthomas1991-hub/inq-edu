@@ -1,0 +1,78 @@
+{% extends "core/base_school_admin.html" %}
+
+{% block title %}Activity Log - School Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5"><i class="bi bi-clock-history"></i> Activity Log</h1>
+            <p class="text-muted">Recent activity in {{ school_name }}</p>
+        </div>
+    </div>
+
+    <!-- Activity Log -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-list-ul"></i> Recent Activities</h5>
+                </div>
+                <div class="card-body">
+                    {% if activity_log %}
+                        <div class="list-group list-group-flush">
+                            {% for activity in activity_log %}
+                                <div class="list-group-item">
+                                    {% if activity.type == 'class_created' %}
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">
+                                                <i class="bi bi-journal-plus text-success"></i>
+                                                <strong>Class Created:</strong> {{ activity.class.name }}
+                                            </h6>
+                                            <small class="text-muted">{{ activity.timestamp|timesince }} ago</small>
+                                        </div>
+                                        <p class="mb-1">
+                                            <span class="badge bg-primary">{{ activity.class.subject_label }}</span>
+                                            <span class="badge bg-secondary">{{ activity.class.key_stage_label }}</span>
+                                        </p>
+                                        <small class="text-muted">
+                                            by 
+                                            <a href="{% url 'school_admin_staff' %}#teacher-{{ activity.teacher.id }}">
+                                                {{ activity.teacher.get_full_name|default:activity.teacher.username }}
+                                            </a>
+                                        </small>
+                                    {% elif activity.type == 'student_joined' %}
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">
+                                                <i class="bi bi-person-plus text-info"></i>
+                                                <strong>Student Joined:</strong> {{ activity.student.get_full_name|default:activity.student.username }}
+                                            </h6>
+                                            <small class="text-muted">{{ activity.timestamp|timesince }} ago</small>
+                                        </div>
+                                        <p class="mb-1">
+                                            joined <strong>{{ activity.class.name }}</strong>
+                                            <span class="badge bg-primary">{{ activity.class.subject_label }}</span>
+                                            <span class="badge bg-secondary">{{ activity.class.key_stage_label }}</span>
+                                        </p>
+                                        <small class="text-muted">
+                                            Teacher: 
+                                            <a href="{% url 'school_admin_staff' %}#teacher-{{ activity.teacher.id }}">
+                                                {{ activity.teacher.get_full_name|default:activity.teacher.username }}
+                                            </a>
+                                        </small>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="p-4 text-center text-muted">
+                            <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                            <p class="mt-3">No activity recorded yet.</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

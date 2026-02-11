@@ -1,6 +1,8 @@
-# Getting Started with Create React App
+# INQ-ED Frontend (React App)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+> **📖 Main Documentation:** See [../README.md](../README.md) for complete project documentation.
+
+This is the React frontend application for INQ-ED. This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
 
