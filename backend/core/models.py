@@ -59,6 +59,10 @@ class Class(models.Model):
             return "EYFS"
         return f"KS{self.year_ks}"
 
+    @property
+    def subject_label(self):
+        return self.get_subject_display()
+
 
 # ClassStudent Model - Students enrolled in a class
 class ClassStudent(models.Model):

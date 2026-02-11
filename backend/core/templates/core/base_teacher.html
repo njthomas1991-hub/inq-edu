@@ -237,6 +237,22 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'teacher_analytics' %}">
+                            <i class="fas fa-chart-line"></i> Analytics
+                        </a>
+                    </li>
+                    {% if class_obj %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="classMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-chalkboard"></i> Classes
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="classMenu">
+                            <li><a class="dropdown-item" href="{% url 'class_detail' class_obj.id %}">Student List</a></li>
+                            <li><a class="dropdown-item" href="{% url 'class_analytics' class_obj.id %}">Class Analytics</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
                         <a class="nav-link" href="{% url 'add_class' %}">
                             <i class="fas fa-plus"></i> Add Class
                         </a>

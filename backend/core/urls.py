@@ -12,7 +12,8 @@ from .views import (
     custom_login_view, student_dashboard_view, teacher_forum_delete_view, teacher_forum_edit_view,
     teacher_forum_reply_edit_view, teacher_forum_reply_delete_view, teacher_resource_edit_view,
     teacher_resource_delete_view, teacher_resource_comment_delete_view, profile_view,
-        account_settings_view, get_user_avatar, save_user_avatar, randomize_avatar
+    account_settings_view, get_user_avatar, save_user_avatar, randomize_avatar,
+    teacher_analytics_view, class_analytics_view, student_analytics_view
 )
 
 urlpatterns = [
@@ -41,8 +42,11 @@ urlpatterns = [
     ),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
     path("teacher/", teacher_dashboard_view, name="teacher_dashboard"),
+    path("teacher/analytics/", teacher_analytics_view, name="teacher_analytics"),
     path("teacher/class/add/", add_class_view, name="add_class"),
     path("teacher/class/<int:class_id>/", class_detail_view, name="class_detail"),
+    path("teacher/class/<int:class_id>/analytics/", class_analytics_view, name="class_analytics"),
+    path("teacher/class/<int:class_id>/student/<int:student_id>/analytics/", student_analytics_view, name="student_analytics"),
     path("teacher/class/<int:class_id>/remove/<int:student_id>/", remove_student_view, name="remove_student"),
     path("teacher/class/<int:class_id>/transfer/<int:student_id>/", transfer_student_view, name="transfer_student"),
     path("teacher/news/", teacher_news_list_view, name="teacher_news"),

@@ -1,0 +1,121 @@
+{% extends "core/base_teacher.html" %}
+
+{% block title %}Teacher Analytics - INQ-ED{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <h2 class="mb-1">Teacher Analytics</h2>
+            <p class="text-muted mb-0">Overview of classes and learning coverage.</p>
+        </div>
+        <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-secondary btn-sm">Back to Dashboard</a>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-muted small">Total Classes</div>
+                    <div class="display-6 fw-semibold">{{ classes_count }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <div class="text-muted small">Total Students</div>
+                    <div class="display-6 fw-semibold">{{ total_students }}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Gameplay Data Coverage</div>
+                    <div class="progress mt-2" role="progressbar" aria-label="Gameplay data coverage" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <div class="small text-muted mt-2">Data populates after gameplay sessions.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <strong>Subjects</strong>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        {% for item in subject_breakdown %}
+                            <div class="col-6">
+                                <div class="border rounded p-3 text-center">
+                                    <div class="text-muted small">{{ item.label }}</div>
+                                    <div class="fw-semibold fs-5">{{ item.count }}</div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="col-12">
+                                <div class="alert alert-info mb-0">No classes yet.</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white">
+                    <strong>Key Stages</strong>
+                </div>
+                <div class="card-body">
+                    <div class="row g-2">
+                        {% for item in key_stage_breakdown %}
+                            <div class="col-6">
+                                <div class="border rounded p-3 text-center">
+                                    <div class="text-muted small">{{ item.label }}</div>
+                                    <div class="fw-semibold fs-5">{{ item.count }}</div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="col-12">
+                                <div class="alert alert-info mb-0">No classes yet.</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <strong>Classes</strong>
+        </div>
+        <div class="card-body">
+            {% if classes %}
+                <div class="row g-3">
+                    {% for class_obj in classes %}
+                        <div class="col-md-6 col-lg-4">
+                            <div class="border rounded p-3 h-100">
+                                <div class="fw-semibold">{{ class_obj.name }}</div>
+                                <div class="text-muted small">{{ class_obj.subject_label }} · {{ class_obj.key_stage_label }}</div>
+                                <div class="small text-muted">Students: {{ class_obj.students.count }}</div>
+                                <div class="mt-2 d-flex gap-2">
+                                    <a href="{% url 'class_detail' class_obj.id %}" class="btn btn-sm btn-outline-secondary">Students</a>
+                                    <a href="{% url 'class_analytics' class_obj.id %}" class="btn btn-sm btn-outline-primary">Analytics</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">Create a class to see analytics.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

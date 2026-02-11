@@ -5,9 +5,14 @@
 {% block content %}
 <div class="container">
     <div class="mb-4">
-        <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-secondary btn-sm mb-2">← Back to Dashboard</a>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
+            <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-secondary btn-sm">← Back to Dashboard</a>
+            <a href="{% url 'class_analytics' class_obj.id %}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-chart-bar"></i> Class Analytics
+            </a>
+        </div>
         <h2 class="mb-1">{{ class_obj.name }}</h2>
-        <p class="text-muted mb-0">{{ class_obj.subject }} • Key Stage {{ class_obj.key_stage_label }}</p>
+        <p class="text-muted mb-0">{{ class_obj.subject_label }} • Key Stage {{ class_obj.key_stage_label }}</p>
         {% if class_obj.description %}
             <p class="text-muted small mt-2">{{ class_obj.description }}</p>
         {% endif %}
@@ -56,6 +61,12 @@
                                             <td>{{ enrollment.date_joined|date:"M d, Y" }}</td>
                                             <td>
                                                 <div class="d-flex gap-1">
+                                                    <a class="btn btn-sm btn-outline-success" title="View student analytics" href="{% url 'student_analytics' class_obj.id enrollment.student.id %}">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-graph-up" viewBox="0 0 16 16">
+                                                            <path fill-rule="evenodd" d="M0 0h1v15h15v1H0z"/>
+                                                            <path fill-rule="evenodd" d="M10 3.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V4.707l-3.146 3.147a.5.5 0 0 1-.708 0L8 5.707 5.854 7.854a.5.5 0 0 1-.708-.708l2.5-2.5a.5.5 0 0 1 .708 0L10.5 6.793 13.293 4H10.5a.5.5 0 0 1-.5-.5"/>
+                                                        </svg>
+                                                    </a>
                                                     <button type="button" class="btn btn-sm btn-outline-primary" title="Transfer to another class" data-bs-toggle="modal" data-bs-target="#transferModal{{ enrollment.student.id }}">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-right" viewBox="0 0 16 16">
                                                             <path fill-rule="evenodd" d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5"/>
@@ -88,7 +99,7 @@
                                                                         <option value="">Select a class...</option>
                                                                         {% for cls in teacher_classes %}
                                                                             {% if cls.id != class_obj.id %}
-                                                                                <option value="{{ cls.id }}">{{ cls.name }} ({{ cls.subject }})</option>
+                                                                                <option value="{{ cls.id }}">{{ cls.name }} ({{ cls.subject_label }})</option>
                                                                             {% endif %}
                                                                         {% endfor %}
                                                                     </select>
