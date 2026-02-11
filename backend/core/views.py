@@ -86,7 +86,7 @@ class ClassForm(forms.ModelForm):
         fields = ('name', 'year_ks', 'subject', 'description')
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Class name'}),
-            'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Subject'}),
+            'subject': forms.Select(attrs={'class': 'form-select'}),
             'year_ks': forms.Select(attrs={'class': 'form-select'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Optional description'}),
         }
