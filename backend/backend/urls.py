@@ -19,10 +19,12 @@ from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib import admin
 from django.urls import path, include
+from core.views import custom_logout_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
+    path('accounts/logout/', custom_logout_view, name='account_logout'),
     path('accounts/', include('allauth.urls')),
     path('summernote/', include('django_summernote.urls')),
 ]
