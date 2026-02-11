@@ -1,0 +1,92 @@
+{% extends "core/base_school_admin.html" %}
+
+{% block title %}Dashboard - School Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5"><i class="bi bi-speedometer2"></i> School Admin Dashboard</h1>
+            <p class="text-muted">Welcome to the school administration panel</p>
+        </div>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="card border-primary h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-people-fill text-primary" style="font-size: 3rem;"></i>
+                    <h3 class="mt-3">{{ teachers_count }}</h3>
+                    <p class="text-muted mb-0">Teachers</p>
+                    <a href="{% url 'school_admin_staff' %}" class="btn btn-primary btn-sm mt-3">
+                        View Staff <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-success h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-journal-text text-success" style="font-size: 3rem;"></i>
+                    <h3 class="mt-3">{{ classes_count }}</h3>
+                    <p class="text-muted mb-0">Classes</p>
+                    <a href="{% url 'school_admin_classes' %}" class="btn btn-success btn-sm mt-3">
+                        View Classes <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-info h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-mortarboard-fill text-info" style="font-size: 3rem;"></i>
+                    <h3 class="mt-3">{{ total_students }}</h3>
+                    <p class="text-muted mb-0">Students</p>
+                    <a href="{% url 'school_admin_analytics' %}" class="btn btn-info btn-sm mt-3">
+                        View Analytics <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Classes Created</h5>
+                    <a href="{% url 'school_admin_activity_log' %}" class="btn btn-sm btn-outline-light">
+                        View Full Activity Log <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_classes %}
+                        <div class="list-group list-group-flush">
+                            {% for class in recent_classes %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">
+                                            <i class="bi bi-journal-text text-success"></i>
+                                            {{ class.name }}
+                                        </h6>
+                                        <small class="text-muted">{{ class.created_at|timesince }} ago</small>
+                                    </div>
+                                    <p class="mb-1">
+                                        <span class="badge bg-primary">{{ class.subject_label }}</span>
+                                        <span class="badge bg-secondary">{{ class.key_stage_label }}</span>
+                                        <span class="text-muted">by {{ class.teacher.get_full_name|default:class.teacher.username }}</span>
+                                    </p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-muted mb-0">No classes created yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
