@@ -27,10 +27,18 @@ class User(AbstractUser):
 
 # Class Model - Created by teachers
 class Class(models.Model):
+    KEY_STAGE_CHOICES = (
+        (0, "EYFS"),
+        (1, "KS1"),
+        (2, "KS2"),
+        (3, "KS3"),
+        (4, "KS4"),
+    )
+
     name = models.CharField(max_length=255)
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='classes_taught')
     subject = models.CharField(max_length=100)
-    year_ks = models.IntegerField()  # Key Stage (1-4)
+    year_ks = models.IntegerField(choices=KEY_STAGE_CHOICES)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -38,7 +46,13 @@ class Class(models.Model):
         verbose_name_plural = "Classes"
 
     def __str__(self):
-        return f"{self.name} - {self.subject} (KS{self.year_ks})"
+        return f"{self.name} - {self.subject} ({self.key_stage_label})"
+
+    @property
+    def key_stage_label(self):
+        if self.year_ks == 0:
+            return "EYFS"
+        return f"KS{self.year_ks}"
 
 
 # ClassStudent Model - Students enrolled in a class

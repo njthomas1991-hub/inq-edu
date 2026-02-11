@@ -60,7 +60,7 @@
                     {% for enrollment in enrollments %}
                         <li class="list-group-item">
                             <strong>{{ enrollment.clazz.name }}</strong>
-                            <span class="text-muted">· {{ enrollment.clazz.subject }} · KS{{ enrollment.clazz.year_ks }}</span>
+                            <span class="text-muted">· {{ enrollment.clazz.subject }} · {{ enrollment.clazz.key_stage_label }}</span>
                         </li>
                     {% endfor %}
                 </ul>

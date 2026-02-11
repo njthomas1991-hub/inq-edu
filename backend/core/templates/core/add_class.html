@@ -22,18 +22,18 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="{{ form.subject.id_for_label }}" class="form-label">Subject *</label>
-                            {{ form.subject }}
-                            {% if form.subject.errors %}
-                                <div class="alert alert-danger mt-1">{{ form.subject.errors }}</div>
+                            <label for="{{ form.year_ks.id_for_label }}" class="form-label">Key Stage (EYFS, KS1-4) *</label>
+                            {{ form.year_ks }}
+                            {% if form.year_ks.errors %}
+                                <div class="alert alert-danger mt-1">{{ form.year_ks.errors }}</div>
                             {% endif %}
                         </div>
 
                         <div class="mb-3">
-                            <label for="{{ form.year_ks.id_for_label }}" class="form-label">Year (Key Stage 1-4) *</label>
-                            {{ form.year_ks }}
-                            {% if form.year_ks.errors %}
-                                <div class="alert alert-danger mt-1">{{ form.year_ks.errors }}</div>
+                            <label for="{{ form.subject.id_for_label }}" class="form-label">Subject *</label>
+                            {{ form.subject }}
+                            {% if form.subject.errors %}
+                                <div class="alert alert-danger mt-1">{{ form.subject.errors }}</div>
                             {% endif %}
                         </div>
 
