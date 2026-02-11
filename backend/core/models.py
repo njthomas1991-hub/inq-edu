@@ -368,3 +368,56 @@ class Avatar(models.Model):
             'pattern': self.pattern,
             'patternColor': self.pattern_color,
         }
+
+
+# Kindlewick Game Progress Model
+class KindlewickGameProgress(models.Model):
+    """Track Kindlewick game progress per student"""
+    GAME_TYPES = (
+        ('map', 'Map Exploration'),
+        ('wizards_castle', 'Wizards Castle'),
+        ('prefixes_potions', 'Prefixes and Potions'),
+        ('grid_coordinator', 'Grid Coordinator'),
+    )
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'student'}, related_name='kindlewick_progress')
+    game_type = models.CharField(max_length=50, choices=GAME_TYPES)
+    current_level = models.IntegerField(default=1)
+    score = models.IntegerField(default=0)
+    tokens_earned = models.IntegerField(default=0)
+    total_playtime = models.IntegerField(default=0, help_text="Total playtime in seconds")
+    last_played = models.DateTimeField(auto_now=True)
+    completed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('user', 'game_type')
+        ordering = ['-last_played']
+        verbose_name = 'Kindlewick Game Progress'
+        verbose_name_plural = 'Kindlewick Game Progress'
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.get_game_type_display()}"
+
+
+# Kindlewick Game Session Model
+class KindlewickGameSession(models.Model):
+    """Track individual game play sessions"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'student'}, related_name='kindlewick_sessions')
+    game_type = models.CharField(max_length=50, choices=KindlewickGameProgress.GAME_TYPES)
+    level = models.IntegerField()
+    score = models.IntegerField(default=0)
+    tokens_earned = models.IntegerField(default=0)
+    playtime = models.IntegerField(default=0, help_text="Playtime in seconds")
+    completed = models.BooleanField(default=False)
+    session_data = models.JSONField(default=dict, blank=True, help_text="Game state/progress data")
+    created_at = models.DateTimeField(auto_now_add=True)
+    finished_at = models.DateTimeField(null=True, blank=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Kindlewick Game Session'
+        verbose_name_plural = 'Kindlewick Game Sessions'
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.game_type} Level {self.level}"
