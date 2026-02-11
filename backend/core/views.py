@@ -219,16 +219,15 @@ def student_dashboard_view(request):
     total_classes = enrollments.count()
     
     # Get unique key stages from enrolled classes and define available worlds
-    key_stages = enrollments.values_list('clazz__year_ks', flat=True).distinct().order_by('clazz__year_ks')
+    key_stages = set(enrollments.values_list('clazz__year_ks', flat=True).distinct())
     
-    # Map key stages to game worlds
+    # Map key stages to game worlds (matches Class.KEY_STAGE_CHOICES: 0=EYFS, 1=KS1, 2=KS2, 3=KS3, 4=KS4)
     worlds = [
         {'ks': 0, 'label': 'EYFS', 'name': 'Moonbeam Meadows', 'status': 'coming_soon', 'url': ''},
         {'ks': 1, 'label': 'KS1', 'name': 'Starlit Shores', 'status': 'coming_soon', 'url': ''},
-        {'ks': 2, 'label': 'Lower KS2', 'name': 'Kindle Wick', 'status': 'available', 'url': 'kindlewick'},
-        {'ks': 3, 'label': 'Upper KS2', 'name': 'Questopia', 'status': 'coming_soon', 'url': ''},
-        {'ks': 4, 'label': 'KS3', 'name': 'WonderWorld', 'status': 'coming_soon', 'url': ''},
-        {'ks': 5, 'label': 'KS4', 'name': 'Nexus Trials', 'status': 'coming_soon', 'url': ''},
+        {'ks': 2, 'label': 'KS2', 'name': 'Kindlewick', 'status': 'available', 'url': 'kindlewick'},
+        {'ks': 3, 'label': 'KS3', 'name': 'Questopia', 'status': 'coming_soon', 'url': ''},
+        {'ks': 4, 'label': 'KS4', 'name': 'Nexus Trials', 'status': 'coming_soon', 'url': ''},
     ]
     
     # Filter worlds to only those the student has classes for

@@ -1,12 +1,43 @@
-{% extends "core/base.html" %}
 {% load static %}
-
-{% block title %}Kindle Wick - inq-ed{% endblock %}
-
-{% block content %}
-<div id="root" style="min-height: 100vh;"></div>
-
-<!-- Load the React app bundle -->
-<link rel="stylesheet" href="{% static 'kindlewick/bundle.css' %}">
-<script src="{% static 'kindlewick/bundle.js' %}" defer></script>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kindlewick - Game World</title>
+    <link rel="icon" type="image/png" href="{% static 'core/images/favicon/favicon-16x16.png' %}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000;
+            color: #fff;
+            overflow: hidden;
+        }
+        #root {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <!-- Load the built Kindlewick Webpack app -->
+    <script src="{% static 'kindlewick/app.js' %}"></script>
+</body>
+</html>
