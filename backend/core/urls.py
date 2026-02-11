@@ -18,7 +18,8 @@ from .views import (
     school_admin_analytics_view, school_admin_activity_log_view,
     current_user_api, kindlewick_progress_list, kindlewick_sessions, kindlewick_session_detail,
     kindlewick_teacher_progress, kindlewick_teacher_sessions,
-    kindlewick_school_admin_progress, kindlewick_school_admin_sessions
+    kindlewick_school_admin_progress, kindlewick_school_admin_sessions,
+    custom_logout_view
 )
 
 urlpatterns = [
@@ -45,7 +46,7 @@ urlpatterns = [
         allauth_views.LoginView.as_view(template_name="core/teacher_login.html"),
         name="teacher_login",
     ),
-    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
+    path("logout/", custom_logout_view, name="logout"),
     path("teacher/", teacher_dashboard_view, name="teacher_dashboard"),
     path("teacher/analytics/", teacher_analytics_view, name="teacher_analytics"),
     path("teacher/class/add/", add_class_view, name="add_class"),

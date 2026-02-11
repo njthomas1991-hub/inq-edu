@@ -427,6 +427,7 @@ footer {
 
 .hero-header {
     background: linear-gradient(to bottom, var(--theme-bg-5), transparent);
+    padding-top: 3rem !important;
 }
 
 .hero-video-overlay {

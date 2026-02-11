@@ -1585,3 +1585,11 @@ def kindlewick_school_admin_sessions(request):
     sessions = KindlewickGameSession.objects.filter(user__in=students).select_related('user').order_by('-created_at')[:limit]
     serializer = KindlewickGameSessionAdminSerializer(sessions, many=True)
     return Response(serializer.data)
+
+
+# Custom Logout View - Ensures redirect to home
+def custom_logout_view(request):
+    """Custom logout that explicitly redirects to home"""
+    from django.contrib.auth import logout
+    logout(request)
+    return redirect('home')
