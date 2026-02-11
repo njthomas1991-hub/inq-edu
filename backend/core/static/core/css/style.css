@@ -203,6 +203,15 @@ header > div.bg-light {
     }
 }
 
+/* On large+ screens, move title to left to prevent overlap with welcome message */
+@media (min-width: 1200px) {
+    header > div.bg-light > div:first-child {
+        position: absolute !important;
+        left: 1rem !important;
+        transform: none !important;
+    }
+}
+
 /* Navbar theme support */
 .navbar-light {
     background-color: var(--theme-bg-2) !important;
