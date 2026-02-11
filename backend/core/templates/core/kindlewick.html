@@ -1,45 +1,12 @@
 {% extends "core/base.html" %}
+{% load static %}
 
 {% block title %}Kindle Wick - inq-ed{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="text-center mb-5">
-                <h1 class="display-3 fw-bold">Kindle Wick</h1>
-                <p class="lead text-muted">Spark curiosity and ignite learning</p>
-            </div>
-            
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body">
-                            <h3 class="card-title">What is Kindle Wick?</h3>
-                            <p class="card-text">An interactive learning experience designed to ignite students' natural curiosity through guided exploration and discovery.</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="col-md-6">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body">
-                            <h3 class="card-title">Key Features</h3>
-                            <ul class="list-unstyled">
-                                <li>✨ Interactive storytelling</li>
-                                <li>🎯 Inquiry-based challenges</li>
-                                <li>🌟 Progress tracking</li>
-                                <li>🎨 Creative expression tools</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="text-center mt-5">
-                <a href="#" class="btn btn-primary btn-lg">Coming Soon</a>
-            </div>
-        </div>
-    </div>
-</div>
+<div id="root" style="min-height: 100vh;"></div>
+
+<!-- Load the React app bundle -->
+<link rel="stylesheet" href="{% static 'kindlewick/bundle.css' %}">
+<script src="{% static 'kindlewick/bundle.js' %}" defer></script>
 {% endblock %}
