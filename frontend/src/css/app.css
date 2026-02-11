@@ -4,6 +4,39 @@
   padding: 20px;
 }
 
+.app-nav {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.app-tab {
+  border: none;
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  background: rgba(15, 23, 42, 0.1);
+  color: #0f172a;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.app-tab.active {
+  background: linear-gradient(135deg, #f97316, #fb7185);
+  color: #0f172a;
+  box-shadow: 0 10px 24px rgba(249, 115, 22, 0.3);
+}
+
+.app-tab:hover {
+  transform: translateY(-1px);
+}
+
+.app-panel {
+  display: grid;
+  gap: 18px;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
