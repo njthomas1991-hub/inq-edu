@@ -217,10 +217,27 @@ def student_dashboard_view(request):
 
     enrollments = ClassStudent.objects.filter(student=request.user).select_related('clazz')
     total_classes = enrollments.count()
+    
+    # Get unique key stages from enrolled classes and define available worlds
+    key_stages = enrollments.values_list('clazz__year_ks', flat=True).distinct().order_by('clazz__year_ks')
+    
+    # Map key stages to game worlds
+    worlds = [
+        {'ks': 0, 'label': 'EYFS', 'name': 'Moonbeam Meadows', 'status': 'coming_soon', 'url': ''},
+        {'ks': 1, 'label': 'KS1', 'name': 'Starlit Shores', 'status': 'coming_soon', 'url': ''},
+        {'ks': 2, 'label': 'Lower KS2', 'name': 'Kindle Wick', 'status': 'available', 'url': 'kindlewick'},
+        {'ks': 3, 'label': 'Upper KS2', 'name': 'Questopia', 'status': 'coming_soon', 'url': ''},
+        {'ks': 4, 'label': 'KS3', 'name': 'WonderWorld', 'status': 'coming_soon', 'url': ''},
+        {'ks': 5, 'label': 'KS4', 'name': 'Nexus Trials', 'status': 'coming_soon', 'url': ''},
+    ]
+    
+    # Filter worlds to only those the student has classes for
+    available_worlds = [w for w in worlds if w['ks'] in key_stages]
 
     return render(request, "core/student_dashboard.html", {
         "enrollments": enrollments,
         "total_classes": total_classes,
+        "available_worlds": available_worlds,
     })
 
 @api_view(['GET'])
