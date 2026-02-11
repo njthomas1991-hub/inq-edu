@@ -34,10 +34,15 @@ class Class(models.Model):
         (3, "KS3"),
         (4, "KS4"),
     )
+    SUBJECT_CHOICES = (
+        ("english", "English"),
+        ("maths", "Maths"),
+        ("english_maths", "English and Maths"),
+    )
 
     name = models.CharField(max_length=255)
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='classes_taught')
-    subject = models.CharField(max_length=100)
+    subject = models.CharField(max_length=100, choices=SUBJECT_CHOICES)
     year_ks = models.IntegerField(choices=KEY_STAGE_CHOICES)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
