@@ -30,7 +30,7 @@
                                     <li class="list-group-item d-flex justify-content-between align-items-center hover-bg-light" style="cursor: pointer; transition: background-color 0.2s;">
                                         <div>
                                             <div class="fw-semibold">{{ class_obj.name }}</div>
-                                            <div class="text-muted small">{{ class_obj.subject }} • Key Stage {{ class_obj.year_ks }}</div>
+                                            <div class="text-muted small">{{ class_obj.subject }} • Key Stage {{ class_obj.key_stage_label }}</div>
                                             {% if class_obj.description %}
                                                 <div class="text-muted small mt-1">{{ class_obj.description|truncatewords:15 }}</div>
                                             {% endif %}
