@@ -154,4 +154,38 @@
         </div>
     </div>
 </div>
+</div>
+<div class="card shadow-sm mt-4">
+    <div class="card-header bg-white">
+        <strong>Game Statistics</strong>
+    </div>
+    <div class="card-body">
+        {% if per_game_stats %}
+        <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>Game</th>
+                        <th>Sessions</th>
+                        <th>Avg. Score</th>
+                        <th>% Success Rate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in per_game_stats %}
+                    <tr>
+                        <td>{{ stat.game_label }}</td>
+                        <td>{{ stat.session_count }}</td>
+                        <td>{{ stat.avg_score }}</td>
+                        <td>{{ stat.avg_success }}%</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info mb-0">No game data available yet.</div>
+        {% endif %}
+    </div>
+</div>
 {% endblock %}

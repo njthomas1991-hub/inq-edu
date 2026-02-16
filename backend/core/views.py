@@ -7,6 +7,7 @@ from django import forms
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.db.models import Q, F
+from django.db import models
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_http_methods
 from django_summernote.widgets import SummernoteWidget
@@ -254,8 +255,18 @@ def custom_login_view(request):
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
-                # Redirect based on role
+                # Log a KindlewickGameSession for student on login
                 if user.role == 'student':
+                    from .models import KindlewickGameSession
+                    # Only log if not already logged in this session (avoid duplicate on refresh)
+                    if not hasattr(request, '_kindlewick_session_logged'):
+                        KindlewickGameSession.objects.create(
+                            user=user,
+                            game_type='prefixes_potions',  # Default or detect game type as needed
+                            level=1,
+                            session_data={"login_event": True}
+                        )
+                        request._kindlewick_session_logged = True
                     return redirect('student_dashboard')
                 elif user.role == 'school_admin':
                     return redirect('admin:index')
@@ -318,6 +329,14 @@ def student_signup_view(request):
             user.role = "student"
             user.save()
             login(request, user)
+            # Log a KindlewickGameSession for student on signup
+            from .models import KindlewickGameSession
+            KindlewickGameSession.objects.create(
+                user=user,
+                game_type='prefixes_potions',  # Default or detect game type as needed
+                level=1,
+                session_data={"signup_event": True}
+            )
             return redirect("student_dashboard")
     else:
         form = StudentSignUpForm()
@@ -447,12 +466,33 @@ def teacher_analytics_view(request):
         {"label": label, "count": count} for label, count in key_stage_counts.items()
     ]
 
+    # Per-game stats for all students in teacher's classes
+    from .models import KindlewickGameSession, KindlewickGameProgress
+    students = set()
+    for clazz in classes:
+        students.update([s.student for s in clazz.students.all()])
+    game_types = dict(KindlewickGameProgress.GAME_TYPES)
+    per_game_stats = []
+    for game_code, game_label in game_types.items():
+        sessions = KindlewickGameSession.objects.filter(user__in=students, game_type=game_code)
+        session_count = sessions.count()
+        avg_score = sessions.aggregate(models.Avg('score'))['score__avg'] or 0
+        avg_success = avg_score  # If score is already percent, else adjust as needed
+        per_game_stats.append({
+            'game_type': game_code,
+            'game_label': game_label,
+            'session_count': session_count,
+            'avg_score': round(avg_score, 2),
+            'avg_success': round(avg_success, 2),
+        })
+
     return render(request, "core/teacher_analytics.html", {
         "classes": classes,
         "classes_count": classes.count(),
         "total_students": total_students,
         "subject_breakdown": subject_breakdown,
         "key_stage_breakdown": key_stage_breakdown,
+        "per_game_stats": per_game_stats,
     })
 
 
@@ -487,10 +527,29 @@ def class_analytics_view(request, class_id):
     enrollments = ClassStudent.objects.filter(clazz=class_obj).select_related("student")
     total_students = enrollments.count()
 
+    # Per-game stats for this class
+    from .models import KindlewickGameSession, KindlewickGameProgress
+    students = [e.student for e in enrollments]
+    game_types = dict(KindlewickGameProgress.GAME_TYPES)
+    per_game_stats = []
+    for game_code, game_label in game_types.items():
+        sessions = KindlewickGameSession.objects.filter(user__in=students, game_type=game_code)
+        session_count = sessions.count()
+        avg_score = sessions.aggregate(models.Avg('score'))['score__avg'] or 0
+        avg_success = avg_score
+        per_game_stats.append({
+            'game_type': game_code,
+            'game_label': game_label,
+            'session_count': session_count,
+            'avg_score': round(avg_score, 2),
+            'avg_success': round(avg_success, 2),
+        })
+
     return render(request, "core/class_analytics.html", {
         "class_obj": class_obj,
         "students": enrollments,
         "total_students": total_students,
+        "per_game_stats": per_game_stats,
     })
 
 
@@ -506,10 +565,28 @@ def student_analytics_view(request, class_id, student_id):
     enrollment = get_object_or_404(ClassStudent, clazz=class_obj, student_id=student_id)
     student = enrollment.student
 
+    # Per-game stats for this student
+    from .models import KindlewickGameSession, KindlewickGameProgress
+    game_types = dict(KindlewickGameProgress.GAME_TYPES)
+    per_game_stats = []
+    for game_code, game_label in game_types.items():
+        sessions = KindlewickGameSession.objects.filter(user=student, game_type=game_code)
+        session_count = sessions.count()
+        avg_score = sessions.aggregate(models.Avg('score'))['score__avg'] or 0
+        avg_success = avg_score
+        per_game_stats.append({
+            'game_type': game_code,
+            'game_label': game_label,
+            'session_count': session_count,
+            'avg_score': round(avg_score, 2),
+            'avg_success': round(avg_success, 2),
+        })
+
     return render(request, "core/student_analytics.html", {
         "class_obj": class_obj,
         "student": student,
         "enrollment": enrollment,
+        "per_game_stats": per_game_stats,
     })
 
 
@@ -1281,6 +1358,24 @@ def school_admin_analytics_view(request):
     # Total students
     total_students = ClassStudent.objects.filter(clazz__teacher__school=request.user.school).values('student').distinct().count()
     
+    # Per-game stats for all students in this school
+    from .models import KindlewickGameSession, KindlewickGameProgress, User
+    students = User.objects.filter(enrolled_classes__clazz__teacher__school=request.user.school, role='student').distinct()
+    game_types = dict(KindlewickGameProgress.GAME_TYPES)
+    per_game_stats = []
+    for game_code, game_label in game_types.items():
+        sessions = KindlewickGameSession.objects.filter(user__in=students, game_type=game_code)
+        session_count = sessions.count()
+        avg_score = sessions.aggregate(models.Avg('score'))['score__avg'] or 0
+        avg_success = avg_score
+        per_game_stats.append({
+            'game_type': game_code,
+            'game_label': game_label,
+            'session_count': session_count,
+            'avg_score': round(avg_score, 2),
+            'avg_success': round(avg_success, 2),
+        })
+
     context = {
         'classes': classes,
         'classes_count': classes.count(),
@@ -1288,6 +1383,7 @@ def school_admin_analytics_view(request):
         'subject_breakdown': subject_breakdown,
         'key_stage_breakdown': key_stage_breakdown,
         'school_name': request.user.school,
+        'per_game_stats': per_game_stats,
     }
     
     return render(request, "core/school_admin_analytics.html", context)
@@ -1360,15 +1456,24 @@ from django.utils import timezone
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
+from rest_framework import status
+
+@api_view(['GET'])
 def current_user_api(request):
-    """Get current logged-in user info"""
-    user = request.user
-    avatar = getattr(user, 'avatar', None)
-    
-    user_data = UserSerializer(user).data
+    """Get current logged-in user info, always return JSON"""
+    if not request.user.is_authenticated:
+        return Response({'error': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
+    avatar = getattr(request.user, 'avatar', None)
+    user_data = UserSerializer(request.user).data
     user_data['avatar'] = AvatarSerializer(avatar).data if avatar else None
-    
     return Response(user_data)
+# 404 JSON handler for base pages
+from django.http import JsonResponse, HttpResponseNotFound
+
+def custom_404_view(request, exception=None):
+    if request.headers.get('accept', '').startswith('application/json'):
+        return JsonResponse({'error': 'Not found'}, status=404)
+    return HttpResponseNotFound('<h1>404 Not Found</h1>')
 
 
 @api_view(['GET', 'POST'])
