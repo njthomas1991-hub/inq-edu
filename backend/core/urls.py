@@ -2,8 +2,6 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 from allauth.account import views as allauth_views
 from .views import (
-    from django.conf.urls import handler404
-    handler404 = 'core.views.custom_404_view'
     home_page_view, about_page_view, kindlewick_page_view, questopia_page_view, pricing_page_view,
     teacher_hub_view, contact_page_view, wonderworld_page_view, hello, teacher_dashboard_view,
     teacher_signup_view, student_signup_view, student_signup_with_details_view,
@@ -23,6 +21,8 @@ from .views import (
     kindlewick_school_admin_progress, kindlewick_school_admin_sessions,
     custom_logout_view
 )
+
+handler404 = 'core.views.custom_404_view'
 
 urlpatterns = [
     path("", home_page_view, name="home"),
