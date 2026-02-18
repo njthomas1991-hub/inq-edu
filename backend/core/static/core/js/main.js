@@ -43,6 +43,11 @@ if (themeToggleCheckbox) {
 // Accessibility Features
 const accessibilityToggle = document.getElementById('accessibilityToggle');
 const accessibilityPanel = document.getElementById('accessibilityPanel');
+
+// Ensure panel is collapsed by default on page load
+if (accessibilityPanel) {
+	accessibilityPanel.classList.remove('active');
+}
 const closeAccessibility = document.getElementById('closeAccessibility');
 const largTextToggle = document.getElementById('largTextToggle');
 const dyslexiaToggle = document.getElementById('dyslexiaToggle');
@@ -61,16 +66,17 @@ const sttResult = document.getElementById('sttResult');
 console.log('Accessibility elements loaded:', { accessibilityToggle, accessibilityPanel, closeAccessibility });
 
 if (accessibilityToggle && accessibilityPanel) {
-	accessibilityToggle.addEventListener('click', () => {
-		console.log('Accessibility toggle clicked');
-		accessibilityPanel.classList.toggle('active');
-		if (accessibilityPanel.classList.contains('active')) {
-			setTimeout(() => {
-				const firstFocusable = accessibilityPanel.querySelector('input, button, [tabindex]:not([tabindex="-1"])');
-				if (firstFocusable) firstFocusable.focus();
-			}, 100);
-		}
-	});
+	 accessibilityToggle.addEventListener('click', () => {
+		 console.log('[DEBUG] Accessibility toggle button clicked');
+		 accessibilityPanel.classList.toggle('active');
+		 console.log('[DEBUG] Panel classList:', accessibilityPanel.className);
+		 if (accessibilityPanel.classList.contains('active')) {
+			 setTimeout(() => {
+				 const firstFocusable = accessibilityPanel.querySelector('input, button, [tabindex]:not([tabindex="-1"])');
+				 if (firstFocusable) firstFocusable.focus();
+			 }, 100);
+		 }
+	 });
 } else {
 	console.log('Accessibility toggle or panel not found');
 }
