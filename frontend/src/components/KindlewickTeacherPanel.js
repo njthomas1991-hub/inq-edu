@@ -12,6 +12,9 @@ const KindlewickTeacherPanel = ({ user }) => {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState(false); // collapsed by default
+  useEffect(() => {
+    console.log('[KindlewickTeacherPanel] Render, expanded state:', expanded);
+  });
 
   const basePath = useMemo(() => {
     if (!user) {
@@ -91,7 +94,13 @@ const KindlewickTeacherPanel = ({ user }) => {
         </div>
         <button
           type="button"
-          onClick={() => setExpanded((prev) => !prev)}
+          onClick={() => {
+            setExpanded((prev) => {
+              const next = !prev;
+              console.log('[KindlewickTeacherPanel] Toggle clicked, new expanded:', next);
+              return next;
+            });
+          }}
           aria-expanded={expanded}
           aria-controls="kw-teacher-panel-content"
         >
