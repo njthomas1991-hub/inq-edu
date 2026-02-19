@@ -35,7 +35,7 @@ if os.path.isfile(env_path):
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-default-change-this-in-production')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = True
 
 ALLOWED_HOSTS = [
     'localhost',

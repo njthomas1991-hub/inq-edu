@@ -28,11 +28,11 @@ class User(AbstractUser):
 # Class Model - Created by teachers
 class Class(models.Model):
     KEY_STAGE_CHOICES = (
-        (0, "EYFS"),
-        (1, "KS1"),
-        (2, "KS2"),
-        (3, "KS3"),
-        (4, "KS4"),
+        ("0", "EYFS"),
+        ("1", "KS1"),
+        ("2", "KS2"),
+        ("3", "KS3"),
+        ("4", "KS4"),
     )
     SUBJECT_CHOICES = (
         ("english", "English"),
@@ -43,7 +43,7 @@ class Class(models.Model):
     name = models.CharField(max_length=255)
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='classes_taught')
     subject = models.CharField(max_length=100, choices=SUBJECT_CHOICES)
-    year_ks = models.IntegerField(choices=KEY_STAGE_CHOICES)
+    year_ks = models.CharField(max_length=1, choices=KEY_STAGE_CHOICES)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -55,7 +55,7 @@ class Class(models.Model):
 
     @property
     def key_stage_label(self):
-        if self.year_ks == 0:
+        if self.year_ks == "0":
             return "EYFS"
         return f"KS{self.year_ks}"
 

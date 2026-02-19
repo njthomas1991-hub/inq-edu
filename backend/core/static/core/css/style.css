@@ -1,3 +1,36 @@
+/* Force navbar container background to match navbar blue */
+.navbar > .container.d-flex.align-items-center.justify-content-between {
+    background-color: rgb(13, 110, 253) !important;
+}
+/* Match dropdown menu to navbar blue and white */
+/* Force navbar dropdown menu to blue/white, override all */
+.navbar .dropdown-menu {
+    background: #0d6efd !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 0.5rem 1rem rgba(13,110,253,0.10) !important;
+}
+.navbar .dropdown-menu .dropdown-item {
+    color: #fff !important;
+    background: transparent !important;
+}
+.navbar .dropdown-menu .dropdown-item:hover,
+.navbar .dropdown-menu .dropdown-item:focus {
+    background: #2563eb !important;
+    color: #fff !important;
+}
+.navbar .dropdown-divider {
+    border-top: 1px solid rgba(255,255,255,0.15) !important;
+}
+/* Ensure navbar dropdown overlays main content */
+.navbar, .dashboard-navbar {
+    position: relative;
+    z-index: 1051;
+}
+
+.dropdown-menu {
+    z-index: 1060;
+}
 /* ========================================
    CSS Variables (Custom Properties)
    ======================================== */
@@ -344,19 +377,7 @@ header > div.bg-light {
 }
 
 /* Dropdown theme support */
-.dropdown-menu {
-    background-color: var(--theme-bg-2);
-    border-color: var(--theme-bg-3);
-}
 
-.dropdown-item {
-    color: var(--theme-text);
-}
-
-.dropdown-item:hover {
-    background-color: var(--theme-bg-3);
-    color: var(--theme-text);
-}
 
 /* Footer theme support */
 footer {

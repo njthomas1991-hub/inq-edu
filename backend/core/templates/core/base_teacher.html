@@ -220,17 +220,15 @@
 
     <!-- Teacher Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary dashboard-navbar">
-        <div class="container">
-            <div class="navbar-center-wrapper">
-                <a class="navbar-brand" href="{% url 'teacher_dashboard' %}">
-                    <strong>INQ-ED</strong> Teacher Hub
-                </a>
-            </div>
+        <div class="container d-flex align-items-center justify-content-between">
+            <a class="navbar-brand mb-0 h1" href="{% url 'teacher_dashboard' %}">
+                <strong>INQ-ED</strong> Teacher Hub
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#teacherNav" aria-controls="teacherNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="teacherNav">
-                <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+            <div class="collapse navbar-collapse flex-grow-0" id="teacherNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'teacher_dashboard' %}">
                             <i class="fas fa-home"></i> Dashboard
@@ -332,10 +330,48 @@
         </div>
     </footer>
 
-    <!-- jQuery (required for Summernote) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- jQuery (required for Summernote) -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Diagnostic: Check if jQuery loaded before Summernote -->
+        <script>
+            (function() {
+                if (typeof window.jQuery === 'undefined' || typeof window.$ === 'undefined') {
+                    console.error('jQuery is NOT loaded before Summernote. Summernote will not be loaded.');
+                    window._skipSummernote = true;
+                } else {
+                    window._skipSummernote = false;
+                }
+            })();
+        </script>
+        <!-- Summernote JS (needs jQuery first) -->
+        <script>
+            if (!window._skipSummernote) {
+                var s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.js';
+                document.head.appendChild(s);
+            }
+        </script>
     <!-- Bootstrap JS Bundle (includes Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var toggler = document.querySelector('.navbar-toggler');
+        var collapse = document.getElementById('teacherNav');
+        if (toggler && collapse) {
+            toggler.addEventListener('click', function() {
+                console.log('Toggler clicked');
+                // Check if Bootstrap Collapse is available
+                if (typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+                    console.log('Bootstrap Collapse is available');
+                } else {
+                    console.error('Bootstrap Collapse is NOT available');
+                }
+            });
+        } else {
+            console.error('Toggler or collapse element not found');
+        }
+    });
+    </script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const navbar = document.querySelector(".dashboard-navbar");
@@ -354,8 +390,6 @@
             });
         });
     </script>
-    <!-- Summernote JS -->
-    <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.js"></script>
     <script src="{% static 'core/js/main.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>

@@ -517,16 +517,82 @@ def teacher_resource_delete_view(request):
     return render(request, "core/teacher_resource_delete.html")
 def teacher_resource_comment_delete_view(request):
     return render(request, "core/teacher_resource_comment_delete.html")
+from django.contrib import messages
+from django.shortcuts import redirect
+
 def profile_view(request):
+    if not request.user.is_authenticated:
+        return redirect('teacher_login')
+    if request.method == 'POST':
+        bio = request.POST.get('bio', '').strip()
+        request.user.bio = bio
+        request.user.save()
+        messages.success(request, 'Bio updated successfully!')
+        return redirect('profile')
     return render(request, "core/profile.html")
 def account_settings_view(request):
     return render(request, "core/account_settings.html")
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import Avatar
+import random
+
 def get_user_avatar(request):
-    return render(request, "core/get_user_avatar.html")
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Not authenticated'}, status=403)
+    try:
+        avatar = request.user.avatar
+        return JsonResponse(avatar.to_dict())
+    except Avatar.DoesNotExist:
+        # Return default avatar values
+        return JsonResponse({
+            'bodyType': 'blob',
+            'bodyColor': '#FF6B9D',
+            'eyeType': 'big_round',
+            'mouthType': 'happy',
+            'headDecoration': 'horns',
+            'decorationColor': '#FFB347',
+            'pattern': 'solid',
+            'patternColor': '#FF1493',
+        })
+@csrf_exempt
 def save_user_avatar(request):
-    return render(request, "core/save_user_avatar.html")
+    if not request.user.is_authenticated:
+        return JsonResponse({'success': False, 'error': 'Not authenticated'}, status=403)
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'POST required'}, status=405)
+    import json
+    data = json.loads(request.body.decode('utf-8'))
+    avatar, _ = Avatar.objects.get_or_create(user=request.user)
+    avatar.body_type = data.get('bodyType', 'blob')
+    avatar.body_color = data.get('bodyColor', '#FF6B9D')
+    avatar.eye_type = data.get('eyeType', 'big_round')
+    avatar.mouth_type = data.get('mouthType', 'happy')
+    avatar.head_decoration = data.get('headDecoration', 'horns')
+    avatar.decoration_color = data.get('decorationColor', '#FFB347')
+    avatar.pattern = data.get('pattern', 'solid')
+    avatar.pattern_color = data.get('patternColor', '#FF1493')
+    avatar.save()
+    return JsonResponse({'success': True, 'avatar': avatar.to_dict()})
+@csrf_exempt
 def randomize_avatar(request):
-    return render(request, "core/randomize_avatar.html")
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Not authenticated'}, status=403)
+    # Get random choices from model fields
+    def rand_choice(choices):
+        return random.choice([c[0] for c in choices])
+    from .models import Avatar
+    data = {
+        'bodyType': rand_choice(Avatar.BODY_TYPES),
+        'bodyColor': f"#{random.randint(0, 0xFFFFFF):06X}",
+        'eyeType': rand_choice(Avatar.EYE_TYPES),
+        'mouthType': rand_choice(Avatar.MOUTH_TYPES),
+        'headDecoration': rand_choice(Avatar.DECORATION_TYPES),
+        'decorationColor': f"#{random.randint(0, 0xFFFFFF):06X}",
+        'pattern': rand_choice(Avatar.PATTERN_TYPES),
+        'patternColor': f"#{random.randint(0, 0xFFFFFF):06X}",
+    }
+    return JsonResponse(data)
 def teacher_analytics_view(request):
     return render(request, "core/teacher_analytics.html")
 def class_analytics_view(request):

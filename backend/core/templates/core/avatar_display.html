@@ -176,9 +176,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" id="randomizeBtn" onclick="randomizeAvatar(); return false;">Randomize</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveAvatarBtn" onclick="saveAvatar(); return false;">Save Avatar</button>
+                <button type="button" class="btn btn-secondary" id="randomizeBtn">Randomize</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="cancelAvatarBtn">Cancel</button>
+                <button type="button" class="btn btn-primary" id="saveAvatarBtn">Save Avatar</button>
             </div>
         </div>
     </div>
@@ -732,7 +732,6 @@
     }
 
     function saveAvatar() {
-        alert('Save Avatar button clicked!');
         console.log('saveAvatar function called');
         const formData = {
             bodyType: document.getElementById('bodyType').value,
@@ -764,26 +763,22 @@
     }
 
     function randomizeAvatar() {
-        alert('Randomize button clicked!');
         console.log('randomizeAvatar function called');
         fetch('/api/avatar/randomize/', {
             credentials: 'include'
         })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    // Update form fields
-                    document.getElementById('bodyType').value = data.avatar.bodyType;
-                    document.getElementById('bodyColor').value = data.avatar.bodyColor;
-                    document.getElementById('eyeType').value = data.avatar.eyeType;
-                    document.getElementById('mouthType').value = data.avatar.mouthType;
-                    document.getElementById('headDecoration').value = data.avatar.headDecoration;
-                    document.getElementById('decorationColor').value = data.avatar.decorationColor;
-                    document.getElementById('pattern').value = data.avatar.pattern;
-                    document.getElementById('patternColor').value = data.avatar.patternColor;
-                    
-                    updatePreview();
-                }
+                // Update form fields directly from returned data
+                document.getElementById('bodyType').value = data.bodyType;
+                document.getElementById('bodyColor').value = data.bodyColor;
+                document.getElementById('eyeType').value = data.eyeType;
+                document.getElementById('mouthType').value = data.mouthType;
+                document.getElementById('headDecoration').value = data.headDecoration;
+                document.getElementById('decorationColor').value = data.decorationColor;
+                document.getElementById('pattern').value = data.pattern;
+                document.getElementById('patternColor').value = data.patternColor;
+                updatePreview();
             })
             .catch(error => console.error('Error randomizing avatar:', error));
     }
@@ -873,16 +868,15 @@
             
             if (randomizeBtn) {
                 randomizeBtn.addEventListener('click', function(e) {
-                    console.log('Randomize button clicked');
                     randomizeAvatar();
                 });
             }
             if (saveAvatarBtn) {
                 saveAvatarBtn.addEventListener('click', function(e) {
-                    console.log('Save Avatar button clicked');
                     saveAvatar();
                 });
             }
+            // Cancel button just closes modal (handled by data-bs-dismiss)
             
             const modal = document.getElementById('avatarCustomizerModal');
             if (modal) {
