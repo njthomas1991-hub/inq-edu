@@ -4,30 +4,173 @@
 {% block title %}Edit Resource - Teaching Resources{% endblock %}
 
 {% block content %}
-<div class="container">
-    <a class="btn btn-link px-0 mb-3" href="{% url 'teacher_resource_detail' resource.slug %}"><i class="fas fa-arrow-left"></i> Back to Resource</a>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h1 class="h4 mb-4">Edit Teaching Resource</h1>
-            <form method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                {{ form|crispy }}
-                {% if resource.file %}
-                    <div class="mt-2">
-                        <small class="text-muted">Current file: <a href="{{ resource.file.url }}" target="_blank">{{ resource.file.name }}</a></small>
+<div class="teacher-resource-main d-flex justify-content-center">
+    <div class="summernote-wrapper">
+        <a class="btn btn-link px-0 mb-3" href="{% url 'teacher_resource_detail' resource.slug %}">
+            <i class="fas fa-arrow-left"></i> Back to Resource
+        </a>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="h4 mb-4">Edit Teaching Resource</h1>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- Description Field -->
+                    <div class="mb-3">
+                        <label for="summernote-description" class="form-label">Description</label>
+                        {% if form.description %}
+                            <textarea id="summernote-description" name="description" class="summernote-editor form-control" rows="8">{{ form.description.value }}</textarea>
+                        {% else %}
+                            <div class="alert alert-warning">Description field missing from form.</div>
+                        {% endif %}
                     </div>
-                {% endif %}
-                <div class="mt-4 d-flex gap-2">
-                    <button class="btn btn-primary" type="submit">Save Changes</button>
-                    <a href="{% url 'teacher_resource_detail' resource.slug %}" class="btn btn-secondary">Cancel</a>
-                </div>
-            </form>
+
+                    <!-- Notes Field -->
+                    <div class="mb-3">
+                        <label for="summernote-notes" class="form-label">Notes</label>
+                        {% if form.notes %}
+                            <textarea id="summernote-notes" name="notes" class="summernote-editor form-control" rows="8">{% if form.notes.value %}{{ form.notes.value }}{% endif %}</textarea>
+                        {% else %}
+                            <div class="alert alert-warning">Notes field missing from form.</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Multi-file Upload Field -->
+                    <div class="mb-3">
+                        <label for="resource-files" class="form-label">Upload Files</label>
+                        <input type="file" name="files" id="resource-files" class="form-control" multiple>
+                        <small class="text-muted d-block mt-1">
+                            {% if resource.files.exists %}
+                                Current files:
+                                <ul>
+                                    {% for f in resource.files.all %}
+                                        <li><a href="{{ f.file.url }}" target="_blank">{{ f.file.name }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </small>
+                        <div id="file-previews" class="mt-2"></div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="mt-4 d-flex gap-2">
+                        <button class="btn btn-primary" type="submit">Save Changes</button>
+                        <a href="{% url 'teacher_resource_detail' resource.slug %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
 {% block extra_js %}
     {{ form.media }}
+
+    <style>
+        /* Responsive Summernote setup */
+        .summernote-wrapper {
+            width: 100%;
+            max-width: 662.67px;
+            margin: 0 auto;
+        }
+
+        .summernote-wrapper .note-editor,
+        .summernote-wrapper .note-toolbar,
+        .summernote-wrapper .note-editable {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box;
+        }
+
+        .summernote-wrapper .note-editor {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summernote-wrapper .note-editable {
+            height: 300px !important;
+            overflow-y: auto !important;
+        }
+
+        .summernote-wrapper .note-editable img,
+        .summernote-wrapper .note-editable table {
+            max-width: 100% !important;
+            height: auto !important;
+            display: block !important;
+        }
+
+        @media (max-width: 576px) {
+            .summernote-wrapper .note-editable {
+                height: 250px !important;
+            }
+        }
+
+        /* Preview thumbnails */
+        #file-previews img {
+            max-width: 100px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+    </style>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Summernote editors
+        $('.summernote-editor').each(function() {
+            try {
+                $(this).summernote('destroy');
+                $(this).summernote({
+                    height: 300,
+                    minHeight: 300,
+                    maxHeight: 300,
+                    disableResizeEditor: true,
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold','italic','underline','clear']],
+                        ['fontname', ['fontname']],
+                        ['fontsize', ['fontsize']],
+                        ['color', ['color']],
+                        ['para', ['ul','ol','paragraph','height']],
+                        ['table', ['table']],
+                        ['insert', ['link','picture','video']],
+                        ['view', ['fullscreen','codeview','help']]
+                    ]
+                });
+            } catch (e) {
+                console.error('[DEBUG] Summernote editor initialization error:', e);
+            }
+        });
+
+        // Multi-file preview
+        const fileInput = document.getElementById('resource-files');
+        const previews = document.getElementById('file-previews');
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                previews.innerHTML = '';
+                Array.from(this.files).forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            previews.appendChild(img);
+                        }
+                        reader.readAsDataURL(file);
+                    } else {
+                        const p = document.createElement('p');
+                        p.textContent = file.name;
+                        previews.appendChild(p);
+                    }
+                });
+            });
+        }
+    });
+    </script>
 {% endblock %}
+
 {% endblock %}
