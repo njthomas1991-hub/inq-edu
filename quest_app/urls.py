@@ -15,6 +15,7 @@ urlpatterns = [
     path('teacher-analytics/', TemplateView.as_view(template_name='core/teacher_analytics.html'), name='teacher_analytics'),
     path('add-class/', views.add_class, name='add_class'),
     path('api/add-class/', views.add_class_ajax, name='add_class_api'),
+    path('classes/', views.classes_list, name='classes'),
     path('class/<int:pk>/', views.class_detail, name='class_detail'),
     path('teacher-news/', TemplateView.as_view(template_name='core/teacher_news_list.html'), name='teacher_news'),
     path('teacher-help/', TemplateView.as_view(template_name='core/teacher_help_list.html'), name='teacher_help'),

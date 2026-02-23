@@ -13,6 +13,7 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
+from django.views.decorators.http import require_http_methods
 
 def register(request):
     if request.method == "POST":
@@ -112,6 +113,19 @@ def class_detail(request, pk):
 
     students = cls.students.all()
     return render(request, 'core/class_detail.html', {'class': cls, 'students': students, 'message': message})
+
+
+@login_required
+def classes_list(request):
+    user = request.user
+    if user.role == 'teacher':
+        classes = Class.objects.filter(teacher=user)
+    elif user.role == 'school_admin':
+        teachers = get_user_model().objects.filter(role='teacher', school=user.school)
+        classes = Class.objects.filter(teacher__in=teachers)
+    else:
+        classes = Class.objects.none()
+    return render(request, 'core/class_list.html', {'classes': classes})
 
 
 @login_required

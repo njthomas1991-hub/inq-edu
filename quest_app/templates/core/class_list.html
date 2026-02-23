@@ -1,0 +1,37 @@
+{% extends 'core/base_teacher.html' %}
+
+{% block title %}Classes{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h4>Your Classes</h4>
+      <p class="text-muted small">Manage classes and view details.</p>
+    </div>
+    <div>
+      <a href="{% url 'add_class' %}" class="btn btn-primary">Add Class</a>
+    </div>
+  </div>
+
+  <div class="row">
+    {% for cls in classes %}
+      <div class="col-md-4 mb-3">
+        <div class="card h-100">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ cls.name }}</h5>
+            <p class="card-text text-muted mb-2">{{ cls.level }}{% if cls.subject %} • {{ cls.subject }}{% endif %}</p>
+            <div class="mt-auto">
+              <a href="{% url 'class_detail' cls.id %}" class="btn btn-outline-primary btn-sm">Open</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12">
+        <div class="alert alert-info">You have no classes yet.</div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
