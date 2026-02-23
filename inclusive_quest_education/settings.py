@@ -6,6 +6,13 @@ LOGIN_URL = '/login/'
 import os
 from pathlib import Path
 from django.core.exceptions import ImproperlyConfigured
+try:
+    # optional: load .env file for local development if present
+    from dotenv import load_dotenv
+    load_dotenv(os.path.join(os.path.dirname(os.path.dirname(__file__)), '.env'))
+except Exception:
+    # python-dotenv may not be installed in some environments; that's fine
+    pass
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
