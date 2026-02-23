@@ -20,6 +20,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
 from django.conf import settings
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.mail import send_mail
 from django.utils.html import strip_tags
 from django.urls import reverse
@@ -440,9 +441,20 @@ def teacher_resources(request):
     if user.role == 'school_admin':
         # show resources for all teachers in school
         teachers = get_user_model().objects.filter(role='teacher', school=user.school)
-        resources = TeachingResource.objects.filter(teacher__in=teachers).order_by('-uploaded_at')
+        qs = TeachingResource.objects.filter(teacher__in=teachers).order_by('-uploaded_at')
     else:
-        resources = TeachingResource.objects.filter(teacher=user).order_by('-uploaded_at')
+        qs = TeachingResource.objects.filter(teacher=user).order_by('-uploaded_at')
+
+    # Pagination
+    page = request.GET.get('page', 1)
+    per_page = 6
+    paginator = Paginator(qs, per_page)
+    try:
+        resources_page = paginator.page(page)
+    except PageNotAnInteger:
+        resources_page = paginator.page(1)
+    except EmptyPage:
+        resources_page = paginator.page(paginator.num_pages)
 
     form = TeachingResourceForm()
     message = None
@@ -457,7 +469,11 @@ def teacher_resources(request):
         else:
             message = ('error', 'Please correct the errors below.')
 
-    return render(request, 'core/teacher_resources_list.html', {'resources': resources, 'form': form, 'message': message})
+    # If requesting a page fragment (load-more), render only the cards partial
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get('partial'):
+        return render(request, 'core/_resource_cards.html', {'resources': resources_page, 'user': user})
+
+    return render(request, 'core/teacher_resources_list.html', {'resources': resources_page, 'form': form, 'message': message, 'paginator': paginator})
 
 
 @login_required

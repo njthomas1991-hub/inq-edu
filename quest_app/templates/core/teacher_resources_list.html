@@ -51,108 +51,54 @@
               </div>
             </div>
 
-            {% if resources %}
-                <div class="row g-3">
-                {% for res in resources %}
-                    <div class="col-md-6">
-                        <div class="card h-100">
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title">{{ res.title }}</h5>
-                                <p class="card-text text-muted mb-2">{{ res.description|default:"No description" }}</p>
-                                <p class="card-text mt-auto small text-muted">By {{ res.teacher.first_name|default:res.teacher.username }} • {{ res.uploaded_at|date:"j M Y H:i" }}</p>
-                                <div class="mt-2">
-                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#resourceModal-{{ res.id }}">Open</button>
-                                    <a href="{{ res.document.url }}" class="btn btn-sm btn-outline-secondary ms-2" download>Download</a>
-                                    {% if user == res.teacher %}
-                                        <button class="btn btn-sm btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#editResourceModal-{{ res.id }}">Edit</button>
-                                        <form method="post" action="{% url 'resource_delete' res.id %}" style="display:inline;" onsubmit="return confirm('Delete this resource?');">
-                                            {% csrf_token %}
-                                            <button class="btn btn-sm btn-danger ms-2" type="submit">Delete</button>
-                                        </form>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            {# Resource cards are rendered via partial so they can be loaded incrementally #}
+            <div id="resource-cards-container">
+              {% include 'core/_resource_cards.html' with resources=resources user=user %}
+            </div>
 
-                    <!-- Resource Detail Modal -->
-                    <div class="modal fade" id="resourceModal-{{ res.id }}" tabindex="-1" aria-labelledby="resourceModalLabel-{{ res.id }}" aria-hidden="true">
-                      <div class="modal-dialog modal-lg modal-dialog-centered">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title" id="resourceModalLabel-{{ res.id }}">{{ res.title }}</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                            <p class="mb-2">{{ res.description|default:"No description" }}</p>
-                            <p class="small text-muted">Uploaded by {{ res.teacher.first_name|default:res.teacher.username }} {{ res.teacher.last_name }} on {{ res.uploaded_at|date:"j M Y H:i" }}</p>
-
-                            <hr>
-                            <h6>Comments</h6>
-                            <div class="mb-3">
-                                {% for c in res.comments.all %}
-                                    <div class="border rounded p-2 mb-2">
-                                        <div class="small text-muted">{{ c.author.first_name|default:c.author.username }} • {{ c.created_at|date:"j M Y H:i" }}</div>
-                                        <div>{{ c.comment }}</div>
-                                    </div>
-                                {% empty %}
-                                    <p class="text-muted small">No comments yet.</p>
-                                {% endfor %}
-                            </div>
-
-                            <form method="post" action="{% url 'resource_comment' res.id %}">
-                                {% csrf_token %}
-                                <div class="mb-3">
-                                    <textarea name="comment" class="form-control" rows="2" placeholder="Add a comment..."></textarea>
-                                </div>
-                                <div class="text-end">
-                                    <button class="btn btn-primary" type="submit">Post Comment</button>
-                                </div>
-                            </form>
-                          </div>
-                          <div class="modal-footer">
-                            <a href="{{ res.document.url }}" class="btn btn-primary" download>Download Resource</a>
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Edit Resource Modal (authors only) -->
-                    {% if user == res.teacher %}
-                    <div class="modal fade" id="editResourceModal-{{ res.id }}" tabindex="-1" aria-labelledby="editResourceModalLabel-{{ res.id }}" aria-hidden="true">
-                      <div class="modal-dialog modal-lg modal-dialog-centered">
-                        <div class="modal-content">
-                          <div class="modal-header">
-                            <h5 class="modal-title" id="editResourceModalLabel-{{ res.id }}">Edit Resource</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                          </div>
-                          <div class="modal-body">
-                            <form method="post" action="{% url 'resource_edit' res.id %}">
-                                {% csrf_token %}
-                                <div class="mb-3">
-                                    <label class="form-label">Title</label>
-                                    <input type="text" name="title" class="form-control" value="{{ res.title }}">
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Description</label>
-                                    <textarea name="description" class="form-control" rows="4">{{ res.description }}</textarea>
-                                </div>
-                                <div class="text-end">
-                                    <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
-                                    <button class="btn btn-primary" type="submit">Save</button>
-                                </div>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    {% endif %}
-                {% endfor %}
-                </div>
-            {% else %}
-                <p class="text-muted">No resources yet.</p>
-            {% endif %}
+            <script>
+            (function(){
+              var btn = document.getElementById('load-more-resources');
+              if (!btn) return;
+              btn.addEventListener('click', function(){
+                var next = btn.getAttribute('data-next-page');
+                if (!next) return;
+                btn.disabled = true;
+                btn.textContent = 'Loading...';
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', window.location.pathname + '?page=' + next + '&partial=1');
+                xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');
+                xhr.onload = function(){
+                  if (xhr.status >= 200 && xhr.status < 300){
+                    // append returned HTML to container
+                    var container = document.getElementById('resource-cards-container');
+                    var temp = document.createElement('div');
+                    temp.innerHTML = xhr.responseText;
+                    // move children of temp into container
+                    while (temp.firstChild){
+                      container.appendChild(temp.firstChild);
+                    }
+                    // update or remove load button
+                    var newBtn = document.getElementById('load-more-resources');
+                    if (!newBtn) return;
+                    var nextPage = newBtn.getAttribute('data-next-page');
+                    if (nextPage){
+                      newBtn.disabled = false;
+                      newBtn.textContent = 'Load more';
+                    } else {
+                      newBtn.parentNode.removeChild(newBtn);
+                    }
+                  } else {
+                    btn.disabled = false;
+                    btn.textContent = 'Load more';
+                    alert('Could not load more resources');
+                  }
+                };
+                xhr.onerror = function(){ btn.disabled=false; btn.textContent='Load more'; };
+                xhr.send();
+              });
+            })();
+            </script>
         </div>
     </div>
 </div>
