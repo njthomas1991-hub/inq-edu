@@ -1,0 +1,55 @@
+{% extends 'core/base_teacher.html' %}
+
+{% block title %}Class Detail - {{ class.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">{{ class.name }}</h5>
+          <a href="{% url 'add_class' %}" class="btn btn-sm btn-outline-primary">Add Class</a>
+        </div>
+        <div class="card-body">
+          <p><strong>Level:</strong> {{ class.level }}</p>
+          <p><strong>Subject:</strong> {{ class.subject|default:'—' }}</p>
+          <p><strong>School:</strong> {{ class.school|default:'—' }}</p>
+
+          <hr />
+          <h6>Students</h6>
+          <ul class="list-group mb-3">
+            {% for student in students %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>{{ student.get_full_name|default:student.username }}</strong>
+                  <div class="text-muted small">{{ student.email }}</div>
+                </div>
+                <a href="#" class="btn btn-outline-secondary btn-sm">View</a>
+              </li>
+            {% empty %}
+              <li class="list-group-item text-muted">No students enrolled.</li>
+            {% endfor %}
+          </ul>
+
+          <h6>Add Student</h6>
+          {% if message %}
+            {% if message.0 == 'error' %}
+              <div class="alert alert-danger">{{ message.1 }}</div>
+            {% else %}
+              <div class="alert alert-success">{{ message.1 }}</div>
+            {% endif %}
+          {% endif %}
+          <form method="post">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+              <input name="identifier" class="form-control" placeholder="Enter username or email" />
+              <button class="btn btn-primary" type="submit">Add</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

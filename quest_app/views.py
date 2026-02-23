@@ -12,6 +12,7 @@ import json
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 
 def register(request):
     if request.method == "POST":
@@ -80,6 +81,37 @@ class CustomLoginView(LoginView):
 def profile(request):
     user = request.user
     return render(request, "core/profile.html", {"user": user})
+
+
+@login_required
+def class_detail(request, pk):
+    cls = get_object_or_404(Class, pk=pk)
+    # Only allow teachers who own the class or school_admins
+    if request.user != cls.teacher and request.user.role != 'school_admin':
+        return redirect('teacher_dashboard')
+
+    message = None
+    if request.method == 'POST':
+        ident = request.POST.get('identifier', '').strip()
+        if not ident:
+            message = ('error', 'Please enter a username or email.')
+        else:
+            User = get_user_model()
+            user = None
+            try:
+                # prefer exact username match, else try email
+                user = User.objects.filter(username=ident).first() or User.objects.filter(email=ident).first()
+            except Exception:
+                user = None
+            if not user:
+                message = ('error', 'No user found with that username or email.')
+            else:
+                cls.students.add(user)
+                cls.save()
+                message = ('success', f'Added {user.get_full_name() or user.username} to class.')
+
+    students = cls.students.all()
+    return render(request, 'core/class_detail.html', {'class': cls, 'students': students, 'message': message})
 
 
 @login_required
