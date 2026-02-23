@@ -156,10 +156,50 @@
                     // show credentials
                     var success = document.createElement('div');
                     success.className = 'alert alert-success ajax-add-alert';
-                    success.innerHTML = 'Created student <strong>' + (res.json.username) + '</strong><br/>Username: <code>' + res.json.username + '</code><br/>Password: <code>' + res.json.password + '</code>' + (res.json.emailed ? '<br/><em>Credentials emailed</em>' : '');
+                    success.innerHTML = 'Created student <strong>' + (res.json.username) + '</strong>' + (res.json.emailed ? '<br/><em>Credentials emailed</em>' : '');
                     container.insertBefore(success, container.firstChild);
-                    // Optionally append to students list (simple reload is safer)
-                    setTimeout(function(){ location.reload(); }, 1000);
+                    // Insert new student into the students list with hidden password and eye toggle
+                    var list = document.querySelector('.list-group');
+                    if (list) {
+                      var li = document.createElement('li');
+                      li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                      li.innerHTML = `
+                        <div>
+                          <strong>${res.json.username}</strong>
+                          <div class="text-muted small">${email || ''}</div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                          <span class="student-password" data-pw="${res.json.password}">••••••••</span>
+                          <button class="btn btn-outline-secondary btn-sm toggle-password" type="button" aria-label="Show password">👁</button>
+                          <div class="btn-group" role="group">
+                            <form method="post" style="display:inline;">
+                              {% csrf_token %}
+                              <input type="hidden" name="action" value="remove_student" />
+                              <input type="hidden" name="user_id" value="${res.json.id}" />
+                              <button class="btn btn-outline-secondary btn-sm" type="submit">Remove</button>
+                            </form>
+                            <form method="post" style="display:inline; margin-left:4px;">
+                              {% csrf_token %}
+                              <input type="hidden" name="action" value="delete_student" />
+                              <input type="hidden" name="user_id" value="${res.json.id}" />
+                              <button class="btn btn-outline-danger btn-sm" type="submit" onclick="return confirm('Delete student account? This is permanent.')">Delete</button>
+                            </form>
+                          </div>
+                        </div>`;
+                      list.insertBefore(li, list.firstChild);
+                      // attach toggle handler
+                      var tbtn = li.querySelector('.toggle-password');
+                      var pwspan = li.querySelector('.student-password');
+                      tbtn && tbtn.addEventListener('click', function(){
+                        if (pwspan.textContent.indexOf('•') === 0) {
+                          pwspan.textContent = pwspan.getAttribute('data-pw');
+                          tbtn.textContent = '🙈';
+                        } else {
+                          pwspan.textContent = '••••••••';
+                          tbtn.textContent = '👁';
+                        }
+                      });
+                    }
                   } else {
                     var err = document.createElement('div');
                     err.className = 'alert alert-danger ajax-add-alert';
