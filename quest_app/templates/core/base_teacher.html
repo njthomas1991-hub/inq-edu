@@ -61,7 +61,7 @@
                     </li>
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#" id="add-class-btn">
+                        <a class="nav-link" href="{% url 'add_class' %}">
                             <i class="fas fa-plus"></i> Add Class
                         </a>
                     </li>
@@ -239,132 +239,8 @@
             console.error('Toggler or collapse element not found');
         }
     });
-        // Inline Add Class modal + AJAX create
-        document.addEventListener('DOMContentLoaded', function(){
-                // inject modal HTML
-                var modalHtml = `
-                <div class="modal fade" id="addClassModal" tabindex="-1" aria-labelledby="addClassModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="addClassModalLabel">Create Class</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div id="add-class-alert"></div>
-                                <form id="add-class-form">
-                                    <div class="mb-3">
-                                        <label for="class-name" class="form-label">Class Name *</label>
-                                        <input type="text" id="class-name" name="name" class="form-control" required />
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="class-school" class="form-label">School (optional)</label>
-                                        <input type="text" id="class-school" name="school" class="form-control" />
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" id="add-class-submit" class="btn btn-primary">Create</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>`;
-                document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-                var addBtn = document.getElementById('add-class-btn');
-                var modalEl = document.getElementById('addClassModal');
-                var bsModal = new bootstrap.Modal(modalEl);
-                addBtn && addBtn.addEventListener('click', function(e){ e.preventDefault(); bsModal.show(); });
-
-                function getCookie(name) {
-                    var cookieValue = null;
-                    if (document.cookie && document.cookie !== '') {
-                        var cookies = document.cookie.split(';');
-                        for (var i = 0; i < cookies.length; i++) {
-                            var cookie = cookies[i].trim();
-                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                                break;
-                            }
-                        }
-                    }
-                    return cookieValue;
-                }
-
-                var submitBtn = document.getElementById('add-class-submit');
-                submitBtn && submitBtn.addEventListener('click', function(){
-                    var name = document.getElementById('class-name').value.trim();
-                    var school = document.getElementById('class-school').value.trim();
-                    var alertBox = document.getElementById('add-class-alert');
-                    alertBox.innerHTML = '';
-                    if (!name) {
-                        alertBox.innerHTML = '<div class="alert alert-danger">Please enter a class name.</div>';
-                        return;
-                    }
-                      fetch('/api/add-class/', {
-                        method: 'POST',
-                        credentials: 'same-origin',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': getCookie('csrftoken') || ''
-                        },
-                        body: JSON.stringify({name: name, school: school})
-                    }).then(function(r){ return r.json().then(function(js){ return {status: r.status, json: js}; }); })
-                    }).then(function(res){
-                        if (res.json && res.json.success) {
-                              // close modal
-                              bsModal.hide();
-                              // clear form
-                              document.getElementById('class-name').value = '';
-                              document.getElementById('class-school').value = '';
-
-                              // show toast (create container if missing)
-                              var toastContainer = document.querySelector('.iq-toast-container');
-                              if (!toastContainer) {
-                                  toastContainer = document.createElement('div');
-                                  toastContainer.className = 'iq-toast-container position-fixed top-0 end-0 p-3';
-                                  document.body.appendChild(toastContainer);
-                              }
-                              var toastEl = document.createElement('div');
-                              toastEl.className = 'toast align-items-center text-bg-success border-0';
-                              toastEl.setAttribute('role','alert');
-                              toastEl.setAttribute('aria-live','assertive');
-                              toastEl.setAttribute('aria-atomic','true');
-                              toastEl.innerHTML = `
-                                  <div class="d-flex">
-                                    <div class="toast-body">Class "${res.json.name}" created.</div>
-                                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                                  </div>`;
-                              toastContainer.appendChild(toastEl);
-                              var bToast = new bootstrap.Toast(toastEl, { delay: 4000 });
-                              bToast.show();
-
-                              // Append to classes list on dashboard if present
-                              var classesList = document.getElementById('classes-list');
-                              if (classesList) {
-                                  var li = document.createElement('li');
-                                  li.className = 'list-group-item d-flex align-items-center justify-content-between';
-                                  var span = document.createElement('span');
-                                  span.innerHTML = '<i class="fas fa-chalkboard me-2 text-secondary"></i>' + (res.json.name || 'New Class');
-                                  li.appendChild(span);
-                                  // simple view button (link to class detail if available)
-                                  var viewBtn = document.createElement('a');
-                                  viewBtn.className = 'btn btn-outline-primary btn-sm';
-                                  viewBtn.href = '/class/' + (res.json.id || '');
-                                  viewBtn.textContent = 'View';
-                                  li.appendChild(viewBtn);
-                                  classesList.insertBefore(li, classesList.firstChild);
-                              }
-                        } else {
-                            var error = (res.json && (res.json.error || res.json)) || 'Unknown error';
-                            alertBox.innerHTML = '<div class="alert alert-danger">' + error + '</div>';
-                        }
-                    }).catch(function(err){
-                        alertBox.innerHTML = '<div class="alert alert-danger">Save failed: ' + err + '</div>';
-                    });
-                });
-        });
+        // The inline Add Class modal and AJAX were removed; the navbar "Add Class" link now
+        // navigates to the full add-class page handled by the `add_class` view.
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {
