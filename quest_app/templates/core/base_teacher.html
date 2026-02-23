@@ -311,11 +311,51 @@
                         },
                         body: JSON.stringify({name: name, school: school})
                     }).then(function(r){ return r.json().then(function(js){ return {status: r.status, json: js}; }); })
-                    .then(function(res){
+                    }).then(function(res){
                         if (res.json && res.json.success) {
-                              // close modal and redirect to teacher dashboard to show new class
+                              // close modal
                               bsModal.hide();
-                              window.location.href = '/teacher-dashboard/';
+                              // clear form
+                              document.getElementById('class-name').value = '';
+                              document.getElementById('class-school').value = '';
+
+                              // show toast (create container if missing)
+                              var toastContainer = document.querySelector('.iq-toast-container');
+                              if (!toastContainer) {
+                                  toastContainer = document.createElement('div');
+                                  toastContainer.className = 'iq-toast-container position-fixed top-0 end-0 p-3';
+                                  document.body.appendChild(toastContainer);
+                              }
+                              var toastEl = document.createElement('div');
+                              toastEl.className = 'toast align-items-center text-bg-success border-0';
+                              toastEl.setAttribute('role','alert');
+                              toastEl.setAttribute('aria-live','assertive');
+                              toastEl.setAttribute('aria-atomic','true');
+                              toastEl.innerHTML = `
+                                  <div class="d-flex">
+                                    <div class="toast-body">Class "${res.json.name}" created.</div>
+                                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                                  </div>`;
+                              toastContainer.appendChild(toastEl);
+                              var bToast = new bootstrap.Toast(toastEl, { delay: 4000 });
+                              bToast.show();
+
+                              // Append to classes list on dashboard if present
+                              var classesList = document.getElementById('classes-list');
+                              if (classesList) {
+                                  var li = document.createElement('li');
+                                  li.className = 'list-group-item d-flex align-items-center justify-content-between';
+                                  var span = document.createElement('span');
+                                  span.innerHTML = '<i class="fas fa-chalkboard me-2 text-secondary"></i>' + (res.json.name || 'New Class');
+                                  li.appendChild(span);
+                                  // simple view button (link to class detail if available)
+                                  var viewBtn = document.createElement('a');
+                                  viewBtn.className = 'btn btn-outline-primary btn-sm';
+                                  viewBtn.href = '/class/' + (res.json.id || '');
+                                  viewBtn.textContent = 'View';
+                                  li.appendChild(viewBtn);
+                                  classesList.insertBefore(li, classesList.firstChild);
+                              }
                         } else {
                             var error = (res.json && (res.json.error || res.json)) || 'Unknown error';
                             alertBox.innerHTML = '<div class="alert alert-danger">' + error + '</div>';
