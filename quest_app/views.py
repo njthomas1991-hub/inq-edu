@@ -92,27 +92,98 @@ def class_detail(request, pk):
         return redirect('teacher_dashboard')
 
     message = None
+    created_credentials = None
+
+    def _make_username(fname, linitial):
+        base = (fname or '').strip().lower() + (linitial or '').strip().lower()
+        base = ''.join(ch for ch in base if ch.isalnum()) or 'student'
+        User = get_user_model()
+        username = base
+        suffix = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base}{suffix}"
+            suffix += 1
+        return username
+
+    def _make_password():
+        # simple adjective+noun+number generator
+        adjs = ['blue','green','bright','silent','quick','brave','happy','sunny']
+        nouns = ['apple','river','mountain','ocean','fox','panda','stone','ember']
+        a = random.choice(adjs)
+        b = random.choice(nouns)
+        num = random.randint(10, 99)
+        return f"{a}-{b}{num}"
+
     if request.method == 'POST':
-        ident = request.POST.get('identifier', '').strip()
-        if not ident:
-            message = ('error', 'Please enter a username or email.')
-        else:
-            User = get_user_model()
-            user = None
-            try:
-                # prefer exact username match, else try email
-                user = User.objects.filter(username=ident).first() or User.objects.filter(email=ident).first()
-            except Exception:
-                user = None
-            if not user:
-                message = ('error', 'No user found with that username or email.')
+        action = request.POST.get('action')
+        User = get_user_model()
+
+        if action == 'create_student':
+            fname = request.POST.get('first_name', '').strip()
+            linitial = request.POST.get('last_initial', '').strip()
+            if not fname or not linitial:
+                message = ('error', 'First name and last initial are required.')
             else:
+                username = _make_username(fname, linitial)
+                password = _make_password()
+                user = User.objects.create_user(username=username, password=password)
+                user.first_name = fname
+                user.last_name = linitial
+                user.role = 'student'
+                user.save()
                 cls.students.add(user)
-                cls.save()
-                message = ('success', f'Added {user.get_full_name() or user.username} to class.')
+                created_credentials = {'username': username, 'password': password, 'name': user.get_full_name() or username}
+                message = ('success', f'Created student {created_credentials["name"]}.')
+
+        elif action == 'remove_student':
+            uid = request.POST.get('user_id')
+            try:
+                user = User.objects.get(pk=uid)
+                cls.students.remove(user)
+                message = ('success', f'Removed {user.get_full_name() or user.username} from class.')
+            except Exception:
+                message = ('error', 'Could not remove student.')
+
+        elif action == 'delete_student':
+            uid = request.POST.get('user_id')
+            try:
+                user = User.objects.get(pk=uid)
+                user.delete()
+                message = ('success', 'Student account deleted.')
+            except Exception:
+                message = ('error', 'Could not delete student.')
+
+        elif action == 'move_student':
+            uid = request.POST.get('user_id')
+            target = request.POST.get('target_class')
+            try:
+                target_cls = Class.objects.get(pk=int(target))
+                user = User.objects.get(pk=uid)
+                cls.students.remove(user)
+                target_cls.students.add(user)
+                message = ('success', f'Moved {user.get_full_name() or user.username} to {target_cls.name}.')
+            except Exception:
+                message = ('error', 'Could not move student.')
+
+        elif action == 'edit_student':
+            uid = request.POST.get('user_id')
+            new_fname = request.POST.get('first_name', '').strip()
+            new_linit = request.POST.get('last_initial', '').strip()
+            try:
+                user = User.objects.get(pk=uid)
+                if new_fname:
+                    user.first_name = new_fname
+                if new_linit:
+                    user.last_name = new_linit
+                user.save()
+                message = ('success', 'Student updated.')
+            except Exception:
+                message = ('error', 'Could not update student.')
 
     students = cls.students.all()
-    return render(request, 'core/class_detail.html', {'class': cls, 'students': students, 'message': message})
+    # also supply classes that teacher owns for move target
+    other_classes = Class.objects.filter(teacher=request.user).exclude(pk=cls.pk)
+    return render(request, 'core/class_detail.html', {'class': cls, 'students': students, 'message': message, 'created_credentials': created_credentials, 'other_classes': other_classes})
 
 
 @login_required

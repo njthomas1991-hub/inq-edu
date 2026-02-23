@@ -25,7 +25,36 @@
                   <strong>{{ student.get_full_name|default:student.username }}</strong>
                   <div class="text-muted small">{{ student.email }}</div>
                 </div>
-                <a href="#" class="btn btn-outline-secondary btn-sm">View</a>
+                <div class="btn-group" role="group">
+                  <form method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="remove_student" />
+                    <input type="hidden" name="user_id" value="{{ student.id }}" />
+                    <button class="btn btn-outline-secondary btn-sm" type="submit">Remove</button>
+                  </form>
+                  <form method="post" style="display:inline; margin-left:4px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="delete_student" />
+                    <input type="hidden" name="user_id" value="{{ student.id }}" />
+                    <button class="btn btn-outline-danger btn-sm" type="submit" onclick="return confirm('Delete student account? This is permanent.')">Delete</button>
+                  </form>
+                  <button class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#move-{{ student.id }}">Move</button>
+                </div>
+              </li>
+              <li class="list-group-item">
+                <div class="collapse" id="move-{{ student.id }}">
+                  <form method="post" class="d-flex gap-2">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="move_student" />
+                    <input type="hidden" name="user_id" value="{{ student.id }}" />
+                    <select name="target_class" class="form-select form-select-sm">
+                      {% for oc in other_classes %}
+                        <option value="{{ oc.id }}">{{ oc.name }}</option>
+                      {% endfor %}
+                    </select>
+                    <button class="btn btn-sm btn-primary" type="submit">Move</button>
+                  </form>
+                </div>
               </li>
             {% empty %}
               <li class="list-group-item text-muted">No students enrolled.</li>
@@ -40,13 +69,41 @@
               <div class="alert alert-success">{{ message.1 }}</div>
             {% endif %}
           {% endif %}
-          <form method="post">
-            {% csrf_token %}
-            <div class="input-group mb-3">
-              <input name="identifier" class="form-control" placeholder="Enter username or email" />
-              <button class="btn btn-primary" type="submit">Add</button>
+
+          {% if created_credentials %}
+            <div class="alert alert-success">
+              Created student <strong>{{ created_credentials.name }}</strong><br />
+              Username: <code>{{ created_credentials.username }}</code><br />
+              Password: <code>{{ created_credentials.password }}</code>
             </div>
-          </form>
+          {% endif %}
+
+          <button class="btn btn-outline-primary mb-3" id="show-add-student">Add Student</button>
+          <div id="add-student-form" style="display:none;">
+            <form method="post">
+              {% csrf_token %}
+              <input type="hidden" name="action" value="create_student" />
+              <div class="row">
+                <div class="col-md-6 mb-2">
+                  <input name="first_name" class="form-control" placeholder="First name" required />
+                </div>
+                <div class="col-md-3 mb-2">
+                  <input name="last_initial" class="form-control" placeholder="Last initial" maxlength="1" required />
+                </div>
+                <div class="col-md-3 mb-2">
+                  <button class="btn btn-primary w-100" type="submit">Create student</button>
+                </div>
+              </div>
+            </form>
+          </div>
+
+          <script>
+            document.getElementById('show-add-student').addEventListener('click', function(e){
+              e.preventDefault();
+              var el = document.getElementById('add-student-form');
+              el.style.display = el.style.display === 'none' ? '' : 'none';
+            });
+          </script>
         </div>
       </div>
     </div>
