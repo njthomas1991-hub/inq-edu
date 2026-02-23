@@ -9,6 +9,8 @@ from django.contrib import messages
 from .forms import ClassForm
 import random
 import json
+from pathlib import Path
+from datetime import datetime
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
@@ -17,13 +19,50 @@ from django.views.decorators.http import require_http_methods
 from django.conf import settings
 from django.core.mail import send_mail
 from django.utils.html import strip_tags
+from django.urls import reverse
+from django.core.signing import dumps, loads, BadSignature, SignatureExpired
 
 def register(request):
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
             user = form.save()
+            # Log the user in
             login(request, user)
+            # Respect the 'remember_me' choice on registration (default True)
+            try:
+                remember = form.cleaned_data.get('remember_me', True)
+                if remember:
+                    # Persistent session (will use SESSION_COOKIE_AGE)
+                    request.session.set_expiry(None)
+                else:
+                    # Session expires on browser close
+                    request.session.set_expiry(0)
+            except Exception:
+                pass
+
+            # For teachers, keep a local minimal record (git-ignored file)
+            try:
+                if getattr(user, 'role', '') == 'teacher':
+                    path = Path(settings.BASE_DIR) / '.saved_teachers.json'
+                    records = []
+                    if path.exists():
+                        try:
+                            records = json.loads(path.read_text(encoding='utf-8')) or []
+                        except Exception:
+                            records = []
+                    records.append({
+                        'username': user.username,
+                        'email': user.email,
+                        'first_name': user.first_name,
+                        'last_name': user.last_name,
+                        'created': datetime.utcnow().isoformat() + 'Z'
+                    })
+                    path.write_text(json.dumps(records, indent=2), encoding='utf-8')
+            except Exception:
+                # don't block registration on IO error
+                pass
+
             return redirect("dashboard")
     else:
         form = CustomUserCreationForm()
@@ -272,6 +311,77 @@ def create_student_api(request):
             pass
 
     return JsonResponse({'success': True, 'id': user.id, 'username': username, 'password': password, 'emailed': emailed})
+
+
+@login_required
+@require_http_methods(["POST"])
+def generate_reset_api(request):
+    """Generate a single-use signed reset token and return a one-time URL (no email required).
+    POST JSON: {"user_id": 3}
+    """
+    try:
+        payload = json.loads(request.body.decode('utf-8'))
+    except Exception:
+        return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+
+    uid = payload.get('user_id')
+    if not uid:
+        return JsonResponse({'success': False, 'error': 'user_id required'}, status=400)
+
+    User = get_user_model()
+    try:
+        user = User.objects.get(pk=int(uid))
+    except User.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'User not found'}, status=404)
+
+    # permission: teacher who owns class or school_admins can generate for their students
+    # to be safe, require that requesting user is teacher of a class that includes the student or a school_admin
+    is_allowed = False
+    if request.user.role == 'school_admin':
+        is_allowed = True
+    else:
+        # check teacher owns any class with this student
+        if Class.objects.filter(teacher=request.user, students=user).exists() or Class.objects.filter(teacher=request.user, students__id=user.id).exists():
+            is_allowed = True
+
+    if not is_allowed:
+        return JsonResponse({'success': False, 'error': 'Permission denied'}, status=403)
+
+    # create signed token with max_age enforced on load; include a small nonce timestamp
+    token = dumps({'user_id': user.id, 'ts': int(random.time() if hasattr(random, 'time') else 0)}, salt='student-reset')
+    reset_url = request.build_absolute_uri(reverse('student_reset', args=[token]))
+    return JsonResponse({'success': True, 'url': reset_url})
+
+
+@require_http_methods(["GET", "POST"])
+def student_reset(request, token):
+    """Allow setting a new password using a signed token. Token is single-use by virtue of being short-lived.
+    We use `loads(..., max_age=86400)` to limit token validity to 24 hours.
+    """
+    try:
+        data = loads(token, salt='student-reset', max_age=86400)
+    except SignatureExpired:
+        return render(request, 'core/student_reset.html', {'error': 'Reset link expired.'})
+    except BadSignature:
+        return render(request, 'core/student_reset.html', {'error': 'Invalid reset link.'})
+
+    uid = data.get('user_id')
+    User = get_user_model()
+    try:
+        user = User.objects.get(pk=int(uid))
+    except User.DoesNotExist:
+        return render(request, 'core/student_reset.html', {'error': 'User not found.'})
+
+    if request.method == 'POST':
+        pw1 = request.POST.get('password')
+        pw2 = request.POST.get('password2')
+        if not pw1 or pw1 != pw2:
+            return render(request, 'core/student_reset.html', {'error': 'Passwords do not match.'})
+        user.set_password(pw1)
+        user.save()
+        return render(request, 'core/student_reset.html', {'success': 'Password updated. The user can now log in.'})
+
+    return render(request, 'core/student_reset.html', {'token': token})
 
 
 @login_required

@@ -82,3 +82,10 @@ merged.db
 
 # Secrets
 secrets.json
+# Temporary scan outputs and large files
+.secrets*.json
+.secrets*.raw
+truffle_results.*
+.truffle_results.*
+# Local saved teachers (contains minimal account info; intentionally git-ignored)
+.saved_teachers.json

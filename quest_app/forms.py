@@ -28,9 +28,11 @@ class ClassForm(forms.ModelForm):
         return cleaned
 
 class CustomUserCreationForm(UserCreationForm):
+    remember_me = forms.BooleanField(required=False, initial=True, label='Remember me')
+
     class Meta:
         model = User
-        fields = ("email", "first_name", "last_name", "role", "password1", "password2")
+        fields = ("email", "first_name", "last_name", "role", "password1", "password2",)
 
 class CustomAuthenticationForm(AuthenticationForm):
     username = forms.EmailField(label="Email")

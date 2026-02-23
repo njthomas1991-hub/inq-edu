@@ -24,6 +24,8 @@ urlpatterns = [
     path('teacher-forum/', TemplateView.as_view(template_name='core/teacher_forum.html'), name='teacher_forum'),
     path('account-settings/', TemplateView.as_view(template_name='core/account_settings.html'), name='account_settings'),
     path('profile/', views.profile, name='profile'),
+    path('api/generate-reset/', views.generate_reset_api, name='generate_reset_api'),
+    path('student-reset/<str:token>/', views.student_reset, name='student_reset'),
     # Avatar API endpoints
     path('api/avatar/', views.avatar_api, name='avatar_api'),
     path('api/avatar/save/', views.avatar_save, name='avatar_save'),

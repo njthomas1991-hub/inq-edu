@@ -5,10 +5,19 @@ LOGOUT_REDIRECT_URL = '/login/'
 LOGIN_URL = '/login/'
 import os
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'replace-this-with-a-secure-key'
+def _get_env_secret(key: str) -> str:
+    val = os.environ.get(key)
+    if val:
+        return val
+    raise ImproperlyConfigured(
+        f"Environment variable {key} is not set. Create a .env file or set the variable. See .env.example"
+    )
+
+SECRET_KEY = _get_env_secret('DJANGO_SECRET_KEY')
 DEBUG = True
 ALLOWED_HOSTS = []
 

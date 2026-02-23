@@ -42,6 +42,12 @@
                 </div>
               </li>
               <li class="list-group-item">
+                <div class="d-flex gap-2 align-items-center">
+                  <button class="btn btn-sm btn-outline-secondary generate-reset" data-user-id="{{ student.id }}">Generate login link</button>
+                  <small class="text-muted">One-time link (no email required)</small>
+                </div>
+              </li>
+              <li class="list-group-item">
                 <div class="collapse" id="move-{{ student.id }}">
                   <form method="post" class="d-flex gap-2">
                     {% csrf_token %}
@@ -200,6 +206,36 @@
                         }
                       });
                     }
+                    // attach handlers for generate-reset buttons
+                    setTimeout(function(){
+                      var genBtns = document.querySelectorAll('.generate-reset');
+                      genBtns.forEach(function(b){
+                        b.addEventListener('click', function(){
+                          var uid = b.getAttribute('data-user-id');
+                          fetch('{% url "generate_reset_api" %}', {
+                            method: 'POST',
+                            credentials: 'same-origin',
+                            headers: {
+                              'Content-Type': 'application/json',
+                              'X-CSRFToken': getCookie('csrftoken') || ''
+                            },
+                            body: JSON.stringify({user_id: uid})
+                          }).then(function(r){ return r.json(); }).then(function(js){
+                            if (js && js.success) {
+                              var m = document.createElement('div');
+                              m.className = 'alert alert-info ajax-add-alert';
+                              m.innerHTML = 'Reset link: <a href="' + js.url + '" target="_blank">Open link</a> — copy and give to student.';
+                              container.insertBefore(m, container.firstChild);
+                            } else {
+                              var m = document.createElement('div');
+                              m.className = 'alert alert-danger ajax-add-alert';
+                              m.textContent = (js && js.error) || 'Could not generate link.';
+                              container.insertBefore(m, container.firstChild);
+                            }
+                          });
+                        });
+                      });
+                    }, 50);
                   } else {
                     var err = document.createElement('div');
                     err.className = 'alert alert-danger ajax-add-alert';
