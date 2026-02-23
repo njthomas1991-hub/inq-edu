@@ -11,4 +11,8 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('dashboard/', views.dashboard, name='dashboard'),
     path('profile/', views.profile, name='profile'),
+    path('kindlewick/', TemplateView.as_view(template_name='core/kindlewick.html'), name='kindlewick'),
+    path('wonderworld/', TemplateView.as_view(template_name='core/wonderworld.html'), name='wonderworld'),
+    path('questopia/', TemplateView.as_view(template_name='core/questopia.html'), name='questopia'),
+    path('contact/', TemplateView.as_view(template_name='core/contact.html'), name='contact'),
 ]

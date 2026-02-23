@@ -1,0 +1,112 @@
+{% extends "core/base_teacher.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Edit Resource - Teaching Resources{% endblock %}
+
+{% block content %}
+
+<div class="teacher-resource-main d-flex justify-content-center">
+    <div class="summernote-wrapper">
+        <a class="btn btn-link px-0 mb-3" href="{% url 'teacher_resource_detail' resource.slug %}">
+            <i class="fas fa-arrow-left"></i> Back to Resource
+        </a>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h1 class="h4 mb-4">Edit Teaching Resource</h1>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- Description Field -->
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        {% if form.description %}
+                            <textarea id="description" name="description" class="form-control" rows="8">{{ form.description.value }}</textarea>
+                        {% else %}
+                            <div class="alert alert-warning">Description field missing from form.</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Notes Field -->
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes</label>
+                        {% if form.notes %}
+                            <textarea id="notes" name="notes" class="form-control" rows="8">{% if form.notes.value %}{{ form.notes.value }}{% endif %}</textarea>
+                        {% else %}
+                            <div class="alert alert-warning">Notes field missing from form.</div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Multi-file Upload Field -->
+                    <div class="mb-3">
+                        <label for="resource-files" class="form-label">Upload Files</label>
+                        <input type="file" name="files" id="resource-files" class="form-control" multiple>
+                        <small class="text-muted d-block mt-1">
+                            {% if resource.files.exists %}
+                                Current files:
+                                <ul>
+                                    {% for f in resource.files.all %}
+                                        <li><a href="{{ f.file.url }}" target="_blank">{{ f.file.name }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </small>
+                        <div id="file-previews" class="mt-2"></div>
+                    </div>
+
+                    <!-- Submit Buttons -->
+                    <div class="mt-4 d-flex gap-2">
+                        <button class="btn btn-primary" type="submit">Save Changes</button>
+                        <a href="{% url 'teacher_resource_detail' resource.slug %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+    
+
+    <style>
+        /* Preview thumbnails */
+        #file-previews img {
+            max-width: 100px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+    </style>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Multi-file preview
+        const fileInput = document.getElementById('resource-files');
+        const previews = document.getElementById('file-previews');
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                previews.innerHTML = '';
+                Array.from(this.files).forEach(file => {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            previews.appendChild(img);
+                        }
+                        reader.readAsDataURL(file);
+                    } else {
+                        const p = document.createElement('p');
+                        p.textContent = file.name;
+                        previews.appendChild(p);
+                    }
+                });
+            });
+        }
+    });
+    </script>
+{% endblock %}
+
+{% endblock %}

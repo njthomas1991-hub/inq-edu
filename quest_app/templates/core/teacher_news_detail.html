@@ -1,0 +1,20 @@
+{% extends "core/base_teacher.html" %}
+
+{% block title %}{{ news_item.title }} - News{% endblock %}
+
+{% block content %}
+<div class="container">
+    <a class="btn btn-link px-0 mb-3" href="{% url 'teacher_news' %}"><i class="fas fa-arrow-left"></i> Back to News</a>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h1 class="h3">{{ news_item.title }}</h1>
+            <p class="text-muted">Published {{ news_item.published_at|date:"M d, Y" }}</p>
+            <hr>
+            <div class="content">
+                {{ news_item.content|safe }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

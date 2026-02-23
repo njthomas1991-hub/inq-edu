@@ -1,0 +1,433 @@
+<!-- Skip to Main Content Link (for keyboard users) -->
+<a href="#main-content" class="skip-to-main">Skip to main content</a>
+
+<!-- Accessibility Toolbar Button -->
+<button class="accessibility-toggle" id="accessibilityToggle" aria-label="Open accessibility menu" title="Accessibility">
+    <i class="fas fa-universal-access"></i>
+</button>
+
+<!-- Accessibility Panel placeholder -->
+<div id="accessibilityPanel"></div>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Teacher Dashboard - INQ-ED{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{% static 'core/images/favicon/favicon-16x16.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'core/images/favicon/apple-touch-icon.png' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'core/images/favicon/favicon-16x16.png' %}">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">>
+    <!-- PIXI.js for avatar rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7/dist/pixi.min.js"></script>
+</head>
+</head>
+<body class="bg-light">
+<!-- Skip to Main Content Link (for keyboard users) -->
+<a href="#main-content" class="skip-to-main">Skip to main content</a>
+
+                <button id="speakPageBtn" class="btn btn-sm btn-outline-primary w-100 mb-2">
+                    <i class="fas fa-book-reader"></i> Read Entire Page
+                </button>
+                <button id="stopSpeakBtn" class="btn btn-sm btn-outline-secondary w-100">
+                    <i class="fas fa-stop"></i> Stop Reading
+                </button>
+            </div>
+        </div>
+
+        <!-- MODERATE: TTS Speed Control -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <span><i class="fas fa-tachometer-alt"></i> Speech Speed</span>
+            </label>
+            <div class="mt-2">
+                <input type="range" id="ttsSpeedSlider" min="0.5" max="2" step="0.1" value="1" class="form-range">
+                <small class="d-block text-center"><span id="ttsSpeedValue">1.0</span>x</small>
+            </div>
+        </div>
+
+        <!-- MODERATE: Reduced Motion -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="reducedMotionToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-ban"></i> Reduce Motion</span>
+            </label>
+        </div>
+
+        <!-- MODERATE: Underline Links -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="underlineLinksToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-link"></i> Underline All Links</span>
+            </label>
+        </div>
+
+        <!-- LESS COMMON: Speech to Text -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="speechToTextToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-microphone"></i> Voice Commands</span>
+            </label>
+            <div id="sttControls" class="accessibility-sub-options" style="display: none; margin-top: 10px;">
+                <button id="startListeningBtn" class="btn btn-sm btn-outline-success w-100">
+                    <i class="fas fa-microphone"></i> Start Listening
+                </button>
+                <p id="sttResult" class="small mt-2" style="display: none;"></p>
+            </div>
+        </div>
+
+        <!-- LESS COMMON: Focus Mode -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <input type="checkbox" id="focusModeToggle" class="accessibility-checkbox">
+                <span><i class="fas fa-crosshairs"></i> Focus Mode</span>
+            </label>
+        </div>
+
+        <!-- LESS COMMON: Letter Spacing -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <span><i class="fas fa-text-width"></i> Letter Spacing</span>
+            </label>
+            <div class="mt-2">
+                <input type="range" id="letterSpacingSlider" min="0" max="5" step="0.5" value="0" class="form-range">
+                <small class="d-block text-center"><span id="letterSpacingValue">0</span>px</small>
+            </div>
+        </div>
+
+        <!-- LESS COMMON: Word Spacing -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <span><i class="fas fa-arrows-alt-h"></i> Word Spacing</span>
+            </label>
+            <div class="mt-2">
+                <input type="range" id="wordSpacingSlider" min="0" max="10" step="1" value="0" class="form-range">
+                <small class="d-block text-center"><span id="wordSpacingValue">0</span>px</small>
+            </div>
+        </div>
+
+        <!-- SPECIALIZED: Color Blindness Filters -->
+        <div class="accessibility-option">
+            <label class="accessibility-label">
+                <span><i class="fas fa-eye-dropper"></i> Color Blindness Filter</span>
+            </label>
+            <select id="colorBlindnessFilter" class="form-select form-select-sm mt-2">
+                <option value="none">None</option>
+                <option value="protanopia">Protanopia (Red-Blind)</option>
+                <option value="deuteranopia">Deuteranopia (Green-Blind)</option>
+                <option value="tritanopia">Tritanopia (Blue-Blind)</option>
+                <option value="achromatopsia">Achromatopsia (Total)</option>
+            </select>
+        </div>
+
+        <!-- SPECIALIZED: Pause All Media -->
+        <div class="accessibility-option">
+            <button id="pauseAllMediaBtn" class="btn btn-sm btn-outline-warning w-100">
+                <i class="fas fa-pause-circle"></i> Pause All Media
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Reading Guide Element -->
+<div id="readingGuide" class="reading-guide" style="display: none;"></div>
+
+<!-- ARIA Live Region for announcements -->
+<div id="ariaLiveRegion" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+    <div class="teacher-hub-title d-none d-lg-flex">
+        <a class="teacher-hub-title__link" href="{% url 'teacher_dashboard' %}">
+            <h1><strong>INQ-ED</strong> Teacher Hub</h1>
+        </a>
+    </div>
+
+    <!-- Teacher Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary dashboard-navbar">
+        <div class="container d-flex align-items-center justify-content-between">
+            <a class="navbar-brand mb-0 h1" href="{% url 'teacher_dashboard' %}">
+                <strong>INQ-ED</strong> Teacher Hub
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#teacherNav" aria-controls="teacherNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse flex-grow-0" id="teacherNav">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'teacher_dashboard' %}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'teacher_analytics' %}">
+                            <i class="fas fa-chart-line"></i> Analytics
+                        </a>
+                    </li>
+                    {% if class_obj %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="classMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-chalkboard"></i> Classes
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="classMenu">
+                            <li><a class="dropdown-item" href="{% url 'class_detail' class_obj.id %}">Student List</a></li>
+                            <li><a class="dropdown-item" href="{% url 'class_analytics' class_obj.id %}">Class Analytics</a></li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'add_class' %}">
+                            <i class="fas fa-plus"></i> Add Class
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'teacher_news' %}">
+                            <i class="fas fa-bullhorn"></i> News & Announcements
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'teacher_help' %}">
+                            <i class="fas fa-life-ring"></i> Help & Tutorials
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'teacher_resources' %}">
+                            <i class="fas fa-book"></i> Teaching Resources
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'teacher_forum' %}">
+                            <i class="fas fa-comments"></i> Community Forum
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if user.is_authenticated %}
+                                {% include "core/avatar_navbar.html" %}
+                            {% else %}
+                                <i class="fas fa-user-circle"></i>
+                            {% endif %}
+                            {% if user.is_authenticated %}{{ user.get_full_name|default:user.username }}{% else %}Account{% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            {% if user.is_authenticated %}
+                                <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user"></i> Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'account_settings' %}"><i class="fas fa-cog"></i> Account Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="dropdown-item" style="background: none; border: none; cursor: pointer; text-align: left; padding: 0.25rem 1rem;">
+                                            <i class="fas fa-sign-out-alt"></i> Logout
+                                        </button>
+                                    </form>
+                                </li>
+                            {% else %}
+                                <li><a class="dropdown-item" href="{% url 'teacher_login' %}"><i class="fas fa-sign-in-alt"></i> Login</a></li>
+                                <li><a class="dropdown-item" href="{% url 'signup' %}"><i class="fas fa-user-plus"></i> Sign Up</a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content" class="py-4">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2026 INQ-ED. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="{% url 'home' %}" class="text-white text-decoration-none me-3">Back to Main Site</a>
+                    <a href="{% url 'contact' %}" class="text-white text-decoration-none">Support</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+        <!-- jQuery (required for Summernote) -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Diagnostic: Check if jQuery loaded before Summernote -->
+        <script>
+            (function() {
+                if (typeof window.jQuery === 'undefined' || typeof window.$ === 'undefined') {
+                    console.error('jQuery is NOT loaded before Summernote. Summernote will not be loaded.');
+                    window._skipSummernote = true;
+                } else {
+                    window._skipSummernote = false;
+                }
+            })();
+        </script>
+        <!-- Summernote JS (needs jQuery first) -->
+        <script>
+            function loadSummernoteAndPlugin() {
+                if (window._skipSummernote) return;
+                var s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.js';
+                s.onload = function() {
+                    console.log('[DEBUG] Summernote script loaded');
+                    var plugin = document.createElement('script');
+                    plugin.src = '{% static 'core/js/summernote-file-upload.js' %}';
+                    plugin.onload = function() {
+                        console.log('[DEBUG] Summernote file upload plugin loaded');
+                        // Patch all summernote inits to add fileupload button
+                        if (window.jQuery && $.summernote) {
+                            console.log('[DEBUG] jQuery and Summernote available');
+                            var origSummernote = $.fn.summernote;
+                            $.fn.summernote = function() {
+                                var args = Array.prototype.slice.call(arguments);
+                                if (args.length > 0 && typeof args[0] === 'object') {
+                                    args[0].toolbar = args[0].toolbar || [
+                                        ['style', ['style']],
+                                        ['font', ['bold', 'underline', 'italic', 'clear']],
+                                        ['fontname', ['fontname']],
+                                        ['fontsize', ['fontsize']],
+                                        ['color', ['color']],
+                                        ['para', ['ul', 'ol', 'paragraph', 'height']],
+                                        ['table', ['table']],
+                                        ['insert', ['link', 'picture', 'video', 'fileupload']],
+                                        ['view', ['fullscreen', 'codeview', 'help']]
+                                    ];
+                                }
+                                return origSummernote.apply(this, args);
+                            };
+                            // Only initialize the notes field
+                            var notesEl = document.querySelector('.summernote-notes');
+                            if (notesEl) {
+                                console.log('[DEBUG] Found .summernote-notes element, initializing Summernote');
+                                if ($(notesEl).data('summernote')) {
+                                    $(notesEl).summernote('destroy');
+                                }
+                                $(notesEl).summernote({
+                                    toolbar: [
+                                        ['style', ['style']],
+                                        ['font', ['bold', 'underline', 'italic', 'clear']],
+                                        ['fontname', ['fontname']],
+                                        ['fontsize', ['fontsize']],
+                                        ['color', ['color']],
+                                        ['para', ['ul', 'ol', 'paragraph', 'height']],
+                                        ['table', ['table']],
+                                        ['insert', ['link', 'picture', 'video', 'fileupload']],
+                                        ['view', ['fullscreen', 'codeview', 'help']]
+                                    ]
+                                });
+                            } else {
+                                // Removed .summernote-notes debug. Only .summernote-description is handled in edit template.
+                            }
+                        } else {
+                            console.log('[DEBUG] jQuery or Summernote not available');
+                        }
+                    };
+                    document.head.appendChild(plugin);
+                };
+                document.head.appendChild(s);
+            }
+            document.addEventListener('DOMContentLoaded', loadSummernoteAndPlugin);
+        </script>
+    <!-- Bootstrap JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var toggler = document.querySelector('.navbar-toggler');
+        var collapse = document.getElementById('teacherNav');
+        if (toggler && collapse) {
+            toggler.addEventListener('click', function() {
+                console.log('Toggler clicked');
+                // Check if Bootstrap Collapse is available
+                if (typeof bootstrap !== 'undefined' && bootstrap.Collapse) {
+                    console.log('Bootstrap Collapse is available');
+                } else {
+                    console.error('Bootstrap Collapse is NOT available');
+                }
+            });
+        } else {
+            console.error('Toggler or collapse element not found');
+        }
+    });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const navbar = document.querySelector(".dashboard-navbar");
+            const collapse = document.getElementById("teacherNav");
+
+            if (!navbar || !collapse) {
+                return;
+            }
+
+            collapse.addEventListener("show.bs.collapse", () => {
+                navbar.classList.add("nav-expanded");
+            });
+
+            collapse.addEventListener("hidden.bs.collapse", () => {
+                navbar.classList.remove("nav-expanded");
+            });
+        });
+    </script>
+    <script src="{% static 'core/js/main.js' %}"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const accessibilityToggle = document.getElementById("accessibilityToggle");
+        const accessibilityPanel = document.getElementById("accessibilityPanel");
+        const panelContent = `
+            <div class="accessibility-panel-header">
+                <h5 class="mb-0">Accessibility Options</h5>
+                <button class="btn-close" id="closeAccessibility" aria-label="Close accessibility menu"></button>
+            </div>
+            <div class="accessibility-panel-body">
+                <!-- ...existing accessibility options... -->
+            </div>
+        `;
+        accessibilityPanel.classList.remove('active');
+        accessibilityPanel.innerHTML = '';
+        if (accessibilityToggle && accessibilityPanel) {
+            accessibilityToggle.addEventListener("click", function() {
+                if (!accessibilityPanel.classList.contains('active')) {
+                    accessibilityPanel.innerHTML = panelContent;
+                    accessibilityPanel.classList.add('active');
+                    document.getElementById("closeAccessibility").addEventListener("click", function() {
+                        accessibilityPanel.classList.remove('active');
+                        accessibilityPanel.innerHTML = '';
+                    });
+                } else {
+                    accessibilityPanel.classList.remove('active');
+                    accessibilityPanel.innerHTML = '';
+                }
+            });
+        }
+    });
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const accessibilityToggle = document.getElementById("accessibilityToggle");
+        const accessibilityPanel = document.getElementById("accessibilityPanel");
+        const closeAccessibility = document.getElementById("closeAccessibility");
+        accessibilityPanel.classList.remove('active');
+        if (accessibilityToggle && accessibilityPanel) {
+            accessibilityToggle.addEventListener("click", function() {
+                accessibilityPanel.classList.toggle('active');
+            });
+        }
+        if (closeAccessibility && accessibilityPanel) {
+            closeAccessibility.addEventListener("click", function() {
+                accessibilityPanel.classList.remove('active');
+            });
+        }
+    });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

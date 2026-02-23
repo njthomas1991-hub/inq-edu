@@ -1,0 +1,744 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ user.username }}'s Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.2.4/dist/pixi.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667 eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .profile-container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 30px;
+        }
+        .avatar-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        #avatarCanvas {
+            border-radius: 15px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        .customize-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .customize-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.5);
+        }
+        .modal-content {
+            border-radius: 20px;
+            border: none;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #764ba2;
+            margin-bottom: 8px;
+        }
+        .form-select, .form-control {
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            padding: 10px 15px;
+        }
+        .form-select:focus, .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .preview-canvas {
+            border-radius: 15px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            width: 100%;
+            height: auto;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 10px 30px;
+            font-weight: 600;
+        }
+        .btn-secondary {
+            background: #95a5a6;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 30px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="avatar-card text-center">
+            <h1 class="mb-4">{{ user.username }}'s Monster Avatar</h1>
+            <div id="avatarCanvas" class="mx-auto mb-4"></div>
+            <button class="customize-btn" data-bs-toggle="modal" data-bs-target="#avatarCustomizerModal">
+                Customize Avatar
+            </button>
+        </div>
+    </div>
+
+    <!-- Avatar Customizer Modal -->
+    <div class="modal fade" id="avatarCustomizerModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Your Monster</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <!-- Live Preview -->
+                        <div class="col-md-5">
+                            <h6 class="text-center mb-3">Preview</h6>
+                            <div id="previewCanvas" class="preview-canvas mx-auto"></div>
+                        </div>
+                        
+                        <!-- Customization Form -->
+                        <div class="col-md-7">
+                            <form id="avatarForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Body Shape</label>
+                                        <select class="form-select" name="bodyType" id="bodyType">
+                                            <option value="blob">Blob</option>
+                                            <option value="round">Round</option>
+                                            <option value="tall">Tall</option>
+                                            <option value="wide">Wide</option>
+                                            <option value="pear">Pear</option>
+                                            <option value="bean">Bean</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Body Color</label>
+                                        <input type="color" class="form-control" name="bodyColor" id="bodyColor" value="#FF6B9D">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Eyes</label>
+                                        <select class="form-select" name="eyeType" id="eyeType">
+                                            <option value="big_round">Big Round</option>
+                                            <option value="small_dots">Small Dots</option>
+                                            <option value="one_eye">One Eye</option>
+                                            <option value="sleepy">Sleepy</option>
+                                            <option value="googly">Googly</option>
+                                            <option value="angry">Angry</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Mouth</label>
+                                        <select class="form-select" name="mouthType" id="mouthType">
+                                            <option value="happy">Happy</option>
+                                            <option value="toothy">Toothy</option>
+                                            <option value="small">Small</option>
+                                            <option value="big_smile">Big Smile</option>
+                                            <option value="oh">Oh</option>
+                                            <option value="silly">Silly</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Head Decoration</label>
+                                        <select class="form-select" name="headDecoration" id="headDecoration">
+                                            <option value="none">None</option>
+                                            <option value="horns">Horns</option>
+                                            <option value="antennae">Antennae</option>
+                                            <option value="spikes">Spikes</option>
+                                            <option value="ears">Ears</option>
+                                            <option value="mohawk">Mohawk</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Decoration Color</label>
+                                        <input type="color" class="form-control" name="decorationColor" id="decorationColor" value="#FFB347">
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Pattern</label>
+                                        <select class="form-select" name="pattern" id="pattern">
+                                            <option value="solid">Solid</option>
+                                            <option value="spots">Spots</option>
+                                            <option value="stripes">Stripes</option>
+                                            <option value="gradient">Gradient</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Pattern Color</label>
+                                        <input type="color" class="form-control" name="patternColor" id="patternColor" value="#FF1493">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="randomizeAvatar()">Randomize</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAvatar()">Save Avatar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // CSRF Token helper
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // ClassDojo-style Monster Renderer
+        class MonsterRenderer {
+            constructor(container, width = 300, height = 400) {
+                this.app = new PIXI.Application({
+                    width: width,
+                    height: height,
+                    backgroundColor: 0xF5F7FA,
+                    antialias: true
+                });
+                container.appendChild(this.app.view);
+                this.monster = new PIXI.Container();
+                this.app.stage.addChild(this.monster);
+            }
+
+            drawBody(type, color) {
+                const graphics = new PIXI.Graphics();
+                const safeColor = color || '#FF6B9D';
+                graphics.beginFill(parseInt(safeColor.replace('#', ''), 16));
+                
+                const centerX = this.app.view.width / 2;
+                const centerY = this.app.view.height / 2;
+
+                switch(type) {
+                    case 'blob':
+                        // Irregular blob shape (ClassDojo style)
+                        graphics.moveTo(centerX, centerY - 80);
+                        graphics.bezierCurveTo(centerX + 90, centerY - 70, centerX + 100, centerY + 20, centerX + 80, centerY + 90);
+                        graphics.bezierCurveTo(centerX + 50, centerY + 110, centerX - 50, centerY + 110, centerX - 80, centerY + 90);
+                        graphics.bezierCurveTo(centerX - 100, centerY + 20, centerX - 90, centerY - 70, centerX, centerY - 80);
+                        break;
+                    case 'round':
+                        graphics.drawCircle(centerX, centerY, 90);
+                        break;
+                    case 'tall':
+                        graphics.drawEllipse(centerX, centerY, 60, 110);
+                        break;
+                    case 'wide':
+                        graphics.drawEllipse(centerX, centerY, 110, 70);
+                        break;
+                    case 'pear':
+                        graphics.moveTo(centerX, centerY - 70);
+                        graphics.bezierCurveTo(centerX + 60, centerY - 60, centerX + 70, centerY, centerX + 90, centerY + 60);
+                        graphics.bezierCurveTo(centerX + 80, centerY + 100, centerX - 80, centerY + 100, centerX - 90, centerY + 60);
+                        graphics.bezierCurveTo(centerX - 70, centerY, centerX - 60, centerY - 60, centerX, centerY - 70);
+                        break;
+                    case 'bean':
+                        graphics.moveTo(centerX - 20, centerY - 90);
+                        graphics.bezierCurveTo(centerX + 70, centerY - 80, centerX + 80, centerY - 20, centerX + 60, centerY + 50);
+                        graphics.bezierCurveTo(centerX + 50, centerY + 90, centerX - 50, centerY + 90, centerX - 60, centerY + 50);
+                        graphics.bezierCurveTo(centerX - 80, centerY - 20, centerX - 70, centerY - 80, centerX - 20, centerY - 90);
+                        break;
+                }
+                graphics.endFill();
+                
+                // Add shadow/outline
+                graphics.lineStyle(4, 0x000000, 0.2);
+                graphics.drawCircle(centerX, centerY + 5, 90);
+                
+                return graphics;
+            }
+
+            drawPattern(bodyType, patternType, patternColor) {
+                if (patternType === 'solid') return null;
+
+                const graphics = new PIXI.Graphics();
+                const centerX = this.app.view.width / 2;
+                const centerY = this.app.view.height / 2;
+                const safeColor = patternColor || '#FF1493';
+                const color = parseInt(safeColor.replace('#', ''), 16);
+
+                if (patternType === 'spots') {
+                    graphics.beginFill(color, 0.4);
+                    // Draw random-ish spots
+                    graphics.drawCircle(centerX - 30, centerY - 20, 15);
+                    graphics.drawCircle(centerX + 40, centerY - 10, 20);
+                    graphics.drawCircle(centerX - 20, centerY + 30, 18);
+                    graphics.drawCircle(centerX + 20, centerY + 40, 12);
+                    graphics.endFill();
+                } else if (patternType === 'stripes') {
+                    graphics.beginFill(color, 0.3);
+                    for (let i = -80; i < 80; i += 30) {
+                        graphics.drawRect(centerX - 100, centerY + i, 200, 15);
+                    }
+                    graphics.endFill();
+                }
+
+                return graphics;
+            }
+
+            drawEyes(type) {
+                const container = new PIXI.Container();
+                const centerX = this.app.view.width / 2;
+                const centerY = this.app.view.height / 2;
+
+                if (type === 'one_eye') {
+                    const eye = this.createEye(60, 60);
+                    eye.x = centerX;
+                    eye.y = centerY - 20;
+                    container.addChild(eye);
+                } else if (type === 'big_round') {
+                    const leftEye = this.createEye(50, 50);
+                    leftEye.x = centerX - 40;
+                    leftEye.y = centerY - 30;
+                    
+                    const rightEye = this.createEye(50, 50);
+                    rightEye.x = centerX + 40;
+                    rightEye.y = centerY - 30;
+                    
+                    container.addChild(leftEye, rightEye);
+                } else if (type === 'small_dots') {
+                    const leftEye = this.createEye(20, 20);
+                    leftEye.x = centerX - 30;
+                    leftEye.y = centerY - 20;
+                    
+                    const rightEye = this.createEye(20, 20);
+                    rightEye.x = centerX + 30;
+                    rightEye.y = centerY - 20;
+                    
+                    container.addChild(leftEye, rightEye);
+                } else if (type === 'sleepy') {
+                    const leftEye = this.createSleepyEye();
+                    leftEye.x = centerX - 35;
+                    leftEye.y = centerY - 25;
+                    
+                    const rightEye = this.createSleepyEye();
+                    rightEye.x = centerX + 35;
+                    rightEye.y = centerY - 25;
+                    
+                    container.addChild(leftEye, rightEye);
+                } else if (type === 'googly') {
+                    const leftEye = this.createGooglyEye();
+                    leftEye.x = centerX - 40;
+                    leftEye.y = centerY - 30;
+                    
+                    const rightEye = this.createGooglyEye();
+                    rightEye.x = centerX + 40;
+                    rightEye.y = centerY - 30;
+                    
+                    container.addChild(leftEye, rightEye);
+                } else if (type === 'angry') {
+                    const leftEye = this.createAngryEye();
+                    leftEye.x = centerX - 40;
+                    leftEye.y = centerY - 30;
+                    
+                    const rightEye = this.createAngryEye();
+                    rightEye.x = centerX + 40;
+                    rightEye.y = centerY - 30;
+                    
+                    container.addChild(leftEye, rightEye);
+                }
+
+                return container;
+            }
+
+            createEye(width, height) {
+                const eye = new PIXI.Graphics();
+                eye.beginFill(0xFFFFFF);
+                eye.drawEllipse(0, 0, width / 2, height / 2);
+                eye.endFill();
+                
+                eye.beginFill(0x000000);
+                eye.drawCircle(0, 0, width / 4);
+                eye.endFill();
+                
+                eye.beginFill(0xFFFFFF);
+                eye.drawCircle(width / 8, -width / 8, width / 10);
+                eye.endFill();
+                
+                return eye;
+            }
+
+            createSleepyEye() {
+                const eye = new PIXI.Graphics();
+                eye.lineStyle(4, 0x000000);
+                eye.arc(0, 0, 18, 0, Math.PI);
+                return eye;
+            }
+
+            createGooglyEye() {
+                const eye = new PIXI.Graphics();
+                eye.beginFill(0xFFFFFF);
+                eye.drawCircle(0, 0, 25);
+                eye.endFill();
+                
+                eye.lineStyle(3, 0x000000);
+                eye.drawCircle(0, 0, 25);
+                
+                // Offset pupil
+                eye.beginFill(0x000000);
+                eye.drawCircle(8, 5, 12);
+                eye.endFill();
+                
+                return eye;
+            }
+
+            createAngryEye() {
+                const eye = new PIXI.Graphics();
+                eye.beginFill(0xFFFFFF);
+                eye.drawEllipse(0, 0, 20, 15);
+                eye.endFill();
+                
+                eye.beginFill(0xFF0000);
+                eye.drawCircle(0, 0, 10);
+                eye.endFill();
+                
+                // Angry eyebrow
+                eye.lineStyle(4, 0x000000);
+                eye.moveTo(-25, -20);
+                eye.lineTo(5, -15);
+                
+                return eye;
+            }
+
+            drawMouth(type) {
+                const graphics = new PIXI.Graphics();
+                const centerX = this.app.view.width / 2;
+                const centerY = this.app.view.height / 2;
+
+                graphics.lineStyle(4, 0x000000);
+
+                switch(type) {
+                    case 'happy':
+                        graphics.beginFill(0x000000);
+                        graphics.arc(centerX, centerY + 30, 40, 0, Math.PI);
+                        graphics.endFill();
+                        break;
+                    case 'toothy':
+                        graphics.beginFill(0x000000);
+                        graphics.arc(centerX, centerY + 30, 45, 0, Math.PI);
+                        graphics.endFill();
+                        // Teeth
+                        graphics.beginFill(0xFFFFFF);
+                        for (let i = -30; i <= 30; i += 15) {
+                            graphics.drawRect(centerX + i - 5, centerY + 30, 10, 15);
+                        }
+                        graphics.endFill();
+                        break;
+                    case 'small':
+                        graphics.beginFill(0x000000);
+                        graphics.drawCircle(centerX, centerY + 35, 15);
+                        graphics.endFill();
+                        break;
+                    case 'big_smile':
+                        graphics.lineStyle(6, 0x000000);
+                        graphics.arc(centerX, centerY + 20, 60, 0, Math.PI);
+                        break;
+                    case 'oh':
+                        graphics.beginFill(0x000000);
+                        graphics.drawEllipse(centerX, centerY + 40, 20, 30);
+                        graphics.endFill();
+                        break;
+                    case 'silly':
+                        graphics.beginFill(0x000000);
+                        graphics.arc(centerX, centerY + 30, 35, 0, Math.PI);
+                        graphics.endFill();
+                        // Tongue
+                        graphics.beginFill(0xFF69B4);
+                        graphics.drawEllipse(centerX, centerY + 55, 20, 15);
+                        graphics.endFill();
+                        break;
+                }
+
+                return graphics;
+            }
+
+            drawDecoration(type, color) {
+                if (type === 'none') return null;
+
+                const graphics = new PIXI.Graphics();
+                const centerX = this.app.view.width / 2;
+                const centerY = this.app.view.height / 2;
+                const safeColor = color || '#FFB347';
+                const fillColor = parseInt(safeColor.replace('#', ''), 16);
+
+                graphics.beginFill(fillColor);
+
+                switch(type) {
+                    case 'horns':
+                        // Left horn
+                        graphics.moveTo(centerX - 60, centerY - 80);
+                        graphics.lineTo(centerX - 80, centerY - 120);
+                        graphics.lineTo(centerX - 40, centerY - 90);
+                        graphics.closePath();
+                        
+                        // Right horn
+                        graphics.moveTo(centerX + 60, centerY - 80);
+                        graphics.lineTo(centerX + 80, centerY - 120);
+                        graphics.lineTo(centerX + 40, centerY - 90);
+                        graphics.closePath();
+                        break;
+                    case 'antennae':
+                        graphics.drawCircle(centerX - 50, centerY - 110, 12);
+                        graphics.drawCircle(centerX + 50, centerY - 110, 12);
+                        graphics.lineStyle(4, fillColor);
+                        graphics.moveTo(centerX - 50, centerY - 98);
+                        graphics.lineTo(centerX - 40, centerY - 70);
+                        graphics.moveTo(centerX + 50, centerY - 98);
+                        graphics.lineTo(centerX + 40, centerY - 70);
+                        break;
+                    case 'spikes':
+                        for (let i = -70; i <= 70; i += 20) {
+                            graphics.moveTo(centerX + i - 8, centerY - 80);
+                            graphics.lineTo(centerX + i, centerY - 110);
+                            graphics.lineTo(centerX + i + 8, centerY - 80);
+                            graphics.closePath();
+                        }
+                        break;
+                    case 'ears':
+                        graphics.drawEllipse(centerX - 90, centerY - 40, 20, 35);
+                        graphics.drawEllipse(centerX + 90, centerY - 40, 20, 35);
+                        break;
+                    case 'mohawk':
+                        for (let i = -40; i <= 40; i += 15) {
+                            graphics.moveTo(centerX + i - 6, centerY - 80);
+                            graphics.lineTo(centerX + i, centerY - 130 + Math.abs(i) / 2);
+                            graphics.lineTo(centerX + i + 6, centerY - 80);
+                            graphics.closePath();
+                        }
+                        break;
+                }
+
+                graphics.endFill();
+                return graphics;
+            }
+
+            drawArms() {
+                const container = new PIXI.Container();
+                const centerX = this.app.view.width / 2;
+                const centerY = this.app.view.height / 2;
+
+                // Left arm
+                const leftArm = new PIXI.Graphics();
+                leftArm.lineStyle(20, 0x000000, 0.1);
+                leftArm.beginFill(0x000000, 0.15);
+                leftArm.drawEllipse(centerX - 100, centerY + 10, 15, 40);
+                leftArm.endFill();
+                
+                // Hand
+                leftArm.beginFill(0x000000, 0.15);
+                leftArm.drawCircle(centerX - 100, centerY + 50, 18);
+                leftArm.endFill();
+
+                // Right arm
+                const rightArm = new PIXI.Graphics();
+                rightArm.lineStyle(20, 0x000000, 0.1);
+                rightArm.beginFill(0x000000, 0.15);
+                rightArm.drawEllipse(centerX + 100, centerY + 10, 15, 40);
+                rightArm.endFill();
+                
+                // Hand
+                rightArm.beginFill(0x000000, 0.15);
+                rightArm.drawCircle(centerX + 100, centerY + 50, 18);
+                rightArm.endFill();
+
+                container.addChild(leftArm, rightArm);
+                return container;
+            }
+
+            render(avatarData) {
+                // Clear previous monster
+                this.monster.removeChildren();
+
+                // Add defaults for missing fields
+                const data = {
+                    bodyType: avatarData.bodyType || 'blob',
+                    bodyColor: avatarData.bodyColor || '#FF6B9D',
+                    eyeType: avatarData.eyeType || 'big_round',
+                    mouthType: avatarData.mouthType || 'happy',
+                    headDecoration: avatarData.headDecoration || 'horns',
+                    decorationColor: avatarData.decorationColor || '#FFB347',
+                    pattern: avatarData.pattern || 'solid',
+                    patternColor: avatarData.patternColor || '#FF1493'
+                };
+
+                // Draw in layers
+                const arms = this.drawArms();
+                const body = this.drawBody(data.bodyType, data.bodyColor);
+                const pattern = this.drawPattern(data.bodyType, data.pattern, data.patternColor);
+                const eyes = this.drawEyes(data.eyeType);
+                const mouth = this.drawMouth(data.mouthType);
+                const decoration = this.drawDecoration(data.headDecoration, data.decorationColor);
+
+                this.monster.addChild(arms);
+                this.monster.addChild(body);
+                if (pattern) this.monster.addChild(pattern);
+                this.monster.addChild(eyes);
+                this.monster.addChild(mouth);
+                if (decoration) this.monster.addChild(decoration);
+
+                // Breathing animation
+                this.app.ticker.add(() => {
+                    this.monster.scale.y = 1 + Math.sin(Date.now() / 800) * 0.03;
+                });
+            }
+        }
+
+        // Initialize main avatar display
+        let mainRenderer = null;
+        let previewRenderer = null;
+
+        function initMainAvatar() {
+            const container = document.getElementById('avatarCanvas');
+            mainRenderer = new MonsterRenderer(container, 300, 400);
+            
+            // Load avatar data
+            fetch('/api/avatar/')
+                .then(response => response.json())
+                .then(data => {
+                    mainRenderer.render(data);
+                })
+                .catch(error => console.error('Error loading avatar:', error));
+        }
+
+        function initPreview() {
+            const container = document.getElementById('previewCanvas');
+            container.innerHTML = '';  // Clear previous canvas
+            previewRenderer = new MonsterRenderer(container, 250, 350);
+        }
+
+        function updatePreview() {
+            const formData = {
+                bodyType: document.getElementById('bodyType').value,
+                bodyColor: document.getElementById('bodyColor').value,
+                eyeType: document.getElementById('eyeType').value,
+                mouthType: document.getElementById('mouthType').value,
+                headDecoration: document.getElementById('headDecoration').value,
+                decorationColor: document.getElementById('decorationColor').value,
+                pattern: document.getElementById('pattern').value,
+                patternColor: document.getElementById('patternColor').value
+            };
+            
+            if (previewRenderer) {
+                previewRenderer.render(formData);
+            }
+        }
+
+        function saveAvatar() {
+            const formData = {
+                bodyType: document.getElementById('bodyType').value,
+                bodyColor: document.getElementById('bodyColor').value,
+                eyeType: document.getElementById('eyeType').value,
+                mouthType: document.getElementById('mouthType').value,
+                headDecoration: document.getElementById('headDecoration').value,
+                decorationColor: document.getElementById('decorationColor').value,
+                pattern: document.getElementById('pattern').value,
+                patternColor: document.getElementById('patternColor').value
+            };
+
+            fetch('/api/avatar/save/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            })
+            .catch(error => console.error('Error saving avatar:', error));
+        }
+
+        function randomizeAvatar() {
+            fetch('/api/avatar/randomize/')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Update form fields
+                        document.getElementById('bodyType').value = data.avatar.bodyType;
+                        document.getElementById('bodyColor').value = data.avatar.bodyColor;
+                        document.getElementById('eyeType').value = data.avatar.eyeType;
+                        document.getElementById('mouthType').value = data.avatar.mouthType;
+                        document.getElementById('headDecoration').value = data.avatar.headDecoration;
+                        document.getElementById('decorationColor').value = data.avatar.decorationColor;
+                        document.getElementById('pattern').value = data.avatar.pattern;
+                        document.getElementById('patternColor').value = data.avatar.patternColor;
+                        
+                        updatePreview();
+                    }
+                })
+                .catch(error => console.error('Error randomizing avatar:', error));
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            initMainAvatar();
+            
+            const modal = document.getElementById('avatarCustomizerModal');
+            if (modal) {
+                modal.addEventListener('shown.bs.modal', function() {
+                    initPreview();
+                    
+                    // Load current avatar data
+                    fetch('/api/avatar/')
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('bodyType').value = data.bodyType;
+                            document.getElementById('bodyColor').value = data.bodyColor;
+                            document.getElementById('eyeType').value = data.eyeType;
+                            document.getElementById('mouthType').value = data.mouthType;
+                            document.getElementById('headDecoration').value = data.headDecoration;
+                            document.getElementById('decorationColor').value = data.decorationColor;
+                            document.getElementById('pattern').value = data.pattern;
+                            document.getElementById('patternColor').value = data.patternColor;
+                            
+                            updatePreview();
+                        });
+                });
+
+                // Live preview updates
+                const formInputs = modal.querySelectorAll('select, input');
+                formInputs.forEach(input => {
+                    input.addEventListener('change', updatePreview);
+                    input.addEventListener('input', updatePreview);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
