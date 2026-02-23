@@ -13,7 +13,7 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('teacher-dashboard/', views.dashboard, name='teacher_dashboard'),
     path('teacher-analytics/', TemplateView.as_view(template_name='core/teacher_analytics.html'), name='teacher_analytics'),
-    path('add-class/', TemplateView.as_view(template_name='core/add_class.html'), name='add_class'),
+    path('add-class/', views.add_class, name='add_class'),
     path('teacher-news/', TemplateView.as_view(template_name='core/teacher_news_list.html'), name='teacher_news'),
     path('teacher-help/', TemplateView.as_view(template_name='core/teacher_help_list.html'), name='teacher_help'),
     path('teacher-resources/', TemplateView.as_view(template_name='core/teacher_resources_list.html'), name='teacher_resources'),

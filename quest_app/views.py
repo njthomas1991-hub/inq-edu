@@ -6,6 +6,8 @@ from .forms import CustomUserCreationForm, CustomAuthenticationForm
 from django.http import HttpResponseRedirect
 from .models import TeachingResource, Class
 from django.http import JsonResponse
+from django.contrib import messages
+from .forms import ClassForm
 import random
 import json
 from django.core.validators import validate_email
@@ -79,6 +81,21 @@ class CustomLoginView(LoginView):
 def profile(request):
     user = request.user
     return render(request, "core/profile.html", {"user": user})
+
+
+@login_required
+def add_class(request):
+    if request.method == 'POST':
+        form = ClassForm(request.POST)
+        if form.is_valid():
+            cls = form.save(commit=False)
+            cls.teacher = request.user
+            cls.save()
+            messages.success(request, 'Class created successfully.')
+            return redirect('teacher_dashboard')
+    else:
+        form = ClassForm()
+    return render(request, 'core/add_class.html', {'form': form})
 
 
 @login_required
