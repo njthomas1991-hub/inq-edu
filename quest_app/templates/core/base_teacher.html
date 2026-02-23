@@ -302,7 +302,7 @@
                         alertBox.innerHTML = '<div class="alert alert-danger">Please enter a class name.</div>';
                         return;
                     }
-                    fetch('{% url "add_class_api" %}', {
+                      fetch('/api/add-class/', {
                         method: 'POST',
                         credentials: 'same-origin',
                         headers: {
@@ -313,10 +313,9 @@
                     }).then(function(r){ return r.json().then(function(js){ return {status: r.status, json: js}; }); })
                     .then(function(res){
                         if (res.json && res.json.success) {
-                            // close modal and reload dashboard list or redirect
-                            bsModal.hide();
-                            // optional: redirect to dashboard to show new class
-                            window.location.href = '{% url "teacher_dashboard" %}';
+                              // close modal and redirect to teacher dashboard to show new class
+                              bsModal.hide();
+                              window.location.href = '/teacher-dashboard/';
                         } else {
                             var error = (res.json && (res.json.error || res.json)) || 'Unknown error';
                             alertBox.innerHTML = '<div class="alert alert-danger">' + error + '</div>';
