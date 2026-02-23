@@ -15,4 +15,5 @@ urlpatterns = [
     path('wonderworld/', TemplateView.as_view(template_name='core/wonderworld.html'), name='wonderworld'),
     path('questopia/', TemplateView.as_view(template_name='core/questopia.html'), name='questopia'),
     path('contact/', TemplateView.as_view(template_name='core/contact.html'), name='contact'),
+    path('teacher-hub/', TemplateView.as_view(template_name='core/teacher_hub.html'), name='teacher_hub'),
 ]
