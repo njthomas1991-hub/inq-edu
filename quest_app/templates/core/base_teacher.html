@@ -61,7 +61,7 @@
                     </li>
                     {% endif %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'add_class' %}">
+                        <a class="nav-link" href="#" id="add-class-btn">
                             <i class="fas fa-plus"></i> Add Class
                         </a>
                     </li>
@@ -239,6 +239,93 @@
             console.error('Toggler or collapse element not found');
         }
     });
+        // Inline Add Class modal + AJAX create
+        document.addEventListener('DOMContentLoaded', function(){
+                // inject modal HTML
+                var modalHtml = `
+                <div class="modal fade" id="addClassModal" tabindex="-1" aria-labelledby="addClassModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addClassModalLabel">Create Class</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="add-class-alert"></div>
+                                <form id="add-class-form">
+                                    <div class="mb-3">
+                                        <label for="class-name" class="form-label">Class Name *</label>
+                                        <input type="text" id="class-name" name="name" class="form-control" required />
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="class-school" class="form-label">School (optional)</label>
+                                        <input type="text" id="class-school" name="school" class="form-control" />
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" id="add-class-submit" class="btn btn-primary">Create</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                var addBtn = document.getElementById('add-class-btn');
+                var modalEl = document.getElementById('addClassModal');
+                var bsModal = new bootstrap.Modal(modalEl);
+                addBtn && addBtn.addEventListener('click', function(e){ e.preventDefault(); bsModal.show(); });
+
+                function getCookie(name) {
+                    var cookieValue = null;
+                    if (document.cookie && document.cookie !== '') {
+                        var cookies = document.cookie.split(';');
+                        for (var i = 0; i < cookies.length; i++) {
+                            var cookie = cookies[i].trim();
+                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+
+                var submitBtn = document.getElementById('add-class-submit');
+                submitBtn && submitBtn.addEventListener('click', function(){
+                    var name = document.getElementById('class-name').value.trim();
+                    var school = document.getElementById('class-school').value.trim();
+                    var alertBox = document.getElementById('add-class-alert');
+                    alertBox.innerHTML = '';
+                    if (!name) {
+                        alertBox.innerHTML = '<div class="alert alert-danger">Please enter a class name.</div>';
+                        return;
+                    }
+                    fetch('{% url "add_class_api" %}', {
+                        method: 'POST',
+                        credentials: 'same-origin',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken') || ''
+                        },
+                        body: JSON.stringify({name: name, school: school})
+                    }).then(function(r){ return r.json().then(function(js){ return {status: r.status, json: js}; }); })
+                    .then(function(res){
+                        if (res.json && res.json.success) {
+                            // close modal and reload dashboard list or redirect
+                            bsModal.hide();
+                            // optional: redirect to dashboard to show new class
+                            window.location.href = '{% url "teacher_dashboard" %}';
+                        } else {
+                            var error = (res.json && (res.json.error || res.json)) || 'Unknown error';
+                            alertBox.innerHTML = '<div class="alert alert-danger">' + error + '</div>';
+                        }
+                    }).catch(function(err){
+                        alertBox.innerHTML = '<div class="alert alert-danger">Save failed: ' + err + '</div>';
+                    });
+                });
+        });
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", () => {

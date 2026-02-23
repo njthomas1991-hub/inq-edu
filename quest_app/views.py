@@ -99,6 +99,25 @@ def add_class(request):
 
 
 @login_required
+def add_class_ajax(request):
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'POST required'}, status=405)
+    try:
+        payload = json.loads(request.body.decode('utf-8'))
+    except Exception:
+        payload = request.POST
+    name = (payload.get('name') or '').strip()
+    school = (payload.get('school') or '').strip() or None
+    if not name:
+        return JsonResponse({'success': False, 'error': 'Name required'}, status=400)
+    try:
+        cls = Class.objects.create(name=name, school=school, teacher=request.user)
+        return JsonResponse({'success': True, 'id': cls.id, 'name': cls.name})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+
+@login_required
 def avatar_api(request):
     """Return current avatar configuration stored in session (or default)."""
     data = request.session.get('inqed_avatar')
