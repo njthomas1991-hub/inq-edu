@@ -94,7 +94,7 @@
                             {% else %}
                                 <i class="fas fa-user-circle"></i>
                             {% endif %}
-                            {% if user.is_authenticated %}{{ user.get_full_name|default:user.username }}{% else %}Account{% endif %}
+                            {% if user.is_authenticated %}{{ user.first_name|default:user.username|title }}{% else %}Account{% endif %}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             {% if user.is_authenticated %}

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
+<meta name="csrf-token" content="{{ csrf_token }}">
 <div class="container py-4">
   <div class="row g-4">
     <div class="col-md-4">
@@ -85,6 +86,11 @@
             return input;
           }
 
+          // read CSRF token from cookie or from meta tag as fallback
+          const PAGE_CSRF_TOKEN = (function(){
+            try { return document.querySelector('meta[name="csrf-token"]').getAttribute('content') || ''; } catch(e){ return ''; }
+          })();
+
           function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -97,7 +103,7 @@
                 }
               }
             }
-            return cookieValue;
+            return cookieValue || PAGE_CSRF_TOKEN;
           }
 
           // Toast helper (Bootstrap 5)
@@ -219,23 +225,35 @@
           bioEdit && bioEdit.addEventListener('click', function(){
             bioView.style.display = 'none';
             bioEditArea.style.display = '';
-            jQuery('#bio-text').summernote({
-              height: 150,
-              toolbar: [
-                ['style', ['bold','italic','underline','clear']],
-                ['para', ['ul','ol','paragraph']],
-                ['insert', ['link','picture']],
-                ['view', ['fullscreen','codeview']]
-              ]
-            });
-            // focus the editable area inside summernote
-            setTimeout(function(){ jQuery('#bio-text').summernote('focus'); }, 50);
+            // Initialize Summernote only if jQuery and summernote are available
+            try {
+              if (typeof jQuery !== 'undefined' && typeof jQuery('#bio-text').summernote === 'function') {
+                jQuery('#bio-text').summernote({
+                  height: 150,
+                  toolbar: [
+                    ['style', ['bold','italic','underline','clear']],
+                    ['para', ['ul','ol','paragraph']],
+                    ['insert', ['link','picture']],
+                    ['view', ['fullscreen','codeview']]
+                  ]
+                });
+                // focus the editable area inside summernote
+                setTimeout(function(){ try { jQuery('#bio-text').summernote('focus'); } catch(e){} }, 50);
+              } else {
+                // no jQuery/summernote -> leave plain textarea visible
+                /* noop */
+              }
+            } catch (e) {
+              console.warn('Summernote init skipped:', e);
+            }
           });
           bioCancel && bioCancel.addEventListener('click', function(){
             // if summernote active, destroy and reset textarea to current view content
-            if (jQuery && jQuery('#bio-text').next().hasClass('note-editor')) {
-              jQuery('#bio-text').summernote('destroy');
-            }
+            try {
+              if (typeof jQuery !== 'undefined' && jQuery('#bio-text').next().hasClass('note-editor')) {
+                jQuery('#bio-text').summernote('destroy');
+              }
+            } catch (e) { /* ignore */ }
             bioText.value = document.getElementById('profile-bio').textContent || '';
             bioEditArea.style.display = 'none';
             bioView.style.display = '';
@@ -259,11 +277,16 @@
           bioSave && bioSave.addEventListener('click', function(){
             let val = '';
             // if summernote is active, get HTML content
-            if (jQuery && jQuery('#bio-text').next().hasClass('note-editor')) {
-              val = jQuery('#bio-text').summernote('code') || '';
-              // destroy the editor to restore textarea
-              jQuery('#bio-text').summernote('destroy');
-            } else {
+            try {
+              if (typeof jQuery !== 'undefined' && jQuery('#bio-text').next().hasClass('note-editor')) {
+                val = jQuery('#bio-text').summernote('code') || '';
+                // destroy the editor to restore textarea
+                try { jQuery('#bio-text').summernote('destroy'); } catch(e){}
+              } else {
+                val = bioText.value.trim();
+              }
+            } catch (e) {
+              // fallback to plain textarea value
               val = bioText.value.trim();
             }
             fetch('/api/profile/update/', {
