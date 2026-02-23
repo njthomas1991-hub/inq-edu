@@ -30,6 +30,17 @@ class TeachingResource(models.Model):
 
 class Class(models.Model):
     name = models.CharField(max_length=100)
+    LEVEL_CHOICES = [
+        ("EYFS", "EYFS"),
+        ("KS1", "KS1"),
+        ("LKS2", "LKS2"),
+        ("UKS2", "UKS2"),
+        ("KS3", "KS3"),
+        ("KS4", "KS4"),
+        ("SEND", "SEND"),
+    ]
+    level = models.CharField(max_length=10, choices=LEVEL_CHOICES, default='LKS2')
+    subject = models.CharField(max_length=100, blank=True, null=True)
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="classes")
     students = models.ManyToManyField(User, related_name="enrolled_classes", blank=True)
     school = models.CharField(max_length=100, blank=True, null=True)

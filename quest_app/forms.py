@@ -7,11 +7,25 @@ from .models import Class
 class ClassForm(forms.ModelForm):
     class Meta:
         model = Class
-        fields = ['name', 'school']
+        fields = ['name', 'level', 'subject', 'school']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'level': forms.Select(attrs={'class': 'form-select'}),
+            'subject': forms.TextInput(attrs={'class': 'form-control'}),
             'school': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+    def clean(self):
+        cleaned = super().clean()
+        level = cleaned.get('level')
+        subject = cleaned.get('subject')
+        # Require subject for KS3 and KS4
+        if level in ('KS3', 'KS4') and not subject:
+            self.add_error('subject', 'Subject is required for KS3/KS4 classes.')
+        # School is required
+        if not cleaned.get('school'):
+            self.add_error('school', 'School is required.')
+        return cleaned
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:

@@ -108,10 +108,15 @@ def add_class_ajax(request):
         payload = request.POST
     name = (payload.get('name') or '').strip()
     school = (payload.get('school') or '').strip() or None
+    level = (payload.get('level') or '').strip() or 'LKS2'
+    subject = (payload.get('subject') or '').strip() or None
     if not name:
         return JsonResponse({'success': False, 'error': 'Name required'}, status=400)
     try:
-        cls = Class.objects.create(name=name, school=school, teacher=request.user)
+        # validate KS3/KS4 require subject
+        if level in ('KS3','KS4') and not subject:
+            return JsonResponse({'success': False, 'error': 'Subject required for KS3/KS4'}, status=400)
+        cls = Class.objects.create(name=name, school=school, level=level, subject=subject, teacher=request.user)
         return JsonResponse({'success': True, 'id': cls.id, 'name': cls.name})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
