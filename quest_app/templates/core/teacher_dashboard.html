@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Teacher Dashboard</h2>
+<p>Welcome, {{ user.first_name }}!</p>
+<h3>Your Profile</h3>
+<ul>
+  <li>Name: {{ user.first_name }} {{ user.last_name }}</li>
+  <li>School: {{ user.school }}</li>
+  <li>Bio: {{ user.bio }}</li>
+  <li>Role: {{ user.role }}</li>
+  <li>Avatar: {% if user.avatar %}<img src="{{ user.avatar.url }}" width="80"/>{% else %}No avatar{% endif %}</li>
+</ul>
+<h3>Your Resources</h3>
+<ul>
+  {% for resource in resources %}
+    <li>{{ resource.title }} ({{ resource.uploaded_at }})</li>
+  {% empty %}
+    <li>No resources uploaded.</li>
+  {% endfor %}
+</ul>
+<h3>Your Classes</h3>
+<ul>
+  {% for class in classes %}
+    <li>{{ class.name }}</li>
+  {% empty %}
+    <li>No classes linked.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

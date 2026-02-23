@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Profile</h2>
+<ul>
+  <li>Name: {{ user.first_name }} {{ user.last_name }}</li>
+  <li>Email: {{ user.email }}</li>
+  <li>Role: {{ user.role }}</li>
+  <li>School: {{ user.school }}</li>
+  <li>Bio: {{ user.bio }}</li>
+  <li>Avatar: {% if user.avatar %}<img src="{{ user.avatar.url }}" width="80"/>{% else %}No avatar{% endif %}</li>
+</ul>
+{% endblock %}

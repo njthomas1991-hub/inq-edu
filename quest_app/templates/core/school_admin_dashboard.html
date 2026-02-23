@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>School Admin Dashboard</h2>
+<p>Welcome, {{ user.first_name }}!</p>
+<h3>Analytics</h3>
+<ul>
+  <li>Teachers: {{ analytics.teacher_count }}</li>
+  <li>Resources: {{ analytics.resource_count }}</li>
+  <li>Classes: {{ analytics.class_count }}</li>
+</ul>
+<h3>Teacher Profiles</h3>
+<ul>
+  {% for teacher in teacher_profiles %}
+    <li>{{ teacher.first_name }} {{ teacher.last_name }} - {{ teacher.email }} - {{ teacher.bio }}</li>
+  {% empty %}
+    <li>No teachers found.</li>
+  {% endfor %}
+</ul>
+<h3>Resources</h3>
+<ul>
+  {% for resource in resources %}
+    <li>{{ resource.title }} ({{ resource.teacher.first_name }} {{ resource.teacher.last_name }})</li>
+  {% empty %}
+    <li>No resources found.</li>
+  {% endfor %}
+</ul>
+<h3>Classes</h3>
+<ul>
+  {% for class in classes %}
+    <li>{{ class.name }} ({{ class.teacher.first_name }} {{ class.teacher.last_name }})</li>
+  {% empty %}
+    <li>No classes found.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
