@@ -8,6 +8,8 @@ from django.http import JsonResponse
 from django.contrib import messages
 from .forms import ClassForm
 from .forms import TeachingResourceForm
+from .forms import ResourceCommentForm
+from .models import ResourceComment
 import random
 import json
 from pathlib import Path
@@ -456,6 +458,58 @@ def teacher_resources(request):
             message = ('error', 'Please correct the errors below.')
 
     return render(request, 'core/teacher_resources_list.html', {'resources': resources, 'form': form, 'message': message})
+
+
+@login_required
+def resource_edit(request, pk):
+    res = get_object_or_404(TeachingResource, pk=pk)
+    if request.user != res.teacher:
+        return redirect('teacher_resources')
+
+    if request.method == 'POST':
+        # Only allow editing title and description for now
+        title = request.POST.get('title', '').strip()
+        description = request.POST.get('description', '').strip()
+        if not title:
+            messages.error(request, 'Title is required.')
+        else:
+            res.title = title
+            res.description = description
+            res.save()
+            messages.success(request, 'Resource updated.')
+            return redirect('teacher_resources')
+
+    # fallback render same resources page with anchor
+    return redirect('teacher_resources')
+
+
+@login_required
+def resource_delete(request, pk):
+    res = get_object_or_404(TeachingResource, pk=pk)
+    if request.user != res.teacher:
+        messages.error(request, 'Permission denied.')
+        return redirect('teacher_resources')
+    if request.method == 'POST':
+        res.document.delete(save=False)
+        res.delete()
+        messages.success(request, 'Resource deleted.')
+    return redirect('teacher_resources')
+
+
+@login_required
+def resource_comment(request, pk):
+    res = get_object_or_404(TeachingResource, pk=pk)
+    if request.method != 'POST':
+        return redirect('teacher_resources')
+    form = ResourceCommentForm(request.POST)
+    if form.is_valid():
+        comment_text = form.cleaned_data['comment'].strip()
+        if comment_text:
+            ResourceComment.objects.create(resource=res, author=request.user, comment=comment_text)
+            messages.success(request, 'Comment added.')
+    else:
+        messages.error(request, 'Comment cannot be empty.')
+    return redirect('teacher_resources')
 
 
 @login_required

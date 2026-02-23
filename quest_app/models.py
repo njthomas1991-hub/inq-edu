@@ -28,6 +28,16 @@ class TeachingResource(models.Model):
     description = models.TextField(blank=True, null=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
+
+class ResourceComment(models.Model):
+    resource = models.ForeignKey(TeachingResource, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='resource_comments')
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Comment by {self.author} on {self.resource.title}"
+
 class Class(models.Model):
     name = models.CharField(max_length=100)
     LEVEL_CHOICES = [

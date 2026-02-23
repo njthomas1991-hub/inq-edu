@@ -15,6 +15,10 @@ class TeachingResourceForm(forms.ModelForm):
         }
 
 
+class ResourceCommentForm(forms.Form):
+    comment = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Add a comment...'}), label='')
+
+
 class ClassForm(forms.ModelForm):
     class Meta:
         model = Class
