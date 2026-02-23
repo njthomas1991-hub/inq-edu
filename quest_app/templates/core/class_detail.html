@@ -80,29 +80,100 @@
 
           <button class="btn btn-outline-primary mb-3" id="show-add-student">Add Student</button>
           <div id="add-student-form" style="display:none;">
-            <form method="post">
+            <form id="ajax-add-student-form">
               {% csrf_token %}
               <input type="hidden" name="action" value="create_student" />
               <div class="row">
-                <div class="col-md-6 mb-2">
-                  <input name="first_name" class="form-control" placeholder="First name" required />
+                <div class="col-md-5 mb-2">
+                  <input name="first_name" id="student-first-name" class="form-control" placeholder="First name" required />
+                </div>
+                <div class="col-md-2 mb-2">
+                  <input name="last_initial" id="student-last-initial" class="form-control" placeholder="Last initial" maxlength="1" required />
+                </div>
+                <div class="col-md-5 mb-2">
+                  <input name="email" id="student-email" class="form-control" placeholder="Email (optional, will email credentials)" />
+                </div>
+                <div class="col-12">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" value="1" id="send-email-checkbox">
+                    <label class="form-check-label" for="send-email-checkbox">Send credentials by email if provided</label>
+                  </div>
                 </div>
                 <div class="col-md-3 mb-2">
-                  <input name="last_initial" class="form-control" placeholder="Last initial" maxlength="1" required />
-                </div>
-                <div class="col-md-3 mb-2">
-                  <button class="btn btn-primary w-100" type="submit">Create student</button>
+                  <button class="btn btn-primary w-100" id="ajax-add-student-btn" type="button">Create student</button>
                 </div>
               </div>
             </form>
           </div>
 
           <script>
-            document.getElementById('show-add-student').addEventListener('click', function(e){
-              e.preventDefault();
-              var el = document.getElementById('add-student-form');
-              el.style.display = el.style.display === 'none' ? '' : 'none';
-            });
+            (function(){
+              var toggleBtn = document.getElementById('show-add-student');
+              var formWrap = document.getElementById('add-student-form');
+              toggleBtn && toggleBtn.addEventListener('click', function(e){ e.preventDefault(); formWrap.style.display = formWrap.style.display === 'none' ? '' : 'none'; });
+
+              function getCookie(name) {
+                  var cookieValue = null;
+                  if (document.cookie && document.cookie !== '') {
+                      var cookies = document.cookie.split(';');
+                      for (var i = 0; i < cookies.length; i++) {
+                          var cookie = cookies[i].trim();
+                          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                              break;
+                          }
+                      }
+                  }
+                  return cookieValue;
+              }
+
+              var submitBtn = document.getElementById('ajax-add-student-btn');
+              submitBtn && submitBtn.addEventListener('click', function(){
+                var first = document.getElementById('student-first-name').value.trim();
+                var last = document.getElementById('student-last-initial').value.trim();
+                var email = document.getElementById('student-email').value.trim();
+                var sendEmail = document.getElementById('send-email-checkbox').checked;
+                var alertBox = document.createElement('div');
+                var container = document.querySelector('.card-body');
+                // remove previous alerts
+                var old = container.querySelector('.ajax-add-alert'); if (old) old.remove();
+                if (!first || !last) {
+                  alertBox.className = 'alert alert-danger ajax-add-alert';
+                  alertBox.textContent = 'First name and last initial are required.';
+                  container.insertBefore(alertBox, container.firstChild);
+                  return;
+                }
+                fetch('{% url "create_student_api" %}', {
+                  method: 'POST',
+                  credentials: 'same-origin',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') || ''
+                  },
+                  body: JSON.stringify({ class_id: {{ class.id }}, first_name: first, last_initial: last, email: email || null, send_email: sendEmail })
+                }).then(function(r){ return r.json().then(function(js){ return {status: r.status, json: js}; }); }).then(function(res){
+                  if (res.json && res.json.success) {
+                    // show credentials
+                    var success = document.createElement('div');
+                    success.className = 'alert alert-success ajax-add-alert';
+                    success.innerHTML = 'Created student <strong>' + (res.json.username) + '</strong><br/>Username: <code>' + res.json.username + '</code><br/>Password: <code>' + res.json.password + '</code>' + (res.json.emailed ? '<br/><em>Credentials emailed</em>' : '');
+                    container.insertBefore(success, container.firstChild);
+                    // Optionally append to students list (simple reload is safer)
+                    setTimeout(function(){ location.reload(); }, 1000);
+                  } else {
+                    var err = document.createElement('div');
+                    err.className = 'alert alert-danger ajax-add-alert';
+                    err.textContent = (res.json && res.json.error) || 'Create failed';
+                    container.insertBefore(err, container.firstChild);
+                  }
+                }).catch(function(err){
+                  var errEl = document.createElement('div');
+                  errEl.className = 'alert alert-danger ajax-add-alert';
+                  errEl.textContent = 'Request failed: ' + err;
+                  container.insertBefore(errEl, container.firstChild);
+                });
+              });
+            })();
           </script>
         </div>
       </div>

@@ -17,6 +17,7 @@ urlpatterns = [
     path('api/add-class/', views.add_class_ajax, name='add_class_api'),
     path('classes/', views.classes_list, name='classes'),
     path('class/<int:pk>/', views.class_detail, name='class_detail'),
+    path('api/create-student/', views.create_student_api, name='create_student_api'),
     path('teacher-news/', TemplateView.as_view(template_name='core/teacher_news_list.html'), name='teacher_news'),
     path('teacher-help/', TemplateView.as_view(template_name='core/teacher_help_list.html'), name='teacher_help'),
     path('teacher-resources/', TemplateView.as_view(template_name='core/teacher_resources_list.html'), name='teacher_resources'),

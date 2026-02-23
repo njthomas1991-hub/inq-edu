@@ -14,6 +14,9 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.views.decorators.http import require_http_methods
+from django.conf import settings
+from django.core.mail import send_mail
+from django.utils.html import strip_tags
 
 def register(request):
     if request.method == "POST":
@@ -197,6 +200,78 @@ def classes_list(request):
     else:
         classes = Class.objects.none()
     return render(request, 'core/class_list.html', {'classes': classes})
+
+
+@login_required
+@require_http_methods(["POST"])
+def create_student_api(request):
+    """AJAX endpoint: create a student, add to class, optionally email credentials.
+    Expects JSON: {"class_id": 1, "first_name": "Alice", "last_initial": "B", "email": "a@example.com", "send_email": true}
+    """
+    try:
+        payload = json.loads(request.body.decode('utf-8'))
+    except Exception:
+        return JsonResponse({'success': False, 'error': 'Invalid JSON'}, status=400)
+
+    class_id = payload.get('class_id')
+    fname = (payload.get('first_name') or '').strip()
+    linit = (payload.get('last_initial') or '').strip()
+    email = (payload.get('email') or '').strip() or None
+    send_email_flag = bool(payload.get('send_email'))
+
+    if not class_id or not fname or not linit:
+        return JsonResponse({'success': False, 'error': 'class_id, first_name and last_initial required'}, status=400)
+
+    cls = get_object_or_404(Class, pk=int(class_id))
+    # permission: teacher of class or school_admin
+    if request.user != cls.teacher and request.user.role != 'school_admin':
+        return JsonResponse({'success': False, 'error': 'Permission denied'}, status=403)
+
+    # helper functions (same logic as in page view)
+    def _make_username(fname, linitial):
+        base = (fname or '').strip().lower() + (linitial or '').strip().lower()
+        base = ''.join(ch for ch in base if ch.isalnum()) or 'student'
+        User = get_user_model()
+        username = base
+        suffix = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base}{suffix}"
+            suffix += 1
+        return username
+
+    def _make_password():
+        adjs = ['blue','green','bright','silent','quick','brave','happy','sunny']
+        nouns = ['apple','river','mountain','ocean','fox','panda','stone','ember']
+        a = random.choice(adjs)
+        b = random.choice(nouns)
+        num = random.randint(10, 99)
+        return f"{a}-{b}{num}"
+
+    User = get_user_model()
+    username = _make_username(fname, linit)
+    password = _make_password()
+    user = User.objects.create_user(username=username, password=password)
+    user.first_name = fname
+    user.last_name = linit
+    user.role = 'student'
+    if email:
+        user.email = email
+    user.save()
+    cls.students.add(user)
+
+    # email credentials if requested
+    emailed = False
+    if send_email_flag and email:
+        try:
+            subject = f"Your INQ-ED student account"
+            body = f"Hello {fname},\n\nAn account has been created for you on INQ-ED.\n\nUsername: {username}\nPassword: {password}\n\nPlease log in and change your password.\n\nBest regards,\nINQ-ED"
+            send_mail(subject, body, getattr(settings, 'DEFAULT_FROM_EMAIL', 'no-reply@example.com'), [email])
+            emailed = True
+        except Exception as e:
+            # don't fail creation if email fails; include warning
+            pass
+
+    return JsonResponse({'success': True, 'id': user.id, 'username': username, 'password': password, 'emailed': emailed})
 
 
 @login_required
