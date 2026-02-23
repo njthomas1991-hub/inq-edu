@@ -7,6 +7,7 @@ from .models import TeachingResource, Class
 from django.http import JsonResponse
 from django.contrib import messages
 from .forms import ClassForm
+from .forms import TeachingResourceForm
 import random
 import json
 from pathlib import Path
@@ -425,6 +426,36 @@ def add_class(request):
     else:
         form = ClassForm()
     return render(request, 'core/add_class.html', {'form': form})
+
+
+@login_required
+def teacher_resources(request):
+    """List teacher resources and allow teachers to upload new ones."""
+    user = request.user
+    if user.role != 'teacher' and user.role != 'school_admin':
+        return redirect('teacher_dashboard')
+
+    if user.role == 'school_admin':
+        # show resources for all teachers in school
+        teachers = get_user_model().objects.filter(role='teacher', school=user.school)
+        resources = TeachingResource.objects.filter(teacher__in=teachers).order_by('-uploaded_at')
+    else:
+        resources = TeachingResource.objects.filter(teacher=user).order_by('-uploaded_at')
+
+    form = TeachingResourceForm()
+    message = None
+    if request.method == 'POST':
+        form = TeachingResourceForm(request.POST, request.FILES)
+        if form.is_valid():
+            resource = form.save(commit=False)
+            resource.teacher = user
+            resource.save()
+            messages.success(request, 'Resource uploaded.')
+            return redirect('teacher_resources')
+        else:
+            message = ('error', 'Please correct the errors below.')
+
+    return render(request, 'core/teacher_resources_list.html', {'resources': resources, 'form': form, 'message': message})
 
 
 @login_required

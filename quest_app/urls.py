@@ -20,7 +20,7 @@ urlpatterns = [
     path('api/create-student/', views.create_student_api, name='create_student_api'),
     path('teacher-news/', TemplateView.as_view(template_name='core/teacher_news_list.html'), name='teacher_news'),
     path('teacher-help/', TemplateView.as_view(template_name='core/teacher_help_list.html'), name='teacher_help'),
-    path('teacher-resources/', TemplateView.as_view(template_name='core/teacher_resources_list.html'), name='teacher_resources'),
+    path('teacher-resources/', views.teacher_resources, name='teacher_resources'),
     path('teacher-forum/', TemplateView.as_view(template_name='core/teacher_forum.html'), name='teacher_forum'),
     path('account-settings/', TemplateView.as_view(template_name='core/account_settings.html'), name='account_settings'),
     path('profile/', views.profile, name='profile'),

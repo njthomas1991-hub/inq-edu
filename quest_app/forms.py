@@ -2,6 +2,17 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import User
 from .models import Class
+from .models import TeachingResource
+
+
+class TeachingResourceForm(forms.ModelForm):
+    class Meta:
+        model = TeachingResource
+        fields = ['title', 'document', 'description']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Resource title'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Short description (optional)'}),
+        }
 
 
 class ClassForm(forms.ModelForm):
