@@ -21,12 +21,40 @@ from django.core.mail import send_mail
 from django.utils.html import strip_tags
 from django.urls import reverse
 from django.core.signing import dumps, loads, BadSignature, SignatureExpired
+from django.db import IntegrityError
+import re
 
 def register(request):
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST, request.FILES)
         if form.is_valid():
-            user = form.save()
+            # Ensure we create a unique username (username isn't collected on the form)
+            User = get_user_model()
+            email = form.cleaned_data.get('email') or ''
+            first = (form.cleaned_data.get('first_name') or '').strip()
+            last = (form.cleaned_data.get('last_name') or '').strip()
+            if email:
+                base = email.split('@', 1)[0]
+            else:
+                base = (first + last) or 'user'
+            # sanitize base to alnum
+            base = re.sub(r'[^a-z0-9]', '', base.lower()) or 'user'
+            username = base
+            suffix = 1
+            while User.objects.filter(username=username).exists():
+                username = f"{base}{suffix}"
+                suffix += 1
+
+            try:
+                user = form.save(commit=False)
+                user.username = username
+                # set password properly
+                user.set_password(form.cleaned_data.get('password1'))
+                user.save()
+            except IntegrityError:
+                form.add_error(None, 'A user with that username already exists. Please choose a different email or contact the admin.')
+                return render(request, "core/register.html", {"form": form})
+
             # Log the user in
             login(request, user)
             # Respect the 'remember_me' choice on registration (default True)
