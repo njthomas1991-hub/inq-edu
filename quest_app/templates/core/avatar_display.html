@@ -18,6 +18,9 @@
         justify-content: center;
         align-items: center;
     }
+    #avatarCanvas {
+        cursor: pointer;
+    }
     #avatarCanvas canvas {
         width: 100% !important;
         height: 100% !important;
@@ -767,20 +770,75 @@
         fetch('/api/avatar/randomize/', {
             credentials: 'include'
         })
-            .then(response => response.json())
-            .then(data => {
-                // Update form fields directly from returned data
-                document.getElementById('bodyType').value = data.bodyType;
-                document.getElementById('bodyColor').value = data.bodyColor;
-                document.getElementById('eyeType').value = data.eyeType;
-                document.getElementById('mouthType').value = data.mouthType;
-                document.getElementById('headDecoration').value = data.headDecoration;
-                document.getElementById('decorationColor').value = data.decorationColor;
-                document.getElementById('pattern').value = data.pattern;
-                document.getElementById('patternColor').value = data.patternColor;
-                updatePreview();
+            .then(response => {
+                // If server returns non-OK or non-JSON (e.g., HTML error/redirect), fallback to client randomize
+                if (!response.ok) {
+                    console.warn('randomize endpoint returned non-OK status:', response.status);
+                    doClientRandomize();
+                    return null;
+                }
+                const ct = response.headers.get('content-type') || '';
+                if (!ct.includes('application/json')) {
+                    // Likely an HTML error page (Unexpected token '<') — log and fallback
+                    response.text().then(t => {
+                        console.warn('randomize endpoint returned non-JSON response, first 200 chars:', t.slice(0,200));
+                        doClientRandomize();
+                    });
+                    return null;
+                }
+                return response.json();
             })
-            .catch(error => console.error('Error randomizing avatar:', error));
+            .then(data => {
+                if (!data) return;
+                // Update form fields directly from returned data
+                try {
+                    document.getElementById('bodyType').value = data.bodyType;
+                    document.getElementById('bodyColor').value = data.bodyColor;
+                    document.getElementById('eyeType').value = data.eyeType;
+                    document.getElementById('mouthType').value = data.mouthType;
+                    document.getElementById('headDecoration').value = data.headDecoration;
+                    document.getElementById('decorationColor').value = data.decorationColor;
+                    document.getElementById('pattern').value = data.pattern;
+                    document.getElementById('patternColor').value = data.patternColor;
+                    updatePreview();
+                } catch (e) {
+                    console.error('Error applying randomized data:', e);
+                }
+            })
+            .catch(error => {
+                console.error('Error randomizing avatar:', error);
+                doClientRandomize();
+            });
+        
+        function doClientRandomize() {
+            try {
+                const bodyTypes = ['blob','round','tall','wide','pear','bean'];
+                const eyeTypes = ['big_round','small_dots','one_eye','sleepy','googly','angry'];
+                const mouthTypes = ['happy','toothy','small','big_smile','oh','silly'];
+                const headDecor = ['none','horns','antennae','spikes','ears','mohawk'];
+                const colors = ['#FF6B9D','#FFB347','#7BD389','#76B4FF','#C38DFF','#FFD36E'];
+                const patterns = ['solid','spots','stripes','gradient'];
+
+                const pick = arr => arr[Math.floor(Math.random()*arr.length)];
+                const data = {
+                    bodyType: pick(bodyTypes),
+                    bodyColor: pick(colors),
+                    eyeType: pick(eyeTypes),
+                    mouthType: pick(mouthTypes),
+                    headDecoration: pick(headDecor),
+                    decorationColor: pick(colors),
+                    pattern: pick(patterns),
+                    patternColor: pick(colors)
+                };
+                Object.keys(data).forEach(k => {
+                    const el = document.getElementById(k);
+                    if (el) el.value = data[k];
+                });
+                if (typeof updatePreview === 'function') updatePreview();
+            } catch (e) {
+                console.error('doClientRandomize error', e);
+            }
+        }
     }
 
     async function initMainAvatar() {
@@ -936,4 +994,167 @@
         // DOM already loaded
         waitForPIXI(initializeApp);
     }
+</script>
+<script>
+    // Make avatar canvas clickable to open the avatar customizer modal
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            var avatarCanvas = document.getElementById('avatarCanvas');
+            var avatarModalEl = document.getElementById('avatarCustomizerModal');
+            if (avatarCanvas && avatarModalEl && typeof bootstrap !== 'undefined') {
+                avatarCanvas.addEventListener('click', function() {
+                    var modal = new bootstrap.Modal(avatarModalEl);
+                    modal.show();
+                });
+            }
+        } catch (e) {
+            console.error('Error wiring avatar canvas click -> modal', e);
+        }
+    });
+</script>
+<script>
+// Fallback client-side handlers for avatar modal buttons so they work
+// even if PIXI or server endpoints are unavailable.
+document.addEventListener('DOMContentLoaded', function() {
+    const modalEl = document.getElementById('avatarCustomizerModal');
+    const randomizeBtn = document.getElementById('randomizeBtn');
+    const saveAvatarBtn = document.getElementById('saveAvatarBtn');
+
+    function randomChoice(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+    function clientRandomize() {
+        try {
+            const bodyTypes = ['blob','round','tall','wide','pear','bean'];
+            const eyeTypes = ['big_round','small_dots','one_eye','sleepy','googly','angry'];
+            const mouthTypes = ['happy','toothy','small','big_smile','oh','silly'];
+            const headDecor = ['none','horns','antennae','spikes','ears','mohawk'];
+            const colors = ['#FF6B9D','#FFB347','#7BD389','#76B4FF','#C38DFF','#FFD36E'];
+            const patterns = ['solid','spots','stripes','gradient'];
+
+            const data = {
+                bodyType: randomChoice(bodyTypes),
+                bodyColor: randomChoice(colors),
+                eyeType: randomChoice(eyeTypes),
+                mouthType: randomChoice(mouthTypes),
+                headDecoration: randomChoice(headDecor),
+                decorationColor: randomChoice(colors),
+                pattern: randomChoice(patterns),
+                patternColor: randomChoice(colors)
+            };
+
+            // Apply to form fields if present
+            Object.keys(data).forEach(key => {
+                const el = document.getElementById(key);
+                if (el) el.value = data[key];
+            });
+
+            if (typeof updatePreview === 'function') updatePreview();
+        } catch (e) {
+            console.error('clientRandomize error', e);
+        }
+    }
+
+    function clientSave() {
+        try {
+            const formData = {
+                bodyType: document.getElementById('bodyType').value,
+                bodyColor: document.getElementById('bodyColor').value,
+                eyeType: document.getElementById('eyeType').value,
+                mouthType: document.getElementById('mouthType').value,
+                headDecoration: document.getElementById('headDecoration').value,
+                decorationColor: document.getElementById('decorationColor').value,
+                pattern: document.getElementById('pattern').value,
+                patternColor: document.getElementById('patternColor').value
+            };
+
+            // Try server save first, fallback to localStorage
+            fetch('/api/avatar/save/', {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify(formData)
+            }).then(resp => {
+                if (!resp.ok) throw new Error('Server save failed');
+                return resp.json();
+            }).then(data => {
+                if (data && data.success) {
+                    // update main avatar if possible
+                    if (typeof mainRenderer !== 'undefined' && mainRenderer) {
+                        mainRenderer.render(formData);
+                    }
+                    // close modal
+                    if (modalEl && typeof bootstrap !== 'undefined') {
+                        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                        modal.hide();
+                    }
+                } else {
+                    throw new Error('Save endpoint returned no success');
+                }
+            }).catch(err => {
+                console.warn('Server save failed, falling back to localStorage', err);
+                try {
+                    localStorage.setItem('inqed_avatar', JSON.stringify(formData));
+                    if (typeof mainRenderer !== 'undefined' && mainRenderer) {
+                        mainRenderer.render(formData);
+                    }
+                    if (modalEl && typeof bootstrap !== 'undefined') {
+                        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+                        modal.hide();
+                    }
+                } catch (e) {
+                    console.error('clientSave fallback failed', e);
+                }
+            });
+        } catch (e) {
+            console.error('clientSave error', e);
+        }
+    }
+
+    if (randomizeBtn) {
+        randomizeBtn.addEventListener('click', function(e) {
+            // If server-backed randomize exists, let existing handler run; otherwise use client fallback
+            if (typeof randomizeAvatar === 'function') {
+                try { randomizeAvatar(); return; } catch (_) { /* fallthrough */ }
+            }
+            clientRandomize();
+        });
+    }
+
+    if (saveAvatarBtn) {
+        saveAvatarBtn.addEventListener('click', function(e) {
+            if (typeof saveAvatar === 'function') {
+                try { saveAvatar(); return; } catch (_) { /* fallthrough */ }
+            }
+            clientSave();
+        });
+    }
+});
+</script>
+<script>
+// Debug probe: log clicks on avatar modal buttons to ensure listeners fire
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        ['saveAvatarBtn','randomizeBtn','cancelAvatarBtn'].forEach(function(id){
+            var el = document.getElementById(id);
+            if (!el) return;
+            // add a capturing listener that logs then lets other handlers run
+            el.addEventListener('click', function(evt){
+                try {
+                    console.log('[DEBUG] Click on #' + id + ' at', new Date().toISOString(), 'event:', evt.type, 'target:', evt.target);
+                    // add a visual trace for quick inspection
+                    el.style.outline = '2px dashed rgba(0,128,255,0.6)';
+                    setTimeout(function(){ el.style.outline = ''; }, 800);
+                } catch(e) {
+                    console.error('[DEBUG] Error logging click for #' + id, e);
+                }
+            }, {capture: true});
+        });
+        console.log('[DEBUG] Avatar modal debug listeners attached');
+    } catch (e) {
+        console.error('[DEBUG] Failed to attach avatar debug listeners', e);
+    }
+});
 </script>

@@ -20,6 +20,11 @@ urlpatterns = [
     path('teacher-forum/', TemplateView.as_view(template_name='core/teacher_forum.html'), name='teacher_forum'),
     path('account-settings/', TemplateView.as_view(template_name='core/account_settings.html'), name='account_settings'),
     path('profile/', views.profile, name='profile'),
+    # Avatar API endpoints
+    path('api/avatar/', views.avatar_api, name='avatar_api'),
+    path('api/avatar/save/', views.avatar_save, name='avatar_save'),
+    path('api/avatar/randomize/', views.avatar_randomize, name='avatar_randomize'),
+    path('api/profile/update/', views.profile_update, name='profile_update'),
     path('kindlewick/', TemplateView.as_view(template_name='core/kindlewick.html'), name='kindlewick'),
     path('wonderworld/', TemplateView.as_view(template_name='core/wonderworld.html'), name='wonderworld'),
     path('questopia/', TemplateView.as_view(template_name='core/questopia.html'), name='questopia'),

@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'quest_app',
+    'django_summernote',
     'django.contrib.sites',
     'allauth',
     'allauth.account',
@@ -116,3 +117,26 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Media files (for avatars/resources)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# django-summernote configuration: upload handlers and toolbar
+SUMMERNOTE_CONFIG = {
+    # Use the Bootstrap 5 variant (assets loaded globally)
+    'iframe': False,
+    'summernote': {
+        'width': '100%',
+        'height': 150,
+    },
+    'toolbar': [
+        ['style', ['bold', 'italic', 'underline', 'clear']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['insert', ['link', 'picture', 'video']],
+        ['view', ['fullscreen', 'codeview']],
+    ],
+    # where to store uploaded attachments and images (under MEDIA_ROOT)
+    'attachment_upload_to': 'summernote/attachments/',
+    'summernote_upload_to': 'summernote/uploads/',
+    # require authenticated users for attachment uploads
+    'attachment_require_authentication': True,
+    # allow attachments (documents/images)
+    'disable_attachment': False,
+}
