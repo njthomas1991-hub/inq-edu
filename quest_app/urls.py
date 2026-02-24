@@ -54,6 +54,7 @@ urlpatterns = [
     ),
     path("profile/", views.profile, name="profile"),
     path("api/generate-reset/", views.generate_reset_api, name="generate_reset_api"),
+    path("api/student-password/<int:pk>/", views.reveal_student_password, name="reveal_student_password"),
     path("student-reset/<str:token>/", views.student_reset, name="student_reset"),
     # Avatar API endpoints
     path("api/avatar/", views.avatar_api, name="avatar_api"),

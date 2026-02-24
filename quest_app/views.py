@@ -22,6 +22,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_http_methods
+from django.core.cache import cache
 
 from .forms import (
     ClassForm,
@@ -358,6 +359,11 @@ def class_detail(request, pk):
                     "password": password,
                     "name": user.get_full_name() or username,
                 }
+                # Cache the plaintext password for teacher retrieval for a limited time
+                try:
+                    cache.set(f"student_pw:{user.id}", password, timeout=60 * 60 * 24 * 7)
+                except Exception:
+                    pass
                 message = ("success", f'Created student {created_credentials["name"]}.')
 
         elif action == "remove_student":
@@ -400,16 +406,35 @@ def class_detail(request, pk):
             uid = request.POST.get("user_id")
             new_fname = request.POST.get("first_name", "").strip()
             new_linit = request.POST.get("last_initial", "").strip()
+            new_pw = request.POST.get("password", "").strip()
             try:
                 user = User.objects.get(pk=uid)
                 if new_fname:
                     user.first_name = new_fname
                 if new_linit:
                     user.last_name = new_linit
+                if new_pw:
+                    user.set_password(new_pw)
+                    # Cache the new plaintext password for retrieval
+                    try:
+                        cache.set(f"student_pw:{user.id}", new_pw, timeout=60 * 60 * 24 * 7)
+                    except Exception:
+                        pass
                 user.save()
                 message = ("success", "Student updated.")
             except Exception:
                 message = ("error", "Could not update student.")
+
+        elif action == "archive_student":
+            uid = request.POST.get("user_id")
+            try:
+                user = User.objects.get(pk=uid)
+                # mark inactive instead of deleting to preserve data
+                user.is_active = False
+                user.save(update_fields=["is_active"])
+                message = ("success", "Student archived.")
+            except Exception:
+                message = ("error", "Could not archive student.")
 
     students = cls.students.all()
     # also supply classes that teacher owns for move target
@@ -530,6 +555,11 @@ def create_student_api(request):
         except Exception:
             # don't fail creation if email fails; include warning
             pass
+    # Cache the plaintext password for a limited time so teachers can retrieve it
+    try:
+        cache.set(f"student_pw:{user.id}", password, timeout=60 * 60 * 24 * 7)
+    except Exception:
+        pass
 
     return JsonResponse(
         {
@@ -924,6 +954,40 @@ def avatar_randomize(request):
     request.session["inqed_avatar"] = data
     request.session.modified = True
     return JsonResponse(data)
+
+
+@login_required
+@require_http_methods(["POST"])
+def reveal_student_password(request, pk):
+    """Return cached plaintext password for a student if teacher/school_admin authorized."""
+    User = get_user_model()
+    try:
+        student = User.objects.get(pk=pk)
+    except User.DoesNotExist:
+        return JsonResponse({"success": False, "error": "User not found"}, status=404)
+
+    # permission: teacher of any class including this student, or school_admin in same school
+    allowed = False
+    if request.user.role == "school_admin":
+        if getattr(request.user, "school", None) and request.user.school == getattr(student, "school", None):
+            allowed = True
+    else:
+        # teacher must own a class that contains the student
+        if Class.objects.filter(teacher=request.user, students=student).exists():
+            allowed = True
+
+    if not allowed:
+        return JsonResponse({"success": False, "error": "Permission denied"}, status=403)
+
+    try:
+        pw = cache.get(f"student_pw:{student.id}")
+    except Exception:
+        pw = None
+
+    if not pw:
+        return JsonResponse({"success": False, "error": "Password unavailable. Consider generating a reset link."}, status=404)
+
+    return JsonResponse({"success": True, "password": pw})
 
 
 @login_required
