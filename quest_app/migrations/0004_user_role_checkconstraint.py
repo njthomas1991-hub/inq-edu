@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="user",
             constraint=models.CheckConstraint(
-                check=(
+                condition=(
                     models.Q(role__in=["student", "teacher", "school_admin"]) |
                     models.Q(role__isnull=True)
                 ),
