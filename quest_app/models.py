@@ -1,15 +1,18 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+# Keep role choices at module scope so model import works reliably during app
+# initialization.
+class Role(models.TextChoices):
+    STUDENT = ("student", "Student")
+    TEACHER = ("teacher", "Teacher")
+    SCHOOL_ADMIN = ("school_admin", "School Admin")
+
+
 class User(AbstractUser):
 
     email = models.EmailField(blank=True, null=True)
-    ROLE_CHOICES = [
-        ("student", "Student"),
-        ("teacher", "Teacher"),
-        ("school_admin", "School Admin"),
-    ]
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, blank=True, null=True)
+    role = models.CharField(max_length=20, choices=Role.choices, blank=True, null=True)
     avatar = models.ImageField(upload_to="avatars/", blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
     school = models.CharField(max_length=100, blank=True, null=True)
@@ -20,6 +23,29 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.role})"
+
+    class Meta:
+        # Constraints removed to avoid import-time compatibility issues
+        # (some environments may not support CheckConstraint signature).
+        # Use model-level validation instead of a DB CheckConstraint to ensure
+        # compatibility across different Django/DB versions.
+        pass
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        valid = [c.value for c in Role]
+        if self.role and self.role not in valid:
+            raise ValidationError({'role': 'Invalid role choice'})
+
+    def save(self, *args, **kwargs):
+        # Call full_clean to enforce `clean()` on save so invalid role values
+        # are rejected at the model layer regardless of database support.
+        try:
+            self.full_clean()
+        except Exception:
+            # Re-raise to avoid swallowing validation errors.
+            raise
+        return super().save(*args, **kwargs)
 
 class TeachingResource(models.Model):
     teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name="resources")
