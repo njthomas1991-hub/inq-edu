@@ -93,3 +93,5 @@ truffle_results.*
 # Ignore scripts that may contain admin credentials
 scripts/set_admin.py
 scripts/reset_superuser.py
+# Local file where reset_superuser may write the new password
+.saved_superuser
