@@ -7,6 +7,11 @@
     <h2>Welcome Back</h2>
     <form method="post" autocomplete="on">
       {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="mb-3">
+          <div class="text-danger small">{{ form.non_field_errors|striptags }}</div>
+        </div>
+      {% endif %}
       {% comment %} Prefer explicit username + password UI. Fall back to form fields if names differ. {% endcomment %}
       {% if form.login %}
         <div class="mb-3">
@@ -26,8 +31,8 @@
         </div>
       {% else %}
         <div class="mb-3">
-          <label for="id_username">Username</label>
-          <input id="id_username" name="username" type="text" class="form-control" required>
+          <label for="id_username">Email</label>
+          <input id="id_username" name="username" type="email" class="form-control" required autocomplete="email">
         </div>
       {% endif %}
 
@@ -42,7 +47,7 @@
       {% else %}
         <div class="mb-3">
           <label for="id_password">Password</label>
-          <input id="id_password" name="password" type="password" class="form-control" required>
+          <input id="id_password" name="password" type="password" class="form-control" required autocomplete="current-password">
         </div>
       {% endif %}
       <div class="form-check mb-3 text-start">
@@ -54,4 +59,67 @@
     </form>
   </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    try{
+    var uname = document.querySelector('input[name="username"], input[name="login"], #id_username');
+    if (uname){
+      // Do not force input type to email; accept username or email.
+      if (!uname.getAttribute('autocomplete')){
+        if (uname.name && uname.name.toLowerCase().indexOf('email')>-1) uname.setAttribute('autocomplete','email');
+        else uname.setAttribute('autocomplete','username');
+      }
+    }
+    var pwd = document.querySelector('input[name="password"], #id_password');
+    if (pwd){ pwd.setAttribute('autocomplete','current-password'); }
+  }catch(e){}
+  
+  // Debug helper: background AJAX of the login POST and a small response preview.
+  try{
+    var form = document.querySelector('.login-card form');
+    if (form){
+      var dbg = document.createElement('div');
+      dbg.id = 'login-debug-output';
+      dbg.style.position = 'fixed';
+      dbg.style.right = '12px';
+      dbg.style.bottom = '12px';
+      dbg.style.maxWidth = '40%';
+      dbg.style.maxHeight = '40%';
+      dbg.style.overflow = 'auto';
+      dbg.style.background = 'rgba(0,0,0,0.85)';
+      dbg.style.color = '#fff';
+      dbg.style.padding = '8px';
+      dbg.style.zIndex = 2147483647;
+      dbg.style.fontSize = '12px';
+      dbg.style.borderRadius = '6px';
+      dbg.style.display = 'none';
+      dbg.style.whiteSpace = 'pre-wrap';
+      document.body.appendChild(dbg);
+      form.addEventListener('submit', function(e){
+        try{
+          var fd = new FormData(form);
+          var action = form.getAttribute('action') || window.location.href;
+          fetch(action, { method: 'POST', body: fd, credentials: 'same-origin', headers: {'X-Requested-With':'XMLHttpRequest','X-Login-Debug':'1'} })
+            .then(function(res){
+              return res.text().then(function(text){ return {status: res.status, ok: res.ok, text: text}; });
+            })
+            .then(function(r){
+              console.log('Login debug response:', r);
+              dbg.style.display = 'block';
+              var preview = r.text && r.text.length ? r.text.slice(0, 10000) : '[empty response]';
+              dbg.innerText = 'Status: ' + r.status + '\n\n' + preview;
+            }).catch(function(err){
+              console.error('Login debug fetch failed', err);
+              dbg.style.display = 'block';
+              dbg.innerText = 'Fetch error: ' + (err && err.message ? err.message : String(err));
+            });
+        }catch(err){
+          console.error('Login debug error', err);
+        }
+        // Allow the normal form submission to proceed so behaviour is unchanged in normal usage.
+      }, false);
+    }
+  }catch(e){console.error(e);}
+});
+</script>
 {% endblock %}

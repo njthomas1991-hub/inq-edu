@@ -27,10 +27,15 @@ from django.urls import reverse
 from django.core.signing import dumps, loads, BadSignature, SignatureExpired
 from django.db import IntegrityError
 import re
+import logging
+
+# Module logger
+logger = logging.getLogger(__name__)
 
 def register(request):
     if request.method == "POST":
         form = CustomUserCreationForm(request.POST, request.FILES)
+        logger.info('Registration POST received from %s', request.META.get('REMOTE_ADDR'))
         if form.is_valid():
             # Ensure we create a unique username (username isn't collected on the form)
             User = get_user_model()
@@ -50,13 +55,41 @@ def register(request):
                 suffix += 1
 
             try:
-                user = form.save(commit=False)
-                user.username = username
-                # set password properly
-                user.set_password(form.cleaned_data.get('password1'))
+                # Build a clean user creation path to ensure the user is persisted
+                User = get_user_model()
+                pwd = form.cleaned_data.get('password1')
+                # Collect basic fields from the form
+                email = form.cleaned_data.get('email') or ''
+                first = (form.cleaned_data.get('first_name') or '').strip()
+                last = (form.cleaned_data.get('last_name') or '').strip()
+                role = form.cleaned_data.get('role') or None
+
+                logger.info('Creating user: email=%s username=%s', email, username)
+
+                # Use the manager's create_user to ensure proper handling
+                user = User.objects.create_user(username=username, email=email, password=pwd)
+                user.first_name = first
+                user.last_name = last
+                if role:
+                    user.role = role
+
+                # If the form included an uploaded avatar or other file fields, attach them
+                try:
+                    if request.FILES:
+                        if hasattr(user, 'avatar') and request.FILES.get('avatar'):
+                            user.avatar = request.FILES.get('avatar')
+                except Exception:
+                    logger.exception('Failed to attach uploaded files for user %s', username)
+
                 user.save()
+                logger.info('User created: id=%s username=%s', getattr(user, 'id', None), username)
             except IntegrityError:
+                logger.warning('IntegrityError creating user username=%s email=%s', username, email)
                 form.add_error(None, 'A user with that username already exists. Please choose a different email or contact the admin.')
+                return render(request, "core/register.html", {"form": form})
+            except Exception:
+                logger.exception('Unexpected error during registration for username=%s email=%s', username, email)
+                form.add_error(None, 'An unexpected error occurred. Please try again or contact support.')
                 return render(request, "core/register.html", {"form": form})
 
             # Log the user in
@@ -96,6 +129,12 @@ def register(request):
                 pass
 
             return redirect("dashboard")
+        else:
+            # Log invalid form for diagnostics (don't log sensitive fields)
+            try:
+                logger.warning('Registration form invalid: errors=%s', form.errors.as_json())
+            except Exception:
+                logger.warning('Registration form invalid and could not serialize errors')
     else:
         form = CustomUserCreationForm()
     return render(request, "core/register.html", {"form": form})
@@ -150,7 +189,49 @@ class CustomLoginView(LoginView):
         else:
             # Session will persist as per SESSION_COOKIE_AGE
             self.request.session.set_expiry(None)
-        return super().form_valid(form)
+        # Let the base class log the user in and build the normal response
+        response = super().form_valid(form)
+        # Log minimal debug info (never log passwords).
+        try:
+            hdr = self.request.META.get('HTTP_X_LOGIN_DEBUG') or self.request.headers.get('X-Login-Debug') if hasattr(self.request, 'headers') else None
+            uname_field = (self.request.POST.get('username') or self.request.POST.get('login') or '')
+            logger.warning('Login processed: username_field_present=%s, x_login_debug=%s, path=%s', bool(uname_field), bool(hdr), self.request.path)
+            try:
+                print(f"LOGIN DEBUG: username_field_present={bool(uname_field)}, x_login_debug={bool(hdr)}, path={self.request.path}")
+            except Exception:
+                pass
+        except Exception:
+            pass
+        # If the client requested a debug JSON response (from the injected client-side helper),
+        # return a small JSON payload rather than the normal redirect to aid debugging.
+        try:
+            if self.request.META.get('HTTP_X_LOGIN_DEBUG') == '1' or (hasattr(self.request, 'headers') and self.request.headers.get('X-Login-Debug') == '1'):
+                # Determine where we'd redirect the user normally
+                try:
+                    redirect_to = self.get_success_url()
+                except Exception:
+                    redirect_to = '/' 
+                return JsonResponse({'status': 'ok', 'redirect': redirect_to})
+        except Exception:
+            pass
+        try:
+            user = form.get_user() if hasattr(form, 'get_user') else self.request.user
+            if getattr(user, 'role', None) == 'teacher':
+                from django.shortcuts import redirect
+                return redirect('dashboard')
+        except Exception:
+            pass
+        return response
+
+    def get_success_url(self):
+        # Always send teachers to the dashboard regardless of `next`.
+        try:
+            user = self.request.user
+            if getattr(user, 'role', None) == 'teacher':
+                return reverse('dashboard')
+        except Exception:
+            pass
+        return super().get_success_url()
 
 @login_required
 def profile(request):

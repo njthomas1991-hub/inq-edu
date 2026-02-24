@@ -104,3 +104,16 @@
     <button id="load-more-resources" class="btn btn-outline-primary" data-next-page="{{ resources.next_page_number }}">Load more</button>
   </div>
 {% endif %}
+
+{# Numbered pagination (rendered in partial so AJAX loads include it) #}
+{% if resources.paginator.num_pages > 1 %}
+  <nav aria-label="Resources pagination" class="mt-3">
+    <ul class="pagination justify-content-center">
+      {% for p in resources.paginator.page_range %}
+        <li class="page-item {% if resources.number == p %}active{% endif %}">
+          <a class="page-link resource-page-link" href="?page={{ p }}">{{ p }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </nav>
+{% endif %}

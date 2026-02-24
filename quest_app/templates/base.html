@@ -68,8 +68,87 @@
     <main>
         {% block content %}{% endblock %}
     </main>
-    <script src="{% static 'core/js/jquery.min.js' %}"></script>
+        <!-- Diagnostic interceptor: install before jQuery loads to capture assignments -->
+        <script>
+            (function(){
+                try{
+                    var store = {j: undefined, dollar: undefined};
+                    function makeWatcher(name){
+                        Object.defineProperty(window, name, {
+                            configurable: true,
+                            enumerable: true,
+                            get: function(){ return store[name==='jQuery'?'j':'dollar']; },
+                            set: function(v){
+                                try{
+                                    var stack = (new Error()).stack || ''; 
+                                    console.warn('DIAG: window.'+name+' assigned', {value: v===undefined? '<undefined>' : (v && v.fn && v.fn.jquery) || (typeof v), at: new Date().toISOString()});
+                                    console.log(stack.split('\n').slice(1,8).join('\n'));
+                                }catch(e){}
+                                store[name==='jQuery'?'j':'dollar'] = v;
+                            }
+                        });
+                    }
+                    makeWatcher('jQuery');
+                    makeWatcher('$');
+                    console.info('DIAG: jQuery interceptor installed');
+                }catch(e){console.error('DIAG install error', e);} 
+            })();
+        </script>
+        <script src="{% static 'core/js/jquery.min.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'summernote/summernote-bs5.min.js' %}"></script>
+        <!-- Diagnostic: watch for jQuery being removed at runtime -->
+        <script>
+            (function(){
+                try{
+                    var last = typeof window.jQuery !== 'undefined';
+                    var snapshot = last ? (window.jQuery && window.jQuery.fn && window.jQuery.fn.jquery) || '<present>' : '<absent>';
+                    console.debug('jQuery initial:', snapshot);
+                      var checkCount = 0;
+                          var watcher = setInterval(function(){
+                        checkCount += 1;
+                        var now = typeof window.jQuery !== 'undefined';
+                        if (now !== last){
+                            var time = new Date().toISOString();
+                            var stack = (new Error()).stack || 'no-stack';
+                            console.warn('jQuery presence changed', {from: last, to: now, at: time, check: checkCount});
+                            try{ console.log('stack:', stack); }catch(e){}
+                            // capture a light snapshot of currently loaded scripts
+                            try{
+                                var scr = Array.prototype.slice.call(document.scripts||[]).map(function(s){return (s.src||s.getAttribute('src')||'inline').substr(0,200);});
+                                console.warn('scripts', scr.slice(-10));
+                            }catch(e){}
+                            last = now;
+                        }
+                        // stop after a while to avoid noise
+                        if (checkCount > 120) clearInterval(watcher);
+                    }, 250);
+                    // Additional immediate diagnostic: look for script tags that mention jquery and try fetching them
+                    try{
+                        var jqScripts = Array.prototype.slice.call(document.scripts||[]).filter(function(s){
+                            var src = s.getAttribute('src') || '';
+                            return /jquery(\.min)?\.js/i.test(src) || /jquery/i.test(src) && src.toLowerCase().indexOf('jquery')>-1;
+                        });
+                        if (jqScripts.length === 0){
+                            console.info('No <script> tag with "jquery" found in document.scripts');
+                        } else {
+                            jqScripts.forEach(function(s){
+                                var src = s.getAttribute('src') || '[inline]';
+                                console.info('Found jquery script tag src=', src);
+                                try{
+                                    if (src && src.indexOf('http') === 0 || src.indexOf('/') === 0){
+                                        fetch(src, {method:'GET', credentials: 'same-origin'}).then(function(r){
+                                            console.info('Fetch of', src, '->', r.status, r.ok);
+                                        }).catch(function(err){
+                                            console.warn('Fetch of', src, 'failed:', err && err.message ? err.message : String(err));
+                                        });
+                                    }
+                                }catch(e){ console.warn('fetch diagnostic error', e); }
+                            });
+                        }
+                    }catch(e){console.warn('jq script discovery error', e);} 
+                }catch(e){console.error('jQuery-watch init error', e);} 
+            })();
+        </script>
 </body>
 </html>

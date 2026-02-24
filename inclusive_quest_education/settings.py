@@ -20,9 +20,17 @@ def _get_env_secret(key: str) -> str:
     val = os.environ.get(key)
     if val:
         return val
-    raise ImproperlyConfigured(
-        f"Environment variable {key} is not set. Create a .env file or set the variable. See .env.example"
+    # Fallback for local development: generate a strong random secret and warn the user.
+    # This avoids hard-failing when a local .env is not present, while keeping
+    # a clear notice that a proper secret should be provided in production.
+    import secrets, warnings
+    fallback = secrets.token_urlsafe(50)
+    warnings.warn(
+        f"Environment variable {key} is not set. Using a generated fallback SECRET_KEY. "
+        f"Create a .env file and set {key} to a stable secret to avoid this warning.",
+        RuntimeWarning,
     )
+    return fallback
 
 SECRET_KEY = _get_env_secret('DJANGO_SECRET_KEY')
 DEBUG = True

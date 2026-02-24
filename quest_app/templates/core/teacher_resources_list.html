@@ -58,45 +58,64 @@
 
             <script>
             (function(){
-              var btn = document.getElementById('load-more-resources');
-              if (!btn) return;
-              btn.addEventListener('click', function(){
-                var next = btn.getAttribute('data-next-page');
-                if (!next) return;
-                btn.disabled = true;
-                btn.textContent = 'Loading...';
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', window.location.pathname + '?page=' + next + '&partial=1');
-                xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');
-                xhr.onload = function(){
-                  if (xhr.status >= 200 && xhr.status < 300){
-                    // append returned HTML to container
-                    var container = document.getElementById('resource-cards-container');
-                    var temp = document.createElement('div');
-                    temp.innerHTML = xhr.responseText;
-                    // move children of temp into container
-                    while (temp.firstChild){
-                      container.appendChild(temp.firstChild);
-                    }
-                    // update or remove load button
-                    var newBtn = document.getElementById('load-more-resources');
-                    if (!newBtn) return;
-                    var nextPage = newBtn.getAttribute('data-next-page');
-                    if (nextPage){
-                      newBtn.disabled = false;
-                      newBtn.textContent = 'Load more';
-                    } else {
-                      newBtn.parentNode.removeChild(newBtn);
-                    }
-                  } else {
-                    btn.disabled = false;
-                    btn.textContent = 'Load more';
-                    alert('Could not load more resources');
-                  }
+              function bindLoadMore(){
+                var btn = document.getElementById('load-more-resources');
+                if (!btn) return;
+                btn.onclick = function(e){
+                  e.preventDefault();
+                  var next = btn.getAttribute('data-next-page');
+                  if (!next) return;
+                  btn.disabled = true;
+                  btn.textContent = 'Loading...';
+                  fetch(window.location.pathname + '?page=' + next + '&partial=1', {headers: {'X-Requested-With':'XMLHttpRequest'}})
+                    .then(function(res){ if (!res.ok) throw new Error('Network'); return res.text(); })
+                    .then(function(html){
+                      var container = document.getElementById('resource-cards-container');
+                      var temp = document.createElement('div'); temp.innerHTML = html;
+                      // append children
+                      while (temp.firstChild){ container.appendChild(temp.firstChild); }
+                      // re-bind handlers for new content
+                      bindHandlers();
+                    }).catch(function(){
+                      btn.disabled = false; btn.textContent = 'Load more'; alert('Could not load more resources');
+                    });
                 };
-                xhr.onerror = function(){ btn.disabled=false; btn.textContent='Load more'; };
-                xhr.send();
-              });
+              }
+
+              function bindPagination(){
+                // delegate clicks on pagination links inside container
+                var container = document.getElementById('resource-cards-container');
+                if (!container) return;
+                container.querySelectorAll('.resource-page-link').forEach(function(a){
+                  a.onclick = function(e){
+                    e.preventDefault();
+                    var href = a.getAttribute('href');
+                    var params = new URLSearchParams(href.replace(/^[^?]*\?/, ''));
+                    var page = params.get('page') || 1;
+                    // load partial and replace container
+                    fetch(window.location.pathname + '?page=' + page + '&partial=1', {headers: {'X-Requested-With':'XMLHttpRequest'}})
+                      .then(function(res){ if (!res.ok) throw new Error('Network'); return res.text(); })
+                      .then(function(html){
+                        var container = document.getElementById('resource-cards-container');
+                        container.innerHTML = html;
+                        // update browser URL
+                        try{ history.pushState(null, '', '?page=' + page); }catch(e){}
+                        // rebind handlers
+                        bindHandlers();
+                      }).catch(function(){ alert('Could not load page'); });
+                  };
+                });
+              }
+
+              function bindHandlers(){
+                bindLoadMore();
+                bindPagination();
+              }
+
+              // initial bind
+              document.addEventListener('DOMContentLoaded', bindHandlers);
+              // also run immediately in case DOMContentLoaded already fired
+              bindHandlers();
             })();
             </script>
         </div>
