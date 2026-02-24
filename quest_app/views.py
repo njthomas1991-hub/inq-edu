@@ -656,6 +656,11 @@ def student_reset(request, token):
 
 @login_required
 def add_class(request):
+    # Only teachers or school_admins may create classes
+    if getattr(request.user, "role", None) not in ("teacher", "school_admin"):
+        messages.error(request, "Permission denied.")
+        return redirect("dashboard")
+
     if request.method == "POST":
         form = ClassForm(request.POST)
         if form.is_valid():
@@ -667,6 +672,40 @@ def add_class(request):
     else:
         form = ClassForm()
     return render(request, "core/add_class.html", {"form": form})
+
+
+@login_required
+def edit_class(request, pk):
+    # Edit an existing class. Only the owning teacher or school_admin may edit.
+    cls = get_object_or_404(Class, pk=pk)
+    if not (request.user == cls.teacher or getattr(request.user, "role", None) == "school_admin"):
+        messages.error(request, "Permission denied.")
+        return redirect("class_detail", pk=pk)
+
+    if request.method == "POST":
+        form = ClassForm(request.POST, instance=cls)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Class updated successfully.")
+            return redirect("class_detail", pk=pk)
+    else:
+        form = ClassForm(instance=cls)
+    return render(request, "core/edit_class.html", {"form": form, "class": cls})
+
+
+@login_required
+@require_http_methods(["POST"])
+def archive_class(request, pk):
+    # Soft-delete (archive) a class. Only owner teacher or school_admin allowed.
+    cls = get_object_or_404(Class, pk=pk)
+    if not (request.user == cls.teacher or getattr(request.user, "role", None) == "school_admin"):
+        messages.error(request, "Permission denied.")
+        return redirect("class_detail", pk=pk)
+
+    cls.is_deleted = True
+    cls.save(update_fields=["is_deleted"])
+    messages.success(request, "Class archived.")
+    return redirect("classes")
 
 
 @login_required

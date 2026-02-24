@@ -118,6 +118,19 @@ class Class(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Soft-delete flag: mark a class as deleted without removing DB record.
+    # Use `objects` to return only non-deleted classes by default.
+    is_deleted = models.BooleanField(default=False)
+
+    # Default manager returns only non-deleted records. Use `all_objects`
+    # to access the full table when needed.
+    class ClassQuerySet(models.QuerySet):
+        def active(self):
+            return self.filter(is_deleted=False)
+
+    objects = ClassQuerySet.as_manager()
+    all_objects = models.Manager()
+
     def __str__(self):
         return self.name
 

@@ -1,73 +1,97 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'core/css/login.css' %}">
-<div class="login-container">
-  <div class="login-card">
-    <h2>Welcome Back</h2>
-    <form method="post" autocomplete="on">
-      {% csrf_token %}
-      {% if form.non_field_errors %}
-        <div class="mb-3">
-          <div class="text-danger small">{{ form.non_field_errors|striptags }}</div>
-        </div>
-      {% endif %}
-      <div class="mb-3">
-        <div class="small text-muted">Students: log in with the username provided by your teacher. If you don't have credentials or can't log in, please contact your teacher for help.</div>
-      </div>
-      {% comment %} Prefer explicit username + password UI. Fall back to form fields if names differ. {% endcomment %}
-      {% if form.login %}
-        <div class="mb-3">
-          <label for="id_login">Username</label>
-          {{ form.login }}
-          {% if form.login.errors %}
-            <div class="text-danger small">{{ form.login.errors|striptags }}</div>
-          {% endif %}
-        </div>
-      {% elif form.username %}
-        <div class="mb-3">
-          {{ form.username.label_tag }}
-          {{ form.username }}
-          {% if form.username.errors %}
-            <div class="text-danger small">{{ form.username.errors|striptags }}</div>
-          {% endif %}
-        </div>
-      {% else %}
-        <div class="mb-3">
-          <label for="id_username">Email</label>
-          <input id="id_username" name="username" type="email" class="form-control" required autocomplete="email">
-        </div>
-      {% endif %}
 
-      {% if form.password %}
-        <div class="mb-3">
-          {{ form.password.label_tag }}
-          {{ form.password }}
-          {% if form.password.errors %}
-            <div class="text-danger small">{{ form.password.errors|striptags }}</div>
-          {% endif %}
+<div class="container">
+  <div class="row justify-content-center align-items-center min-vh-100">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <div class="text-center mb-3">
+            <div class="mb-2">
+              <img src="{% static 'core/images/inq-ed-logo.png' %}" alt="Inclusive Quest" style="height:44px;" />
+            </div>
+            <h3 class="mb-0">Welcome Back</h3>
+            <p class="text-muted small mb-0">Sign in to your Inclusive Quest account</p>
+          </div>
+
+          <form method="post" autocomplete="on" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger py-2">
+                {{ form.non_field_errors|striptags }}
+              </div>
+            {% endif %}
+
+            <div class="mb-3">
+              <small class="text-muted">Students: use the username provided by your teacher. Contact your teacher if you need help.</small>
+            </div>
+
+            {% if form.login %}
+              <div class="mb-3 form-floating">
+                {{ form.login|add_class:'form-control' }}
+                <label for="id_login">Username or Email</label>
+                {% if form.login.errors %}<div class="text-danger small">{{ form.login.errors|striptags }}</div>{% endif %}
+              </div>
+            {% elif form.username %}
+              <div class="mb-3 form-floating">
+                {{ form.username|add_class:'form-control' }}
+                {{ form.username.errors.as_ul|safe }}
+                <label for="id_username">Username or Email</label>
+              </div>
+            {% else %}
+              <div class="mb-3 form-floating">
+                <input id="id_username" name="username" type="text" class="form-control" required autocomplete="username">
+                <label for="id_username">Username or Email</label>
+              </div>
+            {% endif %}
+
+            {% if form.password %}
+              <div class="mb-3 form-floating">
+                {{ form.password|add_class:'form-control' }}
+                <label for="id_password">Password</label>
+                {% if form.password.errors %}<div class="text-danger small">{{ form.password.errors|striptags }}</div>{% endif %}
+              </div>
+            {% else %}
+              <div class="mb-3 form-floating">
+                <input id="id_password" name="password" type="password" class="form-control" required autocomplete="current-password">
+                <label for="id_password">Password</label>
+              </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="remember" id="remember" checked>
+                <label class="form-check-label small" for="remember">Remember me</label>
+              </div>
+              <div><a href="/password-reset/" class="small">Forgot password?</a></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Sign in</button>
+
+            <div class="text-center my-3">
+              <small class="text-muted">Or sign in with</small>
+              <div class="d-flex gap-2 justify-content-center mt-2">
+                <a href="/accounts/google/login/" class="btn btn-outline-danger btn-sm" aria-label="Sign in with Google"><i class="fab fa-google me-1"></i> Google</a>
+                <a href="/accounts/microsoft/login/" class="btn btn-outline-secondary btn-sm" aria-label="Sign in with Microsoft"><i class="fab fa-microsoft me-1"></i> Microsoft</a>
+              </div>
+            </div>
+
+            <div class="text-center mt-3 small">
+              <span>Don't have an account? <a href="/register/">Register</a></span>
+            </div>
+          </form>
         </div>
-      {% else %}
-        <div class="mb-3">
-          <label for="id_password">Password</label>
-          <input id="id_password" name="password" type="password" class="form-control" required autocomplete="current-password">
-        </div>
-      {% endif %}
-      <div class="form-check mb-3 text-start">
-        <input class="form-check-input" type="checkbox" name="remember" id="remember" checked>
-        <label class="form-check-label" for="remember">Remember Me</label>
       </div>
-      <button type="submit" class="btn btn-primary">Login</button>
-      <a href="/password-reset/" class="forgot-link">Forgot your password?</a>
-    </form>
+    </div>
   </div>
 </div>
+
 <script>
 document.addEventListener('DOMContentLoaded', function(){
-    try{
+  try{
     var uname = document.querySelector('input[name="username"], input[name="login"], #id_username');
     if (uname){
-      // Do not force input type to email; accept username or email.
       if (!uname.getAttribute('autocomplete')){
         if (uname.name && uname.name.toLowerCase().indexOf('email')>-1) uname.setAttribute('autocomplete','email');
         else uname.setAttribute('autocomplete','username');
@@ -76,53 +100,7 @@ document.addEventListener('DOMContentLoaded', function(){
     var pwd = document.querySelector('input[name="password"], #id_password');
     if (pwd){ pwd.setAttribute('autocomplete','current-password'); }
   }catch(e){}
-  
-  // Debug helper: background AJAX of the login POST and a small response preview.
-  try{
-    var form = document.querySelector('.login-card form');
-    if (form){
-      var dbg = document.createElement('div');
-      dbg.id = 'login-debug-output';
-      dbg.style.position = 'fixed';
-      dbg.style.right = '12px';
-      dbg.style.bottom = '12px';
-      dbg.style.maxWidth = '40%';
-      dbg.style.maxHeight = '40%';
-      dbg.style.overflow = 'auto';
-      dbg.style.background = 'rgba(0,0,0,0.85)';
-      dbg.style.color = '#fff';
-      dbg.style.padding = '8px';
-      dbg.style.zIndex = 2147483647;
-      dbg.style.fontSize = '12px';
-      dbg.style.borderRadius = '6px';
-      dbg.style.display = 'none';
-      dbg.style.whiteSpace = 'pre-wrap';
-      document.body.appendChild(dbg);
-      form.addEventListener('submit', function(e){
-        try{
-          var fd = new FormData(form);
-          var action = form.getAttribute('action') || window.location.href;
-          fetch(action, { method: 'POST', body: fd, credentials: 'same-origin', headers: {'X-Requested-With':'XMLHttpRequest','X-Login-Debug':'1'} })
-            .then(function(res){
-              return res.text().then(function(text){ return {status: res.status, ok: res.ok, text: text}; });
-            })
-            .then(function(r){
-              console.log('Login debug response:', r);
-              dbg.style.display = 'block';
-              var preview = r.text && r.text.length ? r.text.slice(0, 10000) : '[empty response]';
-              dbg.innerText = 'Status: ' + r.status + '\n\n' + preview;
-            }).catch(function(err){
-              console.error('Login debug fetch failed', err);
-              dbg.style.display = 'block';
-              dbg.innerText = 'Fetch error: ' + (err && err.message ? err.message : String(err));
-            });
-        }catch(err){
-          console.error('Login debug error', err);
-        }
-        // Allow the normal form submission to proceed so behaviour is unchanged in normal usage.
-      }, false);
-    }
-  }catch(e){console.error(e);}
 });
 </script>
+
 {% endblock %}

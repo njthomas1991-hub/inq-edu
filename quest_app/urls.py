@@ -23,6 +23,8 @@ urlpatterns = [
     ),
     path("add-class/", views.add_class, name="add_class"),
     path("api/add-class/", views.add_class_ajax, name="add_class_api"),
+    path("class/<int:pk>/edit/", views.edit_class, name="edit_class"),
+    path("class/<int:pk>/archive/", views.archive_class, name="archive_class"),
     path("classes/", views.classes_list, name="classes"),
     path("class/<int:pk>/", views.class_detail, name="class_detail"),
     path("api/create-student/", views.create_student_api, name="create_student_api"),
