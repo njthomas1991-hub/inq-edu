@@ -452,6 +452,12 @@ def class_detail(request, pk):
                 # mark inactive instead of deleting to preserve data
                 user.is_active = False
                 user.save(update_fields=["is_active"])
+                # remove from this class so it no longer appears in the class list
+                try:
+                    cls.students.remove(user)
+                except Exception:
+                    # non-fatal; proceed
+                    pass
                 message = ("success", "Student archived.")
             except Exception:
                 message = ("error", "Could not archive student.")
@@ -483,6 +489,55 @@ def classes_list(request):
     else:
         classes = Class.objects.none()
     return render(request, "core/class_list.html", {"classes": classes})
+
+
+@login_required
+def archived_students(request):
+    """View that lists archived (inactive) student accounts relevant to the
+    requesting teacher or school admin. Teachers see inactive students in their
+    school; school_admins see all inactive students in their school.
+
+    Supports POST action `restore_student` to re-enable an archived student.
+    """
+    user = request.user
+    User = get_user_model()
+
+    if user.role not in ("teacher", "school_admin"):
+        return redirect("dashboard")
+
+    message = None
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action == "restore_student":
+            uid = request.POST.get("user_id")
+            try:
+                s = User.objects.get(pk=uid, role="student")
+                # Permission: school_admin may restore any student in their school;
+                # teachers may restore students in their school.
+                allowed = False
+                if user.role == "school_admin":
+                    if getattr(user, "school", None) and user.school == getattr(s, "school", None):
+                        allowed = True
+                else:
+                    if getattr(user, "school", None) and user.school == getattr(s, "school", None):
+                        allowed = True
+
+                if not allowed:
+                    message = ("error", "Permission denied.")
+                else:
+                    s.is_active = True
+                    s.save(update_fields=["is_active"])
+                    message = ("success", f"Restored {s.get_full_name() or s.username}.")
+            except Exception:
+                message = ("error", "Could not restore student.")
+
+    # List inactive students filtered by school if available
+    qs = User.objects.filter(role="student", is_active=False)
+    if getattr(user, "school", None):
+        qs = qs.filter(school=user.school)
+
+    students = qs.order_by("last_name", "first_name", "username")
+    return render(request, "core/archived_students.html", {"students": students, "message": message})
 
 
 @login_required
