@@ -29,13 +29,13 @@
 
             {% if form.login %}
               <div class="mb-3 form-floating">
-                {{ form.login|add_class:'form-control' }}
+                {{ form.login.as_widget(attrs={'class': 'form-control'}) }}
                 <label for="id_login">Username or Email</label>
                 {% if form.login.errors %}<div class="text-danger small">{{ form.login.errors|striptags }}</div>{% endif %}
               </div>
             {% elif form.username %}
               <div class="mb-3 form-floating">
-                {{ form.username|add_class:'form-control' }}
+                {{ form.username.as_widget(attrs={'class': 'form-control'}) }}
                 {{ form.username.errors.as_ul|safe }}
                 <label for="id_username">Username or Email</label>
               </div>
@@ -48,7 +48,7 @@
 
             {% if form.password %}
               <div class="mb-3 form-floating">
-                {{ form.password|add_class:'form-control' }}
+                {{ form.password.as_widget(attrs={'class': 'form-control'}) }}
                 <label for="id_password">Password</label>
                 {% if form.password.errors %}<div class="text-danger small">{{ form.password.errors|striptags }}</div>{% endif %}
               </div>
