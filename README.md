@@ -1,25 +1,128 @@
 # Inclusive Quest Education
 
-This project is a modern Django web application scaffolded for inclusive educational tools and workflows.
+A Django-based learning platform scaffolded for inclusive educational content and classroom workflows.
 
-## Features
-- Django 6.x project structure
-- Initial app: quest_app
-- Ready for further customization
+## Quick Start (development)
 
-## Setup
-1. Create a virtual environment and activate it.
-2. Install dependencies from requirements.txt.
-3. Run migrations and start the development server.
+Prerequisites: Python 3.10+ and a virtual environment manager.
 
-## Development
-- Follow Django best practices.
-- Update requirements.txt as needed.
-- Add new apps and features as required.
+1. Create and activate a virtualenv:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # macOS / Linux
+.\.venv\Scripts\Activate  # Windows PowerShell
+```
+
+2. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+3. Configure environment (recommended): create a `.env` file and set `DJANGO_SECRET_KEY`.
+
+4. Run migrations and start the dev server:
+
+```bash
+export DJANGO_SECRET_KEY="dev-secret"  # or set in .env
+python manage.py migrate
+python manage.py runserver
+```
+
+5. Create a superuser if needed:
+
+```bash
+python manage.py createsuperuser
+```
+
+## Project layout
+
+- `inclusive_quest_education/` — Django project settings, urls, wsgi/asgi.
+- `quest_app/` — primary application (custom `User` model, views, forms, templates).
+- `static/` — static assets (CSS, JS, images).
+- `scripts/` — maintenance scripts (admin reset, secret generation, tooling).
+
+## Authentication & User model
+
+- Custom `User` model is defined in `quest_app.models` and uses `username` as `USERNAME_FIELD`.
+- Registration flows were fixed to use `User.objects.create_user(...)` so accounts persist correctly.
+- `CustomAuthenticationForm` supports email-based login for non-students and includes legacy-account handling.
+
+## Security & Secrets
+
+- Use a `.env` file to store `DJANGO_SECRET_KEY` (see `.env.example` where present). Do not commit `.env`.
+- `scripts/generate_secret.py` can produce secure random secrets for local dev.
+- Files that may contain credentials are git-ignored (examples: `scripts/set_admin.py`, `scripts/reset_superuser.py`, `.saved_superuser`).
+
+### Admin hardening & history cleanup
+
+- A past commit contained hard-coded admin scripts and credentials. To remediate:
+	- A backup branch `backup-before-secret-cleanup` was created.
+	- `git-filter-repo` was used to purge sensitive files from the repository history and the cleaned history was force-pushed.
+	- Admin management scripts were rewritten to require environment variables (no hard-coded passwords) and `reset_superuser` requires explicit confirmation to run.
+	- The `admin` password was rotated during remediation; ensure you rotate any other secrets that may have been exposed earlier.
+
+## Database constraints & migrations
+
+- `Role` choices were moved to module scope in `quest_app/models.py` to avoid import-time errors.
+- Model-level validation (`clean()` + `save()`) now validates `User.role` at the application level.
+- A DB-level `CheckConstraint` for `User.role` was added in migration `quest_app/migrations/0004_user_role_checkconstraint.py` (allows NULL to preserve existing rows).
+
+To apply migrations locally:
+
+```bash
+python manage.py migrate
+```
+
+If the migration fails, inspect invalid `role` values and fix them before re-running.
+
+## Admin password locking
+
+- A pre-save signal prevents changing the password for the `admin` username unless the environment variable `ALLOW_ADMIN_PASSWORD_CHANGE=1` is set for the process performing the change. This protects the canonical admin account from accidental or programmatic changes.
+
+## Scripts and maintenance
+
+- `scripts/reset_superuser.py` — safely resets the superuser password (requires `CONFIRM_RESET=1`). By default it writes the new password to `.saved_superuser` (git-ignored) instead of printing it.
+- `scripts/set_admin.py` — sets admin password but now requires `ADMIN_PASSWORD` env var; avoid embedding passwords in source.
+
+## Running tests
+
+Run the Django test suite or a subset:
+
+```bash
+python manage.py test
+python manage.py test quest_app.tests.test_middleware -v 2
+```
+
+## Contributing & workflow notes
+
+- After the history rewrite, all collaborators must refresh local clones. Recommended workflow:
+
+```bash
+git fetch --all
+git reset --hard origin/master
+```
+
+- If you have local branches, rebase them onto the rewritten `master` or create fresh branches against `origin/master`.
+
+## Post-cleanup checklist (recommended)
+
+- Rotate any credentials potentially exposed prior to the history purge.
+- Verify CI and deployment secrets (update if necessary).
+- Notify collaborators about the force-push and migration changes.
+
+## Contact / Support
+
+For workspace-specific maintainer guidance see `.github/copilot-instructions.md` and open issues/PRs for coordination.
 
 ---
 
-For workspace-specific instructions, see .github/copilot-instructions.md.
+If you'd like, I can also:
+- Create a small script to help collaborators migrate local branches after the rewritten history.
+- Generate secure admin credentials and store them in a secure vault or `.saved_superuser` temporarily before removing.
+
+
 
 ## Recent maintenance & security notes
 

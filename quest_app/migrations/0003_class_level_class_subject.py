@@ -10,14 +10,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='class',
-            name='level',
-            field=models.CharField(choices=[('EYFS', 'EYFS'), ('KS1', 'KS1'), ('LKS2', 'LKS2'), ('UKS2', 'UKS2'), ('KS3', 'KS3'), ('KS4', 'KS4'), ('SEND', 'SEND')], default='LKS2', max_length=10),
-        ),
-        migrations.AddField(
-            model_name='class',
-            name='subject',
-            field=models.CharField(blank=True, max_length=100, null=True),
-        ),
+        # Migration auto-generated earlier; fields are already present in initial migration.
+        # Keep as a no-op to avoid duplicate column errors when running tests.
     ]
