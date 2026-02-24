@@ -399,6 +399,89 @@ footer {
 
 /* Home card image fit */
 
+/* ------------------------------
+   Responsiveness Utilities
+   ------------------------------ */
+/* Ensure media elements never overflow their containers */
+img, picture, video, iframe {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Make tables scrollable on small screens */
+.table-responsive-custom {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Forms: full-width controls on small screens */
+@media (max-width: 575.98px) {
+    .form-control,
+    .btn {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+    .input-group > .form-control {
+        width: 100% !important;
+    }
+}
+
+/* Slightly smaller card padding and tighter spacing on small screens */
+@media (max-width: 767.98px) {
+    .card {
+        margin-bottom: var(--spacing-sm) !important;
+    }
+    .card-body {
+        padding: 0.75rem !important;
+    }
+}
+
+/* Responsive typography: scale headings on narrow viewports */
+h1, .display-4 {
+    font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+}
+h2 {
+    font-size: clamp(1.25rem, 3vw, 2rem);
+}
+
+/* Ensure modals and fixed elements behave on small screens */
+@media (max-width: 575.98px) {
+    .modal-dialog {
+        margin: 0.5rem;
+        max-width: calc(100% - 1rem);
+    }
+}
+
+/* Utility: make content containers fluid but constrained by CSS variables */
+.container-fluid-responsive {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: var(--container-2xl);
+}
+
+/* Touch targets: ensure buttons are easy to tap on small screens */
+@media (max-width: 575.98px) {
+    .btn {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+        font-size: var(--font-size-base) !important;
+    }
+}
+
+/* Accessibility: increase focus outlines on small screens */
+@media (max-width: 767.98px) {
+    a:focus, button:focus, input:focus, select:focus, textarea:focus {
+        outline: 3px solid rgba(100, 150, 255, 0.25) !important;
+        outline-offset: 2px !important;
+    }
+}
+
+
 /* About page tweaks */
 .about-hero {
     padding: 2rem 1rem;
