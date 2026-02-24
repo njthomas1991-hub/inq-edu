@@ -89,3 +89,7 @@ truffle_results.*
 .truffle_results.*
 # Local saved teachers (contains minimal account info; intentionally git-ignored)
 .saved_teachers.json
+
+# Ignore scripts that may contain admin credentials
+scripts/set_admin.py
+scripts/reset_superuser.py
