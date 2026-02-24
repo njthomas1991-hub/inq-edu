@@ -481,6 +481,89 @@ h2 {
     }
 }
 
+/* Project-specific helpers to replace inline styles */
+.logo-max-300 {
+    max-width: 300px;
+    width: 100%;
+    height: auto;
+}
+
+.card-img-cover {
+    width: 100%;
+    object-fit: cover;
+    height: 18.5rem; /* ~296px */
+}
+
+@media (max-width: 767.98px) {
+    .card-img-cover {
+        height: 12rem;
+    }
+}
+
+.scrollable-list {
+    max-height: 420px;
+    overflow-y: auto;
+}
+
+.placeholder-panel {
+    height: 180px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #bbb;
+}
+
+.avatar-sm {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+    border-radius: 50%;
+    overflow: hidden;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.avatar-preview {
+    max-width: 300px;
+    width: 100%;
+    height: auto;
+}
+
+.hero-fullscreen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-top: 2rem;
+}
+
+.hero-media {
+    position: relative;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+/* utility for minimum height used by kindlewick root */
+.min-h-300 {
+    min-height: 300px;
+}
+
+.lead-compact {
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 1rem;
+}
+
+.icon-lg {
+    font-size: 2rem;
+}
+
+
 
 /* About page tweaks */
 .about-hero {

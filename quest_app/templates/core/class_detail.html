@@ -26,13 +26,13 @@
                   <div class="text-muted small">{{ student.email }}</div>
                 </div>
                 <div class="btn-group" role="group">
-                  <form method="post" style="display:inline;">
+                  <form method="post" class="d-inline">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="remove_student" />
                     <input type="hidden" name="user_id" value="{{ student.id }}" />
                     <button class="btn btn-outline-secondary btn-sm" type="submit">Remove</button>
                   </form>
-                  <form method="post" style="display:inline; margin-left:4px;">
+                  <form method="post" class="d-inline ms-1">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="delete_student" />
                     <input type="hidden" name="user_id" value="{{ student.id }}" />
@@ -85,7 +85,7 @@
           {% endif %}
 
           <button class="btn btn-outline-primary mb-3" id="show-add-student">Add Student</button>
-          <div id="add-student-form" style="display:none;">
+          <div id="add-student-form" class="d-none">
             <form id="ajax-add-student-form">
               {% csrf_token %}
               <input type="hidden" name="action" value="create_student" />
@@ -116,7 +116,7 @@
             (function(){
               var toggleBtn = document.getElementById('show-add-student');
               var formWrap = document.getElementById('add-student-form');
-              toggleBtn && toggleBtn.addEventListener('click', function(e){ e.preventDefault(); formWrap.style.display = formWrap.style.display === 'none' ? '' : 'none'; });
+              toggleBtn && toggleBtn.addEventListener('click', function(e){ e.preventDefault(); formWrap.classList.toggle('d-none'); });
 
               function getCookie(name) {
                   var cookieValue = null;
@@ -178,13 +178,13 @@
                           <span class="student-password" data-pw="${res.json.password}">••••••••</span>
                           <button class="btn btn-outline-secondary btn-sm toggle-password" type="button" aria-label="Show password">👁</button>
                           <div class="btn-group" role="group">
-                            <form method="post" style="display:inline;">
+                            <form method="post" class="d-inline">
                               {% csrf_token %}
                               <input type="hidden" name="action" value="remove_student" />
                               <input type="hidden" name="user_id" value="${res.json.id}" />
                               <button class="btn btn-outline-secondary btn-sm" type="submit">Remove</button>
                             </form>
-                            <form method="post" style="display:inline; margin-left:4px;">
+                            <form method="post" class="d-inline ms-1">
                               {% csrf_token %}
                               <input type="hidden" name="action" value="delete_student" />
                               <input type="hidden" name="user_id" value="${res.json.id}" />

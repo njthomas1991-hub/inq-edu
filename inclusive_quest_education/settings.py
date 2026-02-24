@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'quest_app',
+    'rest_framework',
     'django_summernote',
     'django.contrib.sites',
     'allauth',
@@ -54,9 +55,10 @@ INSTALLED_APPS = [
 ]
 # Allauth settings
 SITE_ID = 1
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = False
-ACCOUNT_AUTHENTICATION_METHOD = 'email'
+# allauth: prefer the new settings names (older ACCOUNT_* keys are deprecated)
+# Use explicit login methods and signup fields so usernames are not required.
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'optional'
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -164,4 +166,19 @@ SUMMERNOTE_CONFIG = {
     'attachment_require_authentication': True,
     # allow attachments (documents/images)
     'disable_attachment': False,
+}
+from datetime import timedelta
+
+# REST framework + JWT settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
 }

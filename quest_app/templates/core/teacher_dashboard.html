@@ -37,7 +37,7 @@
             <input type="text" class="form-control form-control-sm" placeholder="Search students...">
             <button class="btn btn-outline-secondary btn-sm" type="button"><i class="fas fa-search"></i></button>
           </div>
-          <ul class="list-group list-group-flush portfolio-list" style="max-height: 420px; overflow-y: auto;">
+          <ul class="list-group list-group-flush portfolio-list scrollable-list">
             {% for student in students %}
               <li class="list-group-item d-flex align-items-center justify-content-between">
                 <span><i class="fas fa-user-circle me-2 text-secondary"></i>{{ student.get_full_name|default:student.username }}</span>
@@ -64,7 +64,7 @@
               <span class="badge bg-success">Weekly</span>
             </div>
             <!-- Placeholder for chart -->
-            <div style="height: 180px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #bbb;">
+            <div class="placeholder-panel">
               [Chart Placeholder]
             </div>
           </div>

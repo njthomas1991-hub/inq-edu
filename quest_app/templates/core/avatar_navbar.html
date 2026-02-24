@@ -1,6 +1,6 @@
 {% load static %}
 <!-- Navbar Avatar Icon Component -->
-<div id="navbarAvatarIcon" style="display: inline-block; vertical-align: middle; margin-right: 8px; border-radius: 50%; overflow: hidden; width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+<div id="navbarAvatarIcon" class="d-inline-block align-middle me-2 avatar-sm rounded-circle overflow-hidden">
     <!-- Avatar will render here -->
 </div>
 
@@ -45,24 +45,9 @@ class NavbarMonsterRenderer {
         const centerX = this.width / 2;
         const centerY = this.height / 2;
 
-        switch(type) {
+                switch(type) {
             case 'blob':
                 graphics.moveTo(centerX, centerY - 80);
-                {% load static %}
-                <!-- Navbar Avatar Icon Component (rendering removed) -->
-                <div id="navbarAvatarIcon" style="display: inline-block; vertical-align: middle; margin-right: 8px; border-radius: 50%; overflow: hidden; width: 40px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                    <!-- Avatar rendering removed for now. Click to open profile or avatar builder if desired. -->
-                </div>
-                        closeBtn.textContent = 'Close';
-                        closeBtn.style.marginLeft = '8px';
-                        closeBtn.onclick = function(){ dbg.remove(); };
-                        btnRow.appendChild(closeBtn);
-                        dbg.appendChild(btnRow);
-
-                        document.body.appendChild(dbg);
-                    } catch(e) { console.warn('[NAVBAR AVATAR] addNavbarDebug failed', e); }
-                })();
-            }
         } catch (error) {
             console.error('Error rendering navbar avatar:', error);
         }

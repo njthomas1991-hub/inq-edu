@@ -3,6 +3,10 @@ from django.contrib.auth import views as auth_views
 from django.views.generic import RedirectView, TemplateView
 
 from . import views
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 urlpatterns = [
     path('', TemplateView.as_view(template_name='core/home.html'), name='home'),
@@ -39,4 +43,7 @@ urlpatterns = [
     path('questopia/', TemplateView.as_view(template_name='core/questopia.html'), name='questopia'),
     path('contact/', TemplateView.as_view(template_name='core/contact.html'), name='contact'),
     path('teacher-hub/', TemplateView.as_view(template_name='core/teacher_hub.html'), name='teacher_hub'),
+    # JWT token endpoints for API clients
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

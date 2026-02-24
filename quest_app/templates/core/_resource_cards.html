@@ -12,7 +12,7 @@
                     <a href="{{ res.document.url }}" class="btn btn-sm btn-outline-secondary ms-2" download>Download</a>
                     {% if user == res.teacher %}
                         <button class="btn btn-sm btn-outline-secondary ms-2" data-bs-toggle="modal" data-bs-target="#editResourceModal-{{ res.id }}">Edit</button>
-                        <form method="post" action="{% url 'resource_delete' res.id %}" style="display:inline;" onsubmit="return confirm('Delete this resource?');">
+                        <form method="post" action="{% url 'resource_delete' res.id %}" class="d-inline" onsubmit="return confirm('Delete this resource?');">
                             {% csrf_token %}
                             <button class="btn btn-sm btn-danger ms-2" type="submit">Delete</button>
                         </form>
@@ -75,7 +75,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form method="post" action="{% url 'resource_edit' res.id %}">
+                  <form method="post" action="{% url 'resource_edit' res.id %}">
                 {% csrf_token %}
                 <div class="mb-3">
                     <label class="form-label">Title</label>
