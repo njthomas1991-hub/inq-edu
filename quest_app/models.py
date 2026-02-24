@@ -38,13 +38,14 @@ class User(AbstractUser):
             raise ValidationError({'role': 'Invalid role choice'})
 
     def save(self, *args, **kwargs):
-        # Call full_clean to enforce `clean()` on save so invalid role values
-        # are rejected at the model layer regardless of database support.
-        try:
+        # Avoid running full_clean for partial updates (e.g. update_fields used
+        # by Django signals like update_last_login). Only validate on full
+        # saves to prevent accidental ValidationError during routine partial
+        # updates.
+        if not kwargs.get('update_fields'):
+            # Call full_clean to enforce `clean()` on save so invalid role
+            # values are rejected at the model layer regardless of database support.
             self.full_clean()
-        except Exception:
-            # Re-raise to avoid swallowing validation errors.
-            raise
         return super().save(*args, **kwargs)
 
 class TeachingResource(models.Model):
