@@ -27,7 +27,7 @@
                   </div>
                   <div class="d-flex align-items-center gap-2 mt-2 mt-md-0">
                     <span class="student-password small text-monospace" id="pw-{{ student.id }}">••••••••</span>
-                    <button class="btn btn-outline-secondary btn-sm toggle-password" data-user-id="{{ student.id }}" type="button" aria-label="Show password">Show</button>
+                    <button class="btn btn-outline-secondary btn-sm toggle-password" data-user-id="{{ student.id }}" type="button" aria-label="Show password">👁</button>
                     <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="collapse" data-bs-target="#edit-{{ student.id }}">Edit</button>
                     <button class="btn btn-outline-primary btn-sm" data-bs-toggle="collapse" data-bs-target="#move-{{ student.id }}">Move</button>
                     <form method="post" class="d-inline">
@@ -144,6 +144,56 @@
                   return cookieValue;
               }
 
+              // Setup delegated handler for password toggle once on load
+              (function setupToggleDelegate(){
+                var container = document.querySelector('.card-body');
+                if (!container || container._hasToggleDelegate) return;
+                container._hasToggleDelegate = true;
+                container.addEventListener('click', function(e){
+                  var btn = e.target.closest('.toggle-password');
+                  if (!btn || !container.contains(btn)) return;
+                  var uid = btn.getAttribute('data-user-id');
+                  var pwEl = uid ? document.getElementById('pw-' + uid) : null;
+                  if (!pwEl) {
+                    var li = btn.closest('li');
+                    pwEl = li && li.querySelector('.student-password');
+                  }
+                  if (!pwEl) return;
+                  if (pwEl.textContent.indexOf('•') === 0) {
+                    var cached = pwEl.getAttribute('data-pw');
+                    if (cached) {
+                      pwEl.textContent = cached;
+                      btn.textContent = '🙈';
+                      return;
+                    }
+                    fetch('{% url "reveal_student_password" 0 %}'.replace('/0/', '/' + (uid || '') + '/'), {
+                      method: 'POST',
+                      credentials: 'same-origin',
+                      headers: {'X-CSRFToken': getCookie('csrftoken') || ''}
+                    }).then(function(r){ return r.json(); }).then(function(js){
+                      if (js && js.success) {
+                        pwEl.textContent = js.password;
+                        try { pwEl.setAttribute('data-pw', js.password); } catch (err) {}
+                        btn.textContent = '🙈';
+                      } else {
+                        var m = document.createElement('div');
+                        m.className = 'alert alert-warning ajax-add-alert';
+                        m.textContent = (js && js.error) || 'Password not available.';
+                        container.insertBefore(m, container.firstChild);
+                      }
+                    }).catch(function(){
+                      var m = document.createElement('div');
+                      m.className = 'alert alert-warning ajax-add-alert';
+                      m.textContent = 'Request failed.';
+                      container.insertBefore(m, container.firstChild);
+                    });
+                  } else {
+                    pwEl.textContent = '••••••••';
+                    btn.textContent = '👁';
+                  }
+                });
+              })();
+
               var submitBtn = document.getElementById('ajax-add-student-btn');
               submitBtn && submitBtn.addEventListener('click', function(){
                 var first = document.getElementById('student-first-name').value.trim();
@@ -186,8 +236,8 @@
                           <div class="text-muted small">${email || ''}</div>
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                          <span class="student-password" data-pw="${res.json.password}">••••••••</span>
-                          <button class="btn btn-outline-secondary btn-sm toggle-password" type="button" aria-label="Show password">👁</button>
+                          <span id="pw-${res.json.id}" class="student-password" data-pw="${res.json.password}">••••••••</span>
+                          <button class="btn btn-outline-secondary btn-sm toggle-password" data-user-id="${res.json.id}" type="button" aria-label="Show password">👁</button>
                           <div class="btn-group" role="group">
                             <form method="post" class="d-inline">
                               {% csrf_token %}
@@ -204,18 +254,7 @@
                           </div>
                         </div>`;
                       list.insertBefore(li, list.firstChild);
-                      // attach toggle handler
-                      var tbtn = li.querySelector('.toggle-password');
-                      var pwspan = li.querySelector('.student-password');
-                      tbtn && tbtn.addEventListener('click', function(){
-                        if (pwspan.textContent.indexOf('•') === 0) {
-                          pwspan.textContent = pwspan.getAttribute('data-pw');
-                          tbtn.textContent = '🙈';
-                        } else {
-                          pwspan.textContent = '••••••••';
-                          tbtn.textContent = '👁';
-                        }
-                      });
+                      // newly-inserted rows use delegation; nothing to attach here
                     }
                     // attach handlers for generate-reset buttons and password toggles
                     setTimeout(function(){
@@ -247,23 +286,38 @@
                         });
                       });
 
-                      // password reveal handlers for existing students
-                      var pwBtns = document.querySelectorAll('.toggle-password');
-                      pwBtns.forEach(function(btn){
-                        btn.addEventListener('click', function(){
+                      // Delegate toggle-password clicks from the container so dynamic rows work
+                      var container = document.querySelector('.card-body');
+                      if (container && !container._hasToggleDelegate) {
+                        container._hasToggleDelegate = true;
+                        container.addEventListener('click', function(e){
+                          var btn = e.target.closest('.toggle-password');
+                          if (!btn || !container.contains(btn)) return;
                           var uid = btn.getAttribute('data-user-id');
-                          var pwEl = document.getElementById('pw-' + uid);
+                          var pwEl = uid ? document.getElementById('pw-' + uid) : null;
+                          if (!pwEl) {
+                            var li = btn.closest('li');
+                            pwEl = li && li.querySelector('.student-password');
+                          }
                           if (!pwEl) return;
-                          // if currently hidden, fetch password
+                          // if currently hidden, fetch password if needed
                           if (pwEl.textContent.indexOf('•') === 0) {
-                            fetch('{% url "reveal_student_password" 0 %}'.replace('/0/', '/' + uid + '/'), {
+                            var cached = pwEl.getAttribute('data-pw');
+                            if (cached) {
+                              pwEl.textContent = cached;
+                              btn.textContent = '🙈';
+                              return;
+                            }
+                            fetch('{% url "reveal_student_password" 0 %}'.replace('/0/', '/' + (uid || '') + '/'), {
                               method: 'POST',
                               credentials: 'same-origin',
                               headers: {'X-CSRFToken': getCookie('csrftoken') || ''}
                             }).then(function(r){ return r.json(); }).then(function(js){
                               if (js && js.success) {
                                 pwEl.textContent = js.password;
-                                btn.textContent = 'Hide';
+                                // cache on element to avoid extra requests
+                                try { pwEl.setAttribute('data-pw', js.password); } catch (err) {}
+                                btn.textContent = '🙈';
                               } else {
                                 var m = document.createElement('div');
                                 m.className = 'alert alert-warning ajax-add-alert';
@@ -278,10 +332,10 @@
                             });
                           } else {
                             pwEl.textContent = '••••••••';
-                            btn.textContent = 'Show';
+                            btn.textContent = '👁';
                           }
                         });
-                      });
+                      }
                     }, 50);
                   } else {
                     var err = document.createElement('div');
