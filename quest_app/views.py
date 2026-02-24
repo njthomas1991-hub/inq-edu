@@ -31,7 +31,12 @@ from .forms import (
     ResourceCommentForm,
     TeachingResourceForm,
 )
-from .models import Class, ResourceComment, TeachingResource
+from .models import (
+    Class,
+    ResourceComment,
+    TeachingResource,
+    StudentPassword,
+)
 
 # Module logger
 logger = logging.getLogger(__name__)
@@ -360,10 +365,16 @@ def class_detail(request, pk):
                     "password": password,
                     "name": user.get_full_name() or username,
                 }
-                # Cache the plaintext password for teacher retrieval for a limited time
+                # Cache the plaintext password for teacher retrieval (no explicit TTL)
                 try:
-                    # Cache plaintext password for 24 hours
-                    cache.set(f"student_pw:{user.id}", password, timeout=60 * 60 * 24)
+                    cache.set(f"student_pw:{user.id}", password)
+                except Exception:
+                    pass
+                # Persist plaintext password so it remains available even if cache is cleared
+                try:
+                    StudentPassword.objects.update_or_create(
+                        user=user, defaults={"password": password}
+                    )
                 except Exception:
                     pass
                 message = ("success", f'Created student {created_credentials["name"]}.')
@@ -417,9 +428,16 @@ def class_detail(request, pk):
                     user.last_name = new_linit
                 if new_pw:
                     user.set_password(new_pw)
-                    # Cache the new plaintext password for retrieval (24h)
+                    # Cache the new plaintext password for teacher retrieval (no explicit TTL)
                     try:
-                        cache.set(f"student_pw:{user.id}", new_pw, timeout=60 * 60 * 24)
+                        cache.set(f"student_pw:{user.id}", new_pw)
+                    except Exception:
+                        pass
+                    # Persist plaintext password so it survives cache eviction
+                    try:
+                        StudentPassword.objects.update_or_create(
+                            user=user, defaults={"password": new_pw}
+                        )
                     except Exception:
                         pass
                 user.save()
@@ -558,9 +576,14 @@ def create_student_api(request):
         except Exception:
             # don't fail creation if email fails; include warning
             pass
-    # Cache the plaintext password for a limited time so teachers can retrieve it
+    # Cache the plaintext password so teachers can retrieve it (no explicit TTL)
     try:
-        cache.set(f"student_pw:{user.id}", password, timeout=60 * 60 * 24 * 7)
+        cache.set(f"student_pw:{user.id}", password)
+    except Exception:
+        pass
+    # Persist plaintext password so it remains available even if cache is cleared
+    try:
+        StudentPassword.objects.update_or_create(user=user, defaults={"password": password})
     except Exception:
         pass
 
@@ -986,6 +1009,14 @@ def reveal_student_password(request, pk):
         pw = cache.get(f"student_pw:{student.id}")
     except Exception:
         pw = None
+    # If cache missed, fall back to persistent store so teachers can always retrieve
+    if not pw:
+        try:
+            sp = StudentPassword.objects.filter(user=student).first()
+            if sp:
+                pw = sp.password
+        except Exception:
+            pw = None
 
     if not pw:
         return JsonResponse({"success": False, "error": "Password unavailable. Consider generating a reset link."}, status=404)

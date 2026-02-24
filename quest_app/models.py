@@ -135,6 +135,25 @@ class Class(models.Model):
         return self.name
 
 
+class StudentPassword(models.Model):
+    """Persistent store for teacher-visible student plaintext passwords.
+
+    WARNING: storing plaintext passwords is a security risk. This model exists
+    only to satisfy the current UX requirement that teachers can retrieve
+    student passwords even if transient caches are cleared. Consider replacing
+    this with one-time reset links or an encrypted secrets store.
+    """
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="plaintext_password"
+    )
+    password = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Plaintext password for {self.user.username} (stored)"
+
+
 logger = logging.getLogger(__name__)
 
 
