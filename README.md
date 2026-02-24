@@ -42,6 +42,7 @@ python manage.py createsuperuser
 - `quest_app/` — primary application (custom `User` model, views, forms, templates).
 - `static/` — static assets (CSS, JS, images).
 - `scripts/` — maintenance scripts (admin reset, secret generation, tooling).
+ - `frontend/` — optional SPA frontend (Vite + React). Build output is placed into `static/frontend`.
 
 ## Authentication & User model
 

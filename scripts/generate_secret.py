@@ -9,12 +9,14 @@ Copy the output into your local .env file as:
 
 Note: Do NOT commit your .env file to version control.
 """
+
 import secrets
-import sys
+
 
 def main():
     key = secrets.token_urlsafe(50)
     print(key)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

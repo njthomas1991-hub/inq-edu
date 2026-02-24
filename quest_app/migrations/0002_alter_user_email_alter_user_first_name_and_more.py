@@ -6,28 +6,41 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('quest_app', '0001_initial'),
+        ("quest_app", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='user',
-            name='email',
+            model_name="user",
+            name="email",
             field=models.EmailField(blank=True, max_length=254, null=True),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='first_name',
-            field=models.CharField(blank=True, max_length=150, verbose_name='first name'),
+            model_name="user",
+            name="first_name",
+            field=models.CharField(
+                blank=True, max_length=150, verbose_name="first name"
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='last_name',
-            field=models.CharField(blank=True, max_length=150, verbose_name='last name'),
+            model_name="user",
+            name="last_name",
+            field=models.CharField(
+                blank=True, max_length=150, verbose_name="last name"
+            ),
         ),
         migrations.AlterField(
-            model_name='user',
-            name='role',
-            field=models.CharField(blank=True, choices=[('student', 'Student'), ('teacher', 'Teacher'), ('school_admin', 'School Admin')], max_length=20, null=True),
+            model_name="user",
+            name="role",
+            field=models.CharField(
+                blank=True,
+                choices=[
+                    ("student", "Student"),
+                    ("teacher", "Teacher"),
+                    ("school_admin", "School Admin"),
+                ],
+                max_length=20,
+                null=True,
+            ),
         ),
     ]
