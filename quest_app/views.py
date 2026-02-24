@@ -334,7 +334,8 @@ def class_detail(request, pk):
         a = random.choice(adjs)
         b = random.choice(nouns)
         num = random.randint(10, 99)
-        return f"{a}-{b}{num}"
+        # Return two words followed by a number (e.g. "blueapple42")
+        return f"{a}{b}{num}"
 
     if request.method == "POST":
         action = request.POST.get("action")
@@ -361,7 +362,8 @@ def class_detail(request, pk):
                 }
                 # Cache the plaintext password for teacher retrieval for a limited time
                 try:
-                    cache.set(f"student_pw:{user.id}", password, timeout=60 * 60 * 24 * 7)
+                    # Cache plaintext password for 24 hours
+                    cache.set(f"student_pw:{user.id}", password, timeout=60 * 60 * 24)
                 except Exception:
                     pass
                 message = ("success", f'Created student {created_credentials["name"]}.')
@@ -415,9 +417,9 @@ def class_detail(request, pk):
                     user.last_name = new_linit
                 if new_pw:
                     user.set_password(new_pw)
-                    # Cache the new plaintext password for retrieval
+                    # Cache the new plaintext password for retrieval (24h)
                     try:
-                        cache.set(f"student_pw:{user.id}", new_pw, timeout=60 * 60 * 24 * 7)
+                        cache.set(f"student_pw:{user.id}", new_pw, timeout=60 * 60 * 24)
                     except Exception:
                         pass
                 user.save()
@@ -525,7 +527,8 @@ def create_student_api(request):
         a = random.choice(adjs)
         b = random.choice(nouns)
         num = random.randint(10, 99)
-        return f"{a}-{b}{num}"
+        # Two words and a number, concatenated for readability (e.g. blueapple42)
+        return f"{a}{b}{num}"
 
     User = get_user_model()
     username = _make_username(fname, linit)
