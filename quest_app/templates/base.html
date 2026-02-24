@@ -31,10 +31,13 @@
                             <a class="nav-link" href="/dashboard/">TeacherHub</a>
                         </li>
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="wonderworldDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <a class="nav-link dropdown-toggle" href="/wonderworld/" id="wonderworldDropdown" role="button" aria-expanded="false">
                                 Wonderworld
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="wonderworldDropdown">
+                                <li><a class="dropdown-item" href="/wonderworld/#primary">Primary — EYFS</a></li>
+                                <li><a class="dropdown-item" href="/wonderworld/#send">SEND</a></li>
+                                <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="/kindlewick/">Kindlewick</a></li>
                             </ul>
                         </li>
@@ -97,6 +100,34 @@
         <script src="{% static 'core/js/jquery.min.js' %}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'summernote/summernote-bs5.min.js' %}"></script>
+    <script>
+        // Show dropdown menus on hover for desktop; clicking the label navigates.
+        (function(){
+            try{
+                var isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+                if (isTouch) return; // keep native behaviour on touch devices
+                var items = document.querySelectorAll('.nav-item.dropdown');
+                items.forEach(function(item){
+                    item.addEventListener('mouseenter', function(){
+                        item.classList.add('show');
+                        var toggle = item.querySelector('.dropdown-toggle');
+                        var menu = item.querySelector('.dropdown-menu');
+                        if (toggle) toggle.classList.add('show');
+                        if (menu) menu.classList.add('show');
+                        if (toggle) toggle.setAttribute('aria-expanded','true');
+                    });
+                    item.addEventListener('mouseleave', function(){
+                        item.classList.remove('show');
+                        var toggle = item.querySelector('.dropdown-toggle');
+                        var menu = item.querySelector('.dropdown-menu');
+                        if (toggle) toggle.classList.remove('show');
+                        if (menu) menu.classList.remove('show');
+                        if (toggle) toggle.setAttribute('aria-expanded','false');
+                    });
+                });
+            }catch(e){ console.warn('dropdown hover init error', e); }
+        })();
+    </script>
         <!-- Diagnostic: watch for jQuery being removed at runtime -->
         <script>
             (function(){

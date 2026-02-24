@@ -1,7 +1,80 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
+
+{% block title %}Kindlewick - inq-ed{% endblock %}
+
 {% block content %}
-<div id="root"></div>
-<!-- Load the built Kindlewick Webpack app -->
-<script src="{% static 'kindlewick/app.js' %}"></script>
+<div class="container py-5">
+	<div class="row justify-content-center">
+		<div class="col-lg-10">
+			<div class="text-center mb-5">
+				<h1 class="display-3 fw-bold">Kindlewick</h1>
+				<p class="lead text-muted">An immersive story-based learning environment for Lower KS2 learners to reinforce and revise skills  — now loadable.</p>
+			</div>
+
+			<div class="row g-4 mb-5">
+				<div class="col-md-4">
+					<div class="card h-100 shadow-sm">
+						<div class="card-body text-center">
+							<div class="display-4 mb-3">📚</div>
+							<h4 class="card-title">Stories</h4>
+							<p class="card-text">Curated narrative experiences that build literacy and comprehension.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="card h-100 shadow-sm">
+						<div class="card-body text-center">
+							<div class="display-4 mb-3">🧭</div>
+							<h4 class="card-title">Guided Discovery</h4>
+							<p class="card-text">Prompts and activities woven into stories to spark inquiry.</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<div class="card h-100 shadow-sm">
+						<div class="card-body text-center">
+							<div class="display-4 mb-3">🎯</div>
+							<h4 class="card-title">Assessment</h4>
+							<p class="card-text">Formative checks integrated into the experience to inform teaching.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="card shadow-sm mb-4">
+				<div class="card-body p-5 text-center">
+					<h3 class="mb-3">Launch Kindlewick</h3>
+					<p class="text-muted mb-4">Click the button below to load the Kindlewick interactive app in this page.</p>
+					<a id="launch-kindlewick" href="#" class="btn btn-primary btn-lg">Load Kindlewick</a>
+				</div>
+			</div>
+
+			<!-- App mount point (hidden until loaded) -->
+			<div id="root" class="mb-5" style="min-height:300px;"></div>
+
+		</div>
+	</div>
+</div>
+
+<!-- Load the built Kindlewick Webpack app (deferred) -->
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var btn = document.getElementById('launch-kindlewick');
+  btn.addEventListener('click', function(e){
+	e.preventDefault();
+	if (window.__kindlewick_loaded) return;
+	var s = document.createElement('script');
+	s.src = '{% static "kindlewick/app.js" %}';
+	s.defer = true;
+	s.onload = function(){ window.__kindlewick_loaded = true; };
+	document.body.appendChild(s);
+	btn.textContent = 'Loading...';
+	setTimeout(function(){ btn.textContent = 'Loaded'; }, 1000);
+  });
+});
+</script>
+
 {% endblock %}

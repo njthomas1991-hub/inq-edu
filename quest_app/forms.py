@@ -88,15 +88,11 @@ class CustomAuthenticationForm(AuthenticationForm):
 
             try:
                 user = User.objects.get(email__iexact=email)
-                logger.warning('Auth form: mapped email %s -> username %s', email, user.username)
-                try:
-                    print(f"AUTH DEBUG: mapped email {email} -> username {user.username}")
-                except Exception:
-                    pass
+                logger.warning('Auth form: found user for email %s (username=%s)', email, user.username)
             except User.MultipleObjectsReturned:
                 user = User.objects.filter(email__iexact=email).order_by('id').first()
                 if user:
-                    logger.warning('Auth form: multiple users with email %s, selected username %s', email, user.username)
+                    logger.warning('Auth form: multiple users with email %s, selected id=%s username=%s', email, user.id, user.username)
             except User.DoesNotExist:
                 user = None
                 logger.warning('Auth form: no user found with email %s', email)
@@ -104,24 +100,47 @@ class CustomAuthenticationForm(AuthenticationForm):
                     print(f"AUTH DEBUG: no user found with email {email}")
                 except Exception:
                     pass
-                # Provide a friendly validation error for unknown emails so the
-                # user sees a clear message on the login page instead of the
-                # generic authentication failure text.
-                try:
-                    raise forms.ValidationError('No account found for that email address. Please register or check the email entered.')
-                except forms.ValidationError:
-                    # Attach the error to the form's non-field errors and return early
-                    self.add_error(None, 'No account found for that email address. Please register or check the email entered.')
-                    return super().clean()
+                # Friendly non-field error
+                self.add_error(None, 'No account found for that email address. Please register or check the email entered.')
+                return super().clean()
+
             if user:
-                # set the username field to the found user's username
-                try:
-                    self.data = self.data.copy()
-                    self.data['username'] = user.username
-                except Exception:
-                    logger.exception('Auth form: failed to set self.data username for email %s', email)
+                # If the found user is a student, require username login
+                if getattr(user, 'role', None) == 'student':
+                    self.add_error(None, 'Students must log in using their username (teacher-provided credentials).')
+                    return super().clean()
+
+                # If the found user has a username, map email->username and let
+                # the base AuthenticationForm handle authentication normally.
+                if user.username:
                     try:
-                        print(f"AUTH DEBUG: failed to set self.data username for email {email}")
+                        self.data = self.data.copy()
+                        self.data['username'] = user.username
                     except Exception:
-                        pass
+                        logger.exception('Auth form: failed to set self.data username for email %s', email)
+                else:
+                    # No username stored for this account (legacy issue). Fall
+                    # back to checking the password directly and mark the user
+                    # as authenticated so login() will succeed.
+                    pwd = (self.data.get('password') or '').strip()
+                    if not pwd:
+                        self.add_error(None, 'Please enter your password.')
+                        return super().clean()
+                    try:
+                        if user.check_password(pwd):
+                            # Set the internal user cache and backend so that
+                            # LoginView.login will accept this user.
+                            self.user_cache = user
+                            user.backend = 'django.contrib.auth.backends.ModelBackend'
+                            # Populate cleaned_data so form is considered valid
+                            self.cleaned_data = {'username': user.username or '', 'password': pwd}
+                            return self.cleaned_data
+                        else:
+                            # Wrong password for the email provided
+                            self.add_error(None, 'Please enter a correct email and password.')
+                            return super().clean()
+                    except Exception:
+                        logger.exception('Auth form: error checking password for email %s', email)
+                        self.add_error(None, 'Authentication error. Please try again.')
+                        return super().clean()
         return super().clean()

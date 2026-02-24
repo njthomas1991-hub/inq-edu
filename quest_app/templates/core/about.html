@@ -1,20 +1,68 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>About Inclusive Quest Education</h1>
-<p>Empowering inquiry-based learning through innovative educational technology.</p>
+<div class="container py-4">
+  <section class="about-hero mb-4">
+    <h1 class="display-5">About Inclusive Quest Education</h1>
+    <p class="lead">Empowering inquiry-based learning through simple, thoughtful educational tools.</p>
+    <p>
+      <a class="btn btn-primary me-2" href="{% url 'register' %}">Get started — create an account</a>
+      <a class="btn btn-outline-secondary" href="{% url 'contact' %}">Contact us</a>
+    </p>
+  </section>
 
-<h2>Our Mission</h2>
-<p>inq-ed is dedicated to transforming education by making inquiry-based learning accessible, engaging, and effective for students and teachers alike.</p>
+  <section class="mission mb-4">
+    <h2>Our Mission</h2>
+    <p>inq-ed helps teachers bring inquiry-driven learning to the classroom with tools that make planning, sharing and assessing student work easier and more meaningful.</p>
+  </section>
 
-<h2>What We Offer</h2>
-<ul>
-  <li>Interactive learning experiences</li>
-  <li>Teacher tools for classroom management</li>
-  <li>Student-centered educational games</li>
-  <li>Comprehensive analytics and progress tracking</li>
-</ul>
+  <section class="offerings mb-4">
+    <h2>What We Offer</h2>
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h3 class="h5">Interactive learning</h3>
+            <p class="mb-0">Engaging activities and quests that put students at the centre of the learning process.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h3 class="h5">Teacher tools</h3>
+            <p class="mb-0">Create classes, manage students, and share resources with a few clicks.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h3 class="h5">Student accounts</h3>
+            <p class="mb-0">Simple credentials for students, created and managed by teachers.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 mb-3">
+        <div class="card h-100">
+          <div class="card-body">
+            <h3 class="h5">Analytics & progress</h3>
+            <p class="mb-0">Track class and student progress with straightforward analytics.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<h2>Our Approach</h2>
-<p>We believe learning should be playful, engaging, and student-driven. Our platform combines proven educational methodologies with modern technology to create an environment where curiosity leads to discovery.</p>
+  <section class="approach mb-4">
+    <h2>Our Approach</h2>
+    <p>We combine research-based pedagogy with intuitive design so teachers can focus on teaching and students can focus on exploring.</p>
+  </section>
 
+  <section class="cta mt-4">
+    <div class="p-3 bg-light rounded">
+      <strong>Try it with your class:</strong>
+      <span class="d-block">Teachers can create student accounts quickly — start by creating a teacher account and adding a class.</span>
+    </div>
+  </section>
+</div>
 {% endblock %}

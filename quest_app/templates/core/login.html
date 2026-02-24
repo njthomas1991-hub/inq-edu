@@ -12,6 +12,9 @@
           <div class="text-danger small">{{ form.non_field_errors|striptags }}</div>
         </div>
       {% endif %}
+      <div class="mb-3">
+        <div class="small text-muted">Students: log in with the username provided by your teacher. If you don't have credentials or can't log in, please contact your teacher for help.</div>
+      </div>
       {% comment %} Prefer explicit username + password UI. Fall back to form fields if names differ. {% endcomment %}
       {% if form.login %}
         <div class="mb-3">

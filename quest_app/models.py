@@ -57,3 +57,35 @@ class Class(models.Model):
 
     def __str__(self):
         return self.name
+
+
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
+import os
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+@receiver(pre_save, sender=User)
+def prevent_admin_password_change(sender, instance, **kwargs):
+    """Prevent changing the password for the `admin` username unless explicitly allowed.
+
+    To allow a change temporarily, set the environment variable
+    `ALLOW_ADMIN_PASSWORD_CHANGE=1` for the process that performs the change.
+    """
+    if instance.username != 'admin':
+        return
+    # If this is a new user (no PK yet) nothing to compare against.
+    if not instance.pk:
+        return
+    try:
+        old = sender.objects.get(pk=instance.pk)
+    except sender.DoesNotExist:
+        return
+    # Password changed?
+    if old.password != instance.password:
+        if os.environ.get('ALLOW_ADMIN_PASSWORD_CHANGE') == '1':
+            logger.info('Admin password change permitted by ALLOW_ADMIN_PASSWORD_CHANGE env var')
+            return
+        raise PermissionError("Password for 'admin' is locked. Set ALLOW_ADMIN_PASSWORD_CHANGE=1 to allow change.")
