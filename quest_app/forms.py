@@ -195,3 +195,13 @@ class CustomAuthenticationForm(AuthenticationForm):
                         self.add_error(None, "Authentication error. Please try again.")
                         return super().clean()
         return super().clean()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Ensure form fields render with Bootstrap form-control where available.
+        for fname in ("login", "username", "password"):
+            if fname in self.fields:
+                widget = self.fields[fname].widget
+                existing = widget.attrs.get("class", "")
+                classes = (existing + " form-control").strip()
+                widget.attrs["class"] = classes
