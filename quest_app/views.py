@@ -52,6 +52,7 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
 from django.core.mail import EmailMessage
+from django.views.decorators.csrf import csrf_exempt
 
 # Module logger
 logger = logging.getLogger(__name__)
@@ -948,6 +949,77 @@ def email_student_card_pdf(request, class_pk, student_id):
     except Exception as e:
         logger.exception("Failed to email student PDF: %s", e)
         return JsonResponse({"success": False, "error": "Failed to send email"}, status=500)
+
+
+@login_required
+@require_http_methods(["POST"])
+def promote_class(request, pk):
+    """Promote all students from class `pk` into a target class or a newly-created class.
+
+    POST JSON:
+      - target_class_id: (optional) existing class id to move students into
+      - new_name: (optional) name for a new class to create if target not provided
+
+    Behavior:
+      - Only the class teacher or a `school_admin` may call.
+      - Students' `StudentProfile.classroom` and the class ManyToMany are updated.
+      - Progress and unlock state (stored in `Progress.data`) are left intact.
+      - The previous class is archived by setting `is_deleted=True`.
+    """
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except Exception:
+        return JsonResponse({"success": False, "error": "Invalid JSON"}, status=400)
+
+    cls = get_object_or_404(Class, pk=pk)
+    # permission
+    if request.user != cls.teacher and request.user.role != "school_admin":
+        return JsonResponse({"success": False, "error": "Permission denied"}, status=403)
+
+    target_id = payload.get("target_class_id")
+    new_name = payload.get("new_name")
+
+    if target_id:
+        try:
+            target = Class.objects.get(pk=int(target_id))
+        except Exception:
+            return JsonResponse({"success": False, "error": "Target class not found"}, status=404)
+    else:
+        # create a new class for promoted students
+        if not new_name:
+            new_name = f"{cls.name} (Next Year)"
+        target = Class.objects.create(
+            name=new_name,
+            level=cls.level,
+            subject=cls.subject,
+            teacher=cls.teacher,
+            school=cls.school,
+        )
+
+    # Move students: update StudentProfile.classroom if present, and Class M2M
+    moved = 0
+    from .models import StudentProfile
+
+    students = list(cls.students.all())
+    for s in students:
+        try:
+            # update ManyToMany relationships
+            cls.students.remove(s)
+            target.students.add(s)
+            # update StudentProfile classroom FK if exists
+            profile = getattr(s, "student_profile", None)
+            if profile:
+                profile.classroom = target
+                profile.save(update_fields=["classroom"])
+            moved += 1
+        except Exception:
+            logger.exception("Failed to move student %s during promotion", getattr(s, "id", None))
+
+    # Archive previous class
+    cls.is_deleted = True
+    cls.save(update_fields=["is_deleted"])
+
+    return JsonResponse({"success": True, "moved": moved, "target_class": target.id})
 
 
 @login_required
