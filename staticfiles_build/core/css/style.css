@@ -398,6 +398,212 @@ footer {
 }
 
 /* Home card image fit */
+
+/* ------------------------------
+   Responsiveness Utilities
+   ------------------------------ */
+/* Ensure media elements never overflow their containers */
+img, picture, video, iframe {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Make tables scrollable on small screens */
+.table-responsive-custom {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Forms: full-width controls on small screens */
+@media (max-width: 575.98px) {
+    .form-control,
+    .btn {
+        width: 100% !important;
+        box-sizing: border-box;
+    }
+    .input-group > .form-control {
+        width: 100% !important;
+    }
+}
+
+/* Slightly smaller card padding and tighter spacing on small screens */
+@media (max-width: 767.98px) {
+    .card {
+        margin-bottom: var(--spacing-sm) !important;
+    }
+    .card-body {
+        padding: 0.75rem !important;
+    }
+}
+
+/* Responsive typography: scale headings on narrow viewports */
+h1, .display-4 {
+    font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+}
+h2 {
+    font-size: clamp(1.25rem, 3vw, 2rem);
+}
+
+/* Ensure modals and fixed elements behave on small screens */
+@media (max-width: 575.98px) {
+    .modal-dialog {
+        margin: 0.5rem;
+        max-width: calc(100% - 1rem);
+    }
+}
+
+/* Utility: make content containers fluid but constrained by CSS variables */
+.container-fluid-responsive {
+    width: 100%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: var(--container-2xl);
+}
+
+/* Touch targets: ensure buttons are easy to tap on small screens */
+@media (max-width: 575.98px) {
+    .btn {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+        font-size: var(--font-size-base) !important;
+    }
+}
+
+/* Accessibility: increase focus outlines on small screens */
+@media (max-width: 767.98px) {
+    a:focus, button:focus, input:focus, select:focus, textarea:focus {
+        outline: 3px solid rgba(100, 150, 255, 0.25) !important;
+        outline-offset: 2px !important;
+    }
+}
+
+/* Project-specific helpers to replace inline styles */
+.logo-max-300 {
+    max-width: 300px;
+    width: 100%;
+    height: auto;
+}
+
+.card-img-cover {
+    width: 100%;
+    object-fit: cover;
+    height: 18.5rem; /* ~296px */
+}
+
+@media (max-width: 767.98px) {
+    .card-img-cover {
+        height: 12rem;
+    }
+}
+
+.scrollable-list {
+    max-height: 420px;
+    overflow-y: auto;
+}
+
+.placeholder-panel {
+    height: 180px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #bbb;
+}
+
+.avatar-sm {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+    border-radius: 50%;
+    overflow: hidden;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.avatar-preview {
+    max-width: 300px;
+    width: 100%;
+    height: auto;
+}
+
+.hero-fullscreen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-top: 2rem;
+}
+
+.hero-media {
+    position: relative;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+/* utility for minimum height used by kindlewick root */
+.min-h-300 {
+    min-height: 300px;
+}
+
+.lead-compact {
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 1rem;
+}
+
+.icon-lg {
+    font-size: 2rem;
+}
+
+
+
+/* About page tweaks */
+.about-hero {
+    padding: 2rem 1rem;
+    text-align: left;
+}
+.about-hero .display-5 {
+    font-family: var(--font-family-heading);
+    color: var(--theme-accent-dark);
+    margin-bottom: 0.5rem;
+}
+.about-hero .lead {
+    color: var(--theme-text-muted);
+    margin-bottom: 1rem;
+}
+.about-hero .btn {
+    min-width: 180px;
+}
+
+.offerings .card {
+    border-radius: var(--radius-md);
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.offerings .card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+}
+
+.approach p {
+    line-height: 1.6;
+}
+
+.cta .bg-light {
+    border: 1px solid var(--theme-border);
+}
+
+@media (max-width: 767.98px) {
+    .about-hero, .mission, .offerings, .approach, .cta { padding-left: 0.75rem; padding-right: 0.75rem; }
+}
+
 /* ========================================
    Profile / Avatar - match dashboard visuals
    ======================================== */

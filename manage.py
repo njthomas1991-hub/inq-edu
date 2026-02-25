@@ -4,30 +4,13 @@
 import os
 import sys
 
-# Load environment variables from env.py if it exists
-env_path = os.path.join(os.path.dirname(__file__), 'backend', 'env.py')
-if os.path.isfile(env_path):
-    with open(env_path) as f:
-        exec(f.read())
-
 
 def main():
-    """Run administrative tasks."""
-    # Add backend to path so we can import backend.settings
-    sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backend'))
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
-import os
-import sys
-
-if __name__ == "__main__":
-    os.environ.setdefault(
-        "DJANGO_SETTINGS_MODULE", "inclusive_quest_education.settings"
-    )
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "inclusive_quest_education.settings")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
         raise ImportError(
-<<<<<<< HEAD
             "Couldn't import Django. Are you sure it's installed and "
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
@@ -35,10 +18,5 @@ if __name__ == "__main__":
     execute_from_command_line(sys.argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
-=======
-            "Couldn't import Django. Are you sure it's installed and available on your PYTHONPATH environment variable? Did you forget to activate a virtual environment?"
-        ) from exc
-    execute_from_command_line(sys.argv)
->>>>>>> origin/tools/branch-migration-helper
