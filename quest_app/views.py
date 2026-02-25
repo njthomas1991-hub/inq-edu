@@ -8,7 +8,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import get_user_model, login
+from django.contrib.auth import get_user_model, login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.core.cache import cache
@@ -41,6 +41,9 @@ from .models import (
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
 from django.conf import settings
+from django.utils import timezone
+
+from rest_framework_simplejwt.tokens import RefreshToken
 
 # Module logger
 logger = logging.getLogger(__name__)
@@ -653,6 +656,79 @@ def create_student_api(request):
             "username": username,
             "password": password,
             "emailed": emailed,
+        }
+    )
+
+
+@require_http_methods(["POST"])
+def student_login_api(request):
+    """Student login endpoint using name (username) + password.
+
+    Returns JWT `access` and `refresh` on success. Enforces role == 'student'.
+    Tracks failed attempts on `StudentProfile` and includes a prompt to
+    contact the teacher when attempts exceed a modest threshold.
+    """
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except Exception:
+        return JsonResponse({"success": False, "error": "Invalid JSON"}, status=400)
+
+    username = (payload.get("username") or payload.get("name") or "").strip()
+    password = payload.get("password") or ""
+    if not username or not password:
+        return JsonResponse({"success": False, "error": "username and password required"}, status=400)
+
+    User = get_user_model()
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        return JsonResponse({"success": False, "error": "Invalid credentials"}, status=401)
+
+    # Ensure this endpoint is only for students
+    if getattr(user, "role", None) != "student":
+        return JsonResponse({"success": False, "error": "Not a student account"}, status=403)
+
+    user_obj = authenticate(request, username=username, password=password)
+    if user_obj is None:
+        # authentication failed: increment failed_attempts on profile if present
+        try:
+            profile = getattr(user, "student_profile", None)
+            if profile is None:
+                # try to create a profile record if missing
+                from .models import StudentProfile
+
+                profile, _ = StudentProfile.objects.get_or_create(user=user, defaults={"student_id": f"S{user.id}"})
+            profile.failed_attempts = (profile.failed_attempts or 0) + 1
+            profile.last_failed_at = timezone.now()
+            profile.save(update_fields=["failed_attempts", "last_failed_at"])
+            prompt = None
+            ATTEMPT_THRESHOLD = 5
+            if profile.failed_attempts >= ATTEMPT_THRESHOLD:
+                prompt = "Too many failed attempts — please contact your teacher."
+        except Exception:
+            prompt = None
+        resp = {"success": False, "error": "Invalid credentials"}
+        if prompt:
+            resp["prompt"] = prompt
+        return JsonResponse(resp, status=401)
+
+    # Successful auth: reset failed attempts
+    try:
+        profile = getattr(user, "student_profile", None)
+        if profile:
+            profile.failed_attempts = 0
+            profile.save(update_fields=["failed_attempts"])
+    except Exception:
+        pass
+
+    # Issue JWT tokens
+    refresh = RefreshToken.for_user(user)
+    return JsonResponse(
+        {
+            "success": True,
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+            "user": {"id": user.id, "username": user.username, "role": user.role},
         }
     )
 

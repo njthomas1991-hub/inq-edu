@@ -189,6 +189,9 @@ class StudentProfile(models.Model):
     progress = models.OneToOneField(
         Progress, on_delete=models.SET_NULL, null=True, blank=True, related_name="student"
     )
+    # Track failed login attempts for student accounts (prompt teachers after threshold)
+    failed_attempts = models.IntegerField(default=0)
+    last_failed_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
