@@ -48,7 +48,7 @@
 				<div class="card-body p-5 text-center">
 					<h3 class="mb-3">Launch Kindlewick</h3>
 					<p class="text-muted mb-4">Click the button below to load the Kindlewick interactive app.</p>
-					<a id="launch-kindlewick" href="#" class="btn btn-primary btn-lg">Load Kindlewick</a>
+					<a id="launch-kindlewick" href="{% static 'kindlewick/index.html' %}" class="btn btn-primary btn-lg">Load Kindlewick</a>
 				</div>
 			</div>
 
@@ -59,22 +59,6 @@
 	</div>
 </div>
 
-<!-- Load the built Kindlewick Webpack app (deferred) -->
-<script>
-document.addEventListener('DOMContentLoaded', function(){
-  var btn = document.getElementById('launch-kindlewick');
-  btn.addEventListener('click', function(e){
-	e.preventDefault();
-	if (window.__kindlewick_loaded) return;
-	var s = document.createElement('script');
-	s.src = '{% static "kindlewick/app.js" %}';
-	s.defer = true;
-	s.onload = function(){ window.__kindlewick_loaded = true; };
-	document.body.appendChild(s);
-	btn.textContent = 'Loading...';
-	setTimeout(function(){ btn.textContent = 'Loaded'; }, 1000);
-  });
-});
-</script>
+<!-- Launch opens the built Kindlewick app at static/kindlewick/index.html -->
 
 {% endblock %}
