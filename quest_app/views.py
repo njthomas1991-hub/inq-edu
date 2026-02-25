@@ -51,6 +51,7 @@ from django.http import FileResponse, HttpResponse
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
 from reportlab.pdfgen import canvas
+from django.core.mail import EmailMessage
 
 # Module logger
 logger = logging.getLogger(__name__)
@@ -852,6 +853,101 @@ def print_student_cards_pdf(request, pk):
     buffer.seek(0)
     filename = f"{cls.name}_login_cards.pdf"
     return FileResponse(buffer, as_attachment=False, filename=filename)
+
+
+@login_required
+@require_http_methods(["POST"])
+def email_student_card_pdf(request, class_pk, student_id):
+    """Generate (or reuse cached) single-sheet PDF for a student and email it.
+
+    POST JSON: {"to": "recipient@example.com"} — if omitted, uses student's email.
+    Permission: teacher of class or school_admin.
+    """
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except Exception:
+        payload = {}
+
+    cls = get_object_or_404(Class, pk=class_pk)
+    # permission: teacher of class or school_admin
+    if request.user != cls.teacher and request.user.role != "school_admin":
+        return JsonResponse({"success": False, "error": "Permission denied"}, status=403)
+
+    try:
+        student = get_user_model().objects.get(pk=int(student_id))
+    except Exception:
+        return JsonResponse({"success": False, "error": "Student not found"}, status=404)
+
+    # recipient
+    to_addr = (payload.get("to") or student.email or "").strip()
+    if not to_addr:
+        return JsonResponse({"success": False, "error": "No recipient address available"}, status=400)
+
+    cache_key = f"student_card_pdf:{student.id}"
+    pdf_bytes = None
+    try:
+        pdf_bytes = cache.get(cache_key)
+    except Exception:
+        pdf_bytes = None
+
+    if not pdf_bytes:
+        # create a small PDF (single card)
+        buf = BytesIO()
+        # use A6-ish size for single-sheet printable card: we'll still use A4 and center
+        c = canvas.Canvas(buf, pagesize=A4)
+        page_w, page_h = A4
+        card_w = 90 * mm
+        card_h = 60 * mm
+        x = (page_w - card_w) / 2
+        y = (page_h - card_h) / 2
+        c.rect(x, y, card_w, card_h)
+        pad = 6 * mm
+        tx = x + pad
+        ty = y + card_h - pad - 8
+        c.setFont("Helvetica-Bold", 12)
+        c.drawString(tx, ty, student.get_full_name() or student.username)
+        c.setFont("Helvetica", 10)
+        c.drawString(tx, ty - 14, f"Username: {student.username}")
+        # try to show persisted password
+        pw = None
+        try:
+            pw = cache.get(f"student_pw:{student.id}")
+        except Exception:
+            pw = None
+        if not pw:
+            try:
+                sp = StudentPassword.objects.filter(user=student).first()
+                if sp:
+                    pw = sp.password
+            except Exception:
+                pw = None
+        c.setFont("Helvetica-Bold", 11)
+        c.drawString(tx, ty - 30, f"Password: {pw or ''}")
+        c.showPage()
+        c.save()
+        buf.seek(0)
+        pdf_bytes = buf.getvalue()
+        # cache for 1 hour
+        try:
+            cache.set(cache_key, pdf_bytes, timeout=3600)
+        except Exception:
+            pass
+
+    # send email with attachment
+    try:
+        subject = f"INQ-ED login card for {student.get_full_name() or student.username}"
+        body = (
+            f"Hello,\n\nAttached is the login card for {student.get_full_name() or student.username}.\n\n"
+            "Please keep it secure.\n\nBest regards,\nINQ-ED"
+        )
+        msg = EmailMessage(subject, body, getattr(settings, "DEFAULT_FROM_EMAIL", None), [to_addr])
+        filename = f"{student.username}_login_card.pdf"
+        msg.attach(filename, pdf_bytes, "application/pdf")
+        msg.send(fail_silently=False)
+        return JsonResponse({"success": True, "emailed": True})
+    except Exception as e:
+        logger.exception("Failed to email student PDF: %s", e)
+        return JsonResponse({"success": False, "error": "Failed to send email"}, status=500)
 
 
 @login_required

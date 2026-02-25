@@ -54,10 +54,58 @@
               <div class="pw">{{ c.password }}</div>
             </div>
           </div>
+          <div class="mt-2 text-end no-print">
+            <button class="btn btn-sm btn-outline-secondary email-card" data-student-id="{{ c.id }}">Email PDF</button>
+          </div>
         </div>
       </div>
     {% endfor %}
   </div>
 
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener('click', function(e){
+  var btn = e.target.closest('.email-card');
+  if (!btn) return;
+  var sid = btn.getAttribute('data-student-id');
+  if (!sid) return;
+  btn.disabled = true;
+  var url = '{% url "email_student_card_pdf" class.pk 0 %}'.replace('/0/', '/' + sid + '/');
+  fetch(url, {method: 'POST', credentials: 'same-origin', headers: {'X-CSRFToken': getCookie('csrftoken') || '', 'Content-Type': 'application/json'}, body: JSON.stringify({})})
+    .then(function(r){ return r.json().then(function(js){ return {status: r.status, json: js}; }); })
+    .then(function(res){
+      var msg = '';
+      if (res.json && res.json.success) msg = 'Emailed successfully'; else msg = (res.json && res.json.error) || 'Email failed';
+      var alert = document.createElement('div');
+      alert.className = 'alert alert-info';
+      alert.textContent = msg;
+      document.querySelector('.container').insertBefore(alert, document.querySelector('.container').firstChild);
+      setTimeout(function(){ try{ alert.remove(); } catch(e){} }, 5000);
+    }).catch(function(){
+      var alert = document.createElement('div');
+      alert.className = 'alert alert-danger';
+      alert.textContent = 'Request failed';
+      document.querySelector('.container').insertBefore(alert, document.querySelector('.container').firstChild);
+      setTimeout(function(){ try{ alert.remove(); } catch(e){} }, 5000);
+    }).finally(function(){ btn.disabled = false; });
+});
+</script>
 {% endblock %}
