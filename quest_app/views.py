@@ -45,6 +45,12 @@ from django.utils import timezone
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import StudentPassword
+from io import BytesIO
+from django.http import FileResponse, HttpResponse
+
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.units import mm
+from reportlab.pdfgen import canvas
 
 # Module logger
 logger = logging.getLogger(__name__)
@@ -765,6 +771,87 @@ def print_student_cards(request, pk):
         cards.append({"id": s.id, "name": s.get_full_name() or s.username, "username": s.username, "password": pw or ""})
 
     return render(request, "core/printable_student_cards.html", {"class": cls, "cards": cards})
+
+
+@login_required
+def print_student_cards_pdf(request, pk):
+    """Generate a PDF of student login cards for bulk printing.
+
+    Layout: 3 columns per row. Simple boxed cards with name, username and password.
+    Permission: teacher of the class or school_admin.
+    """
+    cls = get_object_or_404(Class, pk=pk)
+    if request.user != cls.teacher and request.user.role != "school_admin":
+        return redirect("teacher_dashboard")
+
+    students = cls.students.all().order_by("last_name", "first_name", "username")
+
+    # Gather card data (username/password)
+    cards = []
+    for s in students:
+        pw = None
+        try:
+            pw = cache.get(f"student_pw:{s.id}")
+        except Exception:
+            pw = None
+        if not pw:
+            try:
+                sp = StudentPassword.objects.filter(user=s).first()
+                if sp:
+                    pw = sp.password
+            except Exception:
+                pw = None
+        cards.append({"name": s.get_full_name() or s.username, "username": s.username, "password": pw or ""})
+
+    # PDF layout constants
+    buffer = BytesIO()
+    page_w, page_h = A4
+    c = canvas.Canvas(buffer, pagesize=A4)
+    margin = 12 * mm
+    cols = 3
+    gap = 6 * mm
+    usable_w = page_w - margin * 2
+    card_w = (usable_w - gap * (cols - 1)) / cols
+    rows = int((page_h - margin * 2 + gap) // (40 * mm))  # approximate rows per page
+    card_h = (page_h - margin * 2 - gap * (rows - 1)) / rows
+
+    x0 = margin
+    y0 = page_h - margin - card_h
+
+    col = 0
+    row = 0
+    for idx, card in enumerate(cards):
+        x = x0 + col * (card_w + gap)
+        y = y0 - row * (card_h + gap)
+
+        # Draw box
+        c.rect(x, y, card_w, card_h)
+
+        # Text positions
+        pad = 6 * mm
+        tx = x + pad
+        ty = y + card_h - pad - 10
+
+        c.setFont("Helvetica-Bold", 10)
+        c.drawString(tx, ty, card["name"])  # name
+        c.setFont("Helvetica", 8)
+        c.drawString(tx, ty - 12, f"Username: {card['username']}")
+        c.setFont("Helvetica-Bold", 11)
+        c.drawString(tx, ty - 26, f"Password: {card['password']}")
+
+        col += 1
+        if col >= cols:
+            col = 0
+            row += 1
+            if (row >= rows):
+                c.showPage()
+                col = 0
+                row = 0
+
+    c.save()
+    buffer.seek(0)
+    filename = f"{cls.name}_login_cards.pdf"
+    return FileResponse(buffer, as_attachment=False, filename=filename)
 
 
 @login_required

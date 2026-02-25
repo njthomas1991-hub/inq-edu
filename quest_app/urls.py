@@ -30,6 +30,7 @@ urlpatterns = [
     path("api/create-student/", views.create_student_api, name="create_student_api"),
     path("api/student/login/", views.student_login_api, name="student_login_api"),
     path("class/<int:pk>/print-cards/", views.print_student_cards, name="print_student_cards"),
+    path("class/<int:pk>/print-cards/pdf/", views.print_student_cards_pdf, name="print_student_cards_pdf"),
     path(
         "teacher-news/",
         TemplateView.as_view(template_name="core/teacher_news_list.html"),

@@ -5,11 +5,13 @@
 
 {% block content %}
 <div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
+  <div class="d-flex justify-content-between align-items-center mb-3 no-print">
     <h2>Login cards — {{ class.name }}</h2>
     <div>
-      <button class="btn btn-primary me-2" onclick="window.print();">Print Cards</button>
-      <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="btn btn-secondary">Back</a>
+      <a href="{{ request.path }}" class="btn btn-outline-primary me-2">View HTML</a>
+      <a href="{% url 'print_student_cards_pdf' class.pk %}" class="btn btn-primary me-2">Download PDF</a>
+      <button class="btn btn-secondary me-2" onclick="window.print();">Print Cards</button>
+      <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="btn btn-light">Back</a>
     </div>
   </div>
 
