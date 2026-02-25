@@ -33,6 +33,7 @@ urlpatterns = [
     path("class/<int:pk>/print-cards/pdf/", views.print_student_cards_pdf, name="print_student_cards_pdf"),
     path("class/<int:class_pk>/print-cards/email/<int:student_id>/", views.email_student_card_pdf, name="email_student_card_pdf"),
     path("class/<int:pk>/promote/", views.promote_class, name="promote_class"),
+    path("class/<int:class_pk>/move-students/", views.bulk_move_students, name="bulk_move_students"),
     path(
         "teacher-news/",
         TemplateView.as_view(template_name="core/teacher_news_list.html"),

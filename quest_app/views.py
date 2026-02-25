@@ -1024,6 +1024,88 @@ def promote_class(request, pk):
 
 @login_required
 @require_http_methods(["POST"])
+def bulk_move_students(request, class_pk):
+    """Move a list of students from the source class (`class_pk`) into a single
+    target class (existing or newly-created). Designed for primary schools where
+    the class stays the same but the teacher changes.
+
+    POST JSON options:
+      - student_ids: [1,2,3]  (required)
+      - target_class_id: 42    (optional)
+      - new_teacher_id: 99     (optional; used when creating a new class)
+      - keep_name: true/false  (if creating new class, whether to copy name)
+
+    Permissions: only the class teacher or a `school_admin` may perform.
+    """
+    try:
+        payload = json.loads(request.body.decode("utf-8"))
+    except Exception:
+        return JsonResponse({"success": False, "error": "Invalid JSON"}, status=400)
+
+    student_ids = payload.get("student_ids") or []
+    if not isinstance(student_ids, list) or not student_ids:
+        return JsonResponse({"success": False, "error": "student_ids required"}, status=400)
+
+    src = get_object_or_404(Class, pk=class_pk)
+    # permission
+    if request.user != src.teacher and request.user.role != "school_admin":
+        return JsonResponse({"success": False, "error": "Permission denied"}, status=403)
+
+    target_id = payload.get("target_class_id")
+    new_teacher_id = payload.get("new_teacher_id")
+    keep_name = bool(payload.get("keep_name", True))
+
+    target = None
+    if target_id:
+        try:
+            target = Class.objects.get(pk=int(target_id))
+        except Exception:
+            return JsonResponse({"success": False, "error": "Target class not found"}, status=404)
+    else:
+        # create new class; require teacher id or use source teacher
+        if new_teacher_id:
+            try:
+                new_teacher = get_user_model().objects.get(pk=int(new_teacher_id))
+            except Exception:
+                return JsonResponse({"success": False, "error": "Teacher not found"}, status=404)
+        else:
+            new_teacher = src.teacher
+
+        name = src.name if keep_name else f"{src.name} (New)"
+        target = Class.objects.create(
+            name=name,
+            level=src.level,
+            subject=src.subject,
+            teacher=new_teacher,
+            school=src.school,
+        )
+
+    moved = 0
+    User = get_user_model()
+    for sid in student_ids:
+        try:
+            s = User.objects.get(pk=int(sid))
+        except Exception:
+            continue
+        # Ensure student belongs to source class before moving
+        if not src.students.filter(pk=s.id).exists():
+            continue
+        try:
+            src.students.remove(s)
+            target.students.add(s)
+            profile = getattr(s, "student_profile", None)
+            if profile:
+                profile.classroom = target
+                profile.save(update_fields=["classroom"])
+            moved += 1
+        except Exception:
+            logger.exception("Failed to move student %s in bulk move", s.id)
+
+    return JsonResponse({"success": True, "moved": moved, "target_class": target.id})
+
+
+@login_required
+@require_http_methods(["POST"])
 def generate_reset_api(request):
     """Generate a single-use signed reset token and return a one-time URL (no email required).
     POST JSON: {"user_id": 3}
