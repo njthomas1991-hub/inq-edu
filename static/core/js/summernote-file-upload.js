@@ -47,17 +47,30 @@
     // expose a no-op upload handler (replace with real upload if needed)
     function handleFile(file, context){
       try{
-        var reader = new FileReader();
-        reader.onload = function(){
-          // Insert a simple link with the filename. For real uploads,
-          // upload to server and insert returned URL instead.
-          var txt = document.createElement('a');
-          txt.href = '#';
-          txt.textContent = file.name;
-          context.invoke('editor.insertNode', txt);
-        };
-        // read as data just to trigger the onload; not used here
-        reader.readAsArrayBuffer(file.slice(0,1));
+        var form = new FormData();
+        form.append('file', file);
+        fetch('{% url "summernote_upload" %}', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'X-CSRFToken': (document.cookie||'').split('csrftoken=')[1] || ''
+          },
+          body: form
+        }).then(function(r){ return r.json(); }).then(function(js){
+          if (js && js.success && js.url){
+            // insert an <a> for generic files or <img> for images
+            if (file.type.indexOf('image/') === 0) {
+              context.invoke('editor.insertImage', js.url);
+            } else {
+              var a = document.createElement('a');
+              a.href = js.url;
+              a.textContent = file.name;
+              context.invoke('editor.insertNode', a);
+            }
+          } else {
+            console.warn('upload failed', js);
+          }
+        }).catch(function(err){ console.error('upload error', err); });
       }catch(e){
         console.error('file upload handler failed', e);
       }

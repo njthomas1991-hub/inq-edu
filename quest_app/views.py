@@ -38,6 +38,10 @@ from .models import (
     StudentPassword,
 )
 
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.conf import settings
+
 # Module logger
 logger = logging.getLogger(__name__)
 
@@ -1035,6 +1039,27 @@ def avatar_randomize(request):
     request.session["inqed_avatar"] = data
     request.session.modified = True
     return JsonResponse(data)
+
+
+@login_required
+@require_http_methods(["POST"])
+def summernote_upload(request):
+    """Simple file upload endpoint used by the Summernote plugin.
+
+    Expects a multipart/form-data POST with field `file`. Returns JSON
+    {"url": "<public url>"} on success.
+    """
+    if not request.FILES:
+        return JsonResponse({"success": False, "error": "No file provided"}, status=400)
+    upload = request.FILES.get("file") or next(iter(request.FILES.values()))
+    try:
+        subpath = f"uploads/summernote/{int(time.time())}_{upload.name}"
+        saved_path = default_storage.save(subpath, ContentFile(upload.read()))
+        url = settings.MEDIA_URL + saved_path
+        return JsonResponse({"success": True, "url": url})
+    except Exception as e:
+        logger.exception("summernote upload failed")
+        return JsonResponse({"success": False, "error": "Upload failed"}, status=500)
 
 
 @login_required

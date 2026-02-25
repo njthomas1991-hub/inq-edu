@@ -157,6 +157,45 @@ class StudentPassword(models.Model):
 logger = logging.getLogger(__name__)
 
 
+class Progress(models.Model):
+    """Lightweight progress record for students.
+
+    This model is intentionally minimal — the app can extend it later to
+    include detailed per-activity records, timestamps, or aggregate scores.
+    """
+    data = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Progress {self.pk} (updated {self.updated_at})"
+
+
+class StudentProfile(models.Model):
+    """Profile for users with the student role.
+
+    - `student_id` is a required, unique identifier for each student.
+    - `user` links to the existing `User` model (auth record).
+    - `classroom` links to a primary `Class` record.
+    - `progress` is an optional reference to the `Progress` record.
+    """
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="student_profile"
+    )
+    student_id = models.CharField(max_length=50, unique=True)
+    classroom = models.ForeignKey(
+        Class, on_delete=models.CASCADE, related_name="student_profiles"
+    )
+    progress = models.OneToOneField(
+        Progress, on_delete=models.SET_NULL, null=True, blank=True, related_name="student"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Student {self.student_id} ({self.user.get_full_name()})"
+
+
 @receiver(pre_save, sender=User)
 def prevent_admin_password_change(sender, instance, **kwargs):
     """Prevent changing the password for the `admin` username unless explicitly allowed.

@@ -57,6 +57,7 @@ urlpatterns = [
     path("api/student-password/<int:pk>/", views.reveal_student_password, name="reveal_student_password"),
     path("student-reset/<str:token>/", views.student_reset, name="student_reset"),
     path("archived-students/", views.archived_students, name="archived_students"),
+    path("api/summernote-upload/", views.summernote_upload, name="summernote_upload"),
     # Avatar API endpoints
     path("api/avatar/", views.avatar_api, name="avatar_api"),
     path("api/avatar/save/", views.avatar_save, name="avatar_save"),
