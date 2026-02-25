@@ -44,6 +44,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from rest_framework_simplejwt.tokens import RefreshToken
+from .models import StudentPassword
 
 # Module logger
 logger = logging.getLogger(__name__)
@@ -731,6 +732,39 @@ def student_login_api(request):
             "user": {"id": user.id, "username": user.username, "role": user.role},
         }
     )
+
+
+@login_required
+def print_student_cards(request, pk):
+    """Render a print-friendly page of student login cards for a class.
+
+    Permission: only the class teacher or school_admin can access.
+    Shows username and the persisted student password (cache or `StudentPassword`).
+    """
+    cls = get_object_or_404(Class, pk=pk)
+    # permission: teacher of class or school_admin
+    if request.user != cls.teacher and request.user.role != "school_admin":
+        return redirect("teacher_dashboard")
+
+    students = cls.students.all().order_by("last_name", "first_name", "username")
+    cards = []
+    for s in students:
+        # try cache first
+        pw = None
+        try:
+            pw = cache.get(f"student_pw:{s.id}")
+        except Exception:
+            pw = None
+        if not pw:
+            try:
+                sp = StudentPassword.objects.filter(user=s).first()
+                if sp:
+                    pw = sp.password
+            except Exception:
+                pw = None
+        cards.append({"id": s.id, "name": s.get_full_name() or s.username, "username": s.username, "password": pw or ""})
+
+    return render(request, "core/printable_student_cards.html", {"class": cls, "cards": cards})
 
 
 @login_required

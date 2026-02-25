@@ -29,6 +29,7 @@ urlpatterns = [
     path("class/<int:pk>/", views.class_detail, name="class_detail"),
     path("api/create-student/", views.create_student_api, name="create_student_api"),
     path("api/student/login/", views.student_login_api, name="student_login_api"),
+    path("class/<int:pk>/print-cards/", views.print_student_cards, name="print_student_cards"),
     path(
         "teacher-news/",
         TemplateView.as_view(template_name="core/teacher_news_list.html"),
