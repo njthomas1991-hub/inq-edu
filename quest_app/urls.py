@@ -74,6 +74,9 @@ urlpatterns = [
         TemplateView.as_view(template_name="core/kindlewick.html"),
         name="kindlewick",
     ),
+    # SPA route: serve the built Kindlewick index for the app and its client-side routes
+    path("kindlewick/app/", views.kindlewick_spa, name="kindlewick_app"),
+    path("kindlewick/app/<path:path>/", views.kindlewick_spa),
     path(
         "wonderworld/",
         TemplateView.as_view(template_name="core/wonderworld.html"),

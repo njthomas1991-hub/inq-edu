@@ -232,6 +232,19 @@ def dashboard(request):
     # Add logic for other roles as needed
     return render(request, "core/dashboard.html")
 
+
+def kindlewick_spa(request, path: str = ""):
+    """Serve the built Kindlewick SPA index.html for the app route and any subpaths.
+
+    This allows client-side routing inside the Kindlewick single-page app while
+    keeping assets under the normal `/static/` prefix.
+    """
+    try:
+        idx = Path(settings.BASE_DIR) / "static" / "kindlewick" / "index.html"
+        return FileResponse(open(idx, "rb"), content_type="text/html")
+    except Exception:
+        return HttpResponse("Kindlewick app not found", status=404)
+
     # Custom login view to handle 'Remember Me'
 
 
