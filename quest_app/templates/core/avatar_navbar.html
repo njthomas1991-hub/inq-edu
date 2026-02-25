@@ -1,0 +1,62 @@
+{% load static %}
+<!-- Navbar Avatar Icon Component -->
+<div id="navbarAvatarIcon" class="d-inline-block align-middle me-2 avatar-sm rounded-circle overflow-hidden">
+    <!-- Avatar will render here -->
+</div>
+
+<script>
+// Full MonsterRenderer class - same as dashboard avatar
+class NavbarMonsterRenderer {
+    constructor(app, width = 300, height = 400) {
+        this.app = app;
+        this.width = width;
+        this.height = height;
+        this.monster = new PIXI.Container();
+        this.app.stage.addChild(this.monster);
+    }
+    
+    async init(container, width = 300, height = 400) {
+        this.width = width;
+        this.height = height;
+        // App is already initialized via constructor with config
+        const canvas = this.app.canvas || this.app.view;
+        if (!canvas) {
+            throw new Error('Could not get canvas from PIXI app');
+        }
+        container.appendChild(canvas);
+        
+        // Set canvas size attributes
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Ensure canvas is properly sized with CSS
+        canvas.style.width = '100%';
+        canvas.style.height = '100%';
+        canvas.style.display = 'block';
+        
+        return this;
+    }
+
+    drawBody(type, color) {
+        const graphics = new PIXI.Graphics();
+        const safeColor = color || '#FF6B9D';
+        graphics.beginFill(parseInt(safeColor.replace('#', ''), 16));
+        
+        const centerX = this.width / 2;
+        const centerY = this.height / 2;
+
+                switch(type) {
+            case 'blob':
+                graphics.moveTo(centerX, centerY - 80);
+        } catch (error) {
+            console.error('Error rendering navbar avatar:', error);
+        }
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initNavbarAvatar);
+} else {
+    initNavbarAvatar();
+}
+</script>

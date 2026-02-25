@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # INQ-ED Frontend (React App)
 
 > **📖 Main Documentation:** See [../README.md](../README.md) for complete project documentation.
@@ -70,3 +71,19 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+=======
+# Frontend (Vite + React)
+
+This folder contains a minimal Vite + React scaffold intended to live separately from the Django backend.
+
+Quick commands:
+
+```bash
+cd frontend
+npm install
+npm run dev    # local dev server (hot reload)
+npm run build  # produce static files into ../static/frontend
+```
+
+The production build output is configured to go to `static/frontend` so Django can serve the built assets.
+>>>>>>> origin/tools/branch-migration-helper

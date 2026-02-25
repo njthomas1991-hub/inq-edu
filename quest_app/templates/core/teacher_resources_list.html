@@ -1,0 +1,124 @@
+{% extends "core/base_teacher.html" %}
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h1 class="mb-3">Teaching Resources</h1>
+            <p class="text-muted">A collection of resources and materials for lesson planning and classroom use.</p>
+
+            {% if message %}
+                <div class="alert alert-danger">{{ message.1 }}</div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="mb-0">Your Resources</h4>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addResourceModal">Add Resource</button>
+            </div>
+
+            <!-- Add Resource Modal -->
+            <div class="modal fade" id="addResourceModal" tabindex="-1" aria-labelledby="addResourceModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="addResourceModalLabel">Add Resource</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ form.title.label_tag }}
+                            {{ form.title }}
+                            {% for err in form.title.errors %}<div class="text-danger">{{ err }}</div>{% endfor %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.document.label_tag }}
+                            {{ form.document }}
+                            {% for err in form.document.errors %}<div class="text-danger">{{ err }}</div>{% endfor %}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.description.label_tag }}
+                            {{ form.description }}
+                            {% for err in form.description.errors %}<div class="text-danger">{{ err }}</div>{% endfor %}
+                        </div>
+                        <div class="text-end">
+                            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
+                            <button class="btn btn-primary" type="submit">Upload</button>
+                        </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {# Resource cards are rendered via partial so they can be loaded incrementally #}
+            <div id="resource-cards-container">
+              {% include 'core/_resource_cards.html' with resources=resources user=user %}
+            </div>
+
+            <script>
+            (function(){
+              function bindLoadMore(){
+                var btn = document.getElementById('load-more-resources');
+                if (!btn) return;
+                btn.onclick = function(e){
+                  e.preventDefault();
+                  var next = btn.getAttribute('data-next-page');
+                  if (!next) return;
+                  btn.disabled = true;
+                  btn.textContent = 'Loading...';
+                  fetch(window.location.pathname + '?page=' + next + '&partial=1', {headers: {'X-Requested-With':'XMLHttpRequest'}})
+                    .then(function(res){ if (!res.ok) throw new Error('Network'); return res.text(); })
+                    .then(function(html){
+                      var container = document.getElementById('resource-cards-container');
+                      var temp = document.createElement('div'); temp.innerHTML = html;
+                      // append children
+                      while (temp.firstChild){ container.appendChild(temp.firstChild); }
+                      // re-bind handlers for new content
+                      bindHandlers();
+                    }).catch(function(){
+                      btn.disabled = false; btn.textContent = 'Load more'; alert('Could not load more resources');
+                    });
+                };
+              }
+
+              function bindPagination(){
+                // delegate clicks on pagination links inside container
+                var container = document.getElementById('resource-cards-container');
+                if (!container) return;
+                container.querySelectorAll('.resource-page-link').forEach(function(a){
+                  a.onclick = function(e){
+                    e.preventDefault();
+                    var href = a.getAttribute('href');
+                    var params = new URLSearchParams(href.replace(/^[^?]*\?/, ''));
+                    var page = params.get('page') || 1;
+                    // load partial and replace container
+                    fetch(window.location.pathname + '?page=' + page + '&partial=1', {headers: {'X-Requested-With':'XMLHttpRequest'}})
+                      .then(function(res){ if (!res.ok) throw new Error('Network'); return res.text(); })
+                      .then(function(html){
+                        var container = document.getElementById('resource-cards-container');
+                        container.innerHTML = html;
+                        // update browser URL
+                        try{ history.pushState(null, '', '?page=' + page); }catch(e){}
+                        // rebind handlers
+                        bindHandlers();
+                      }).catch(function(){ alert('Could not load page'); });
+                  };
+                });
+              }
+
+              function bindHandlers(){
+                bindLoadMore();
+                bindPagination();
+              }
+
+              // initial bind
+              document.addEventListener('DOMContentLoaded', bindHandlers);
+              // also run immediately in case DOMContentLoaded already fired
+              bindHandlers();
+            })();
+            </script>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+{% block content %}
+<meta name="csrf-token" content="{{ csrf_token }}">
+<div class="container py-4">
+  <div class="row g-4">
+    <div class="col-md-4">
+      {% include 'core/avatar_display.html' %}
+    </div>
+    <div class="col-md-8">
+      <h2 class="h3 mb-3">Profile</h2>
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="mb-2 profile-row"><strong>Name:</strong>
+            <span class="profile-value" id="profile-name">{{ user.first_name }} {{ user.last_name }}</span>
+            <button class="btn btn-sm btn-link edit-btn" data-field="name" title="Edit Name" aria-label="Edit Name">
+              <span class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/></svg>
+              </span>
+              <span class="fallback">Edit</span>
+            </button>
+          </div>
+          <div class="mb-2 profile-row"><strong>Email:</strong>
+            <span class="profile-value" id="profile-email">{{ user.email }}</span>
+            <button class="btn btn-sm btn-link edit-btn" data-field="email" title="Edit Email" aria-label="Edit Email">
+              <span class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/></svg>
+              </span>
+              <span class="fallback">Edit</span>
+            </button>
+          </div>
+          <div class="mb-2 profile-row"><strong>Role:</strong>
+            <span class="profile-value" id="profile-role">{{ user.role }}</span>
+            <button class="btn btn-sm btn-link edit-btn" data-field="role" title="Edit Role" aria-label="Edit Role">
+              <span class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/></svg>
+              </span>
+              <span class="fallback">Edit</span>
+            </button>
+          </div>
+          <div class="mb-2 profile-row"><strong>School:</strong>
+            <span class="profile-value" id="profile-school">{{ user.school }}</span>
+            <button class="btn btn-sm btn-link edit-btn" data-field="school" title="Edit School" aria-label="Edit School">
+              <span class="icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/></svg>
+              </span>
+              <span class="fallback">Edit</span>
+            </button>
+          </div>
+          <div class="mb-2 profile-row"><strong>Bio:</strong>
+            <div id="bio-view">
+              <p class="mb-0" id="profile-bio">{{ user.bio }}</p>
+              <div class="mt-2">
+                <button id="bio-edit" class="btn btn-sm btn-primary edit-btn" title="Edit Bio" aria-label="Edit Bio">
+                  <span class="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/></svg>
+                  </span>
+                  <span class="fallback">Edit</span>
+                </button>
+                <button id="bio-delete" class="btn btn-sm btn-danger" title="Delete Bio" aria-label="Delete Bio">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+                    <path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div id="bio-edit-area" class="d-none mt-2">
+              <textarea id="bio-text" class="form-control" rows="4">{{ user.bio }}</textarea>
+              <div class="mt-2">
+                <button id="bio-save" class="btn btn-sm btn-success">Save</button>
+                <button id="bio-cancel" class="btn btn-sm btn-secondary">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (function(){
+          // Inline edit handlers for simple client-side editing.
+          function makeInput(fieldId, currentText) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'form-control form-control-sm d-inline-block';
+            input.style.width = '60%';
+            input.value = currentText || '';
+            return input;
+          }
+
+          // read CSRF token from cookie or from meta tag as fallback
+          const PAGE_CSRF_TOKEN = (function(){
+            try { return document.querySelector('meta[name="csrf-token"]').getAttribute('content') || ''; } catch(e){ return ''; }
+          })();
+
+          function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+                }
+              }
+            }
+            return cookieValue || PAGE_CSRF_TOKEN;
+          }
+
+          // Toast helper (Bootstrap 5)
+          function showToast(message, type) {
+            try {
+              let container = document.getElementById('toast-container');
+              if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.style.position = 'fixed';
+                container.style.top = '1rem';
+                container.style.right = '1rem';
+                container.style.zIndex = 1060;
+                document.body.appendChild(container);
+              }
+              const toastEl = document.createElement('div');
+              toastEl.className = 'toast align-items-center text-bg-' + (type === 'success' ? 'success' : (type === 'error' ? 'danger' : 'secondary')) + ' border-0';
+              toastEl.role = 'alert';
+              toastEl.ariaLive = 'assertive';
+              toastEl.ariaAtomic = 'true';
+              toastEl.innerHTML = `
+                <div class="d-flex">
+                  <div class="toast-body">${message}</div>
+                  <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>`;
+              container.appendChild(toastEl);
+              const bsToast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 3500 });
+              bsToast.show();
+              toastEl.addEventListener('hidden.bs.toast', () => { toastEl.remove(); });
+            } catch (e) { console.warn('showToast failed', e); }
+          }
+
+          // Detect if Font Awesome is available by checking computed font-family
+          function hasFontAwesome() {
+            try {
+              const i = document.createElement('i');
+              i.className = 'fas fa-pen';
+              i.style.display = 'none';
+              document.body.appendChild(i);
+              const ff = window.getComputedStyle(i).getPropertyValue('font-family') || '';
+              document.body.removeChild(i);
+              return /Font Awesome|FontAwesome|fa-solid|FontAwesome5Free/.test(ff);
+            } catch (e) { return false; }
+          }
+          // Toggle visibility of icon vs fallback text depending on FA availability
+          (function toggleEditFallbacks(){
+            const showIcon = hasFontAwesome();
+            document.querySelectorAll('.edit-btn').forEach(b => {
+              const ic = b.querySelector('.icon');
+              const fb = b.querySelector('.fallback');
+              if (ic) ic.style.display = showIcon ? '' : 'none';
+              if (fb) fb.style.display = showIcon ? 'none' : '';
+            });
+          })();
+
+          // Summernote is loaded globally via base.html; initialize directly.
+
+          document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', function(e){
+              const field = this.getAttribute('data-field');
+              const span = document.getElementById('profile-' + field);
+              if (!span) return;
+              const current = span.textContent.trim();
+              // replace span with input + save/cancel
+              const input = makeInput(field, current);
+              const saveBtn = document.createElement('button');
+              saveBtn.className = 'btn btn-sm btn-success ms-2';
+              saveBtn.textContent = 'Save';
+              const cancelBtn = document.createElement('button');
+              cancelBtn.className = 'btn btn-sm btn-secondary ms-1';
+              cancelBtn.textContent = 'Cancel';
+              span.style.display = 'none';
+              this.style.display = 'none';
+              span.parentNode.insertBefore(input, span.nextSibling);
+              span.parentNode.insertBefore(saveBtn, input.nextSibling);
+              span.parentNode.insertBefore(cancelBtn, saveBtn.nextSibling);
+
+              saveBtn.addEventListener('click', function(){
+                const newVal = input.value.trim();
+                // send to server
+                fetch('/api/profile/update/', {
+                  method: 'POST',
+                  credentials: 'same-origin',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') || ''
+                  },
+                  body: JSON.stringify({field: field, value: newVal})
+                }).then(r => r.json()).then(js => {
+                  if (js && js.success) {
+                    span.textContent = newVal || '—';
+                  } else {
+                    alert('Failed to save: ' + (js && js.error ? js.error : 'Unknown'));
+                  }
+                }).then(() => {
+                  /* nothing */
+                }).catch(err => { showToast('Save failed: ' + err, 'error'); })
+                .finally(() => {
+                  span.style.display = '';
+                  input.remove(); saveBtn.remove(); cancelBtn.remove(); btn.style.display = '';
+                });
+              });
+              cancelBtn.addEventListener('click', function(){
+                span.style.display = '';
+                input.remove(); saveBtn.remove(); cancelBtn.remove(); btn.style.display = '';
+              });
+            });
+          });
+
+          // Bio edit/delete/save handlers
+          const bioEdit = document.getElementById('bio-edit');
+          const bioDelete = document.getElementById('bio-delete');
+          const bioView = document.getElementById('bio-view');
+          const bioEditArea = document.getElementById('bio-edit-area');
+          const bioText = document.getElementById('bio-text');
+          const bioSave = document.getElementById('bio-save');
+          const bioCancel = document.getElementById('bio-cancel');
+
+          bioEdit && bioEdit.addEventListener('click', function(){
+            bioView.style.display = 'none';
+            bioEditArea.style.display = '';
+            // Initialize Summernote only if jQuery and summernote are available
+            try {
+              if (typeof jQuery !== 'undefined' && typeof jQuery('#bio-text').summernote === 'function') {
+                jQuery('#bio-text').summernote({
+                  height: 150,
+                  toolbar: [
+                    ['style', ['bold','italic','underline','clear']],
+                    ['para', ['ul','ol','paragraph']],
+                    ['insert', ['link','picture']],
+                    ['view', ['fullscreen','codeview']]
+                  ]
+                });
+                // focus the editable area inside summernote
+                setTimeout(function(){ try { jQuery('#bio-text').summernote('focus'); } catch(e){} }, 50);
+              } else {
+                // no jQuery/summernote -> leave plain textarea visible
+                /* noop */
+              }
+            } catch (e) {
+              console.warn('Summernote init skipped:', e);
+            }
+          });
+          bioCancel && bioCancel.addEventListener('click', function(){
+            // if summernote active, destroy and reset textarea to current view content
+            try {
+              if (typeof jQuery !== 'undefined' && jQuery('#bio-text').next().hasClass('note-editor')) {
+                jQuery('#bio-text').summernote('destroy');
+              }
+            } catch (e) { /* ignore */ }
+            bioText.value = document.getElementById('profile-bio').textContent || '';
+            bioEditArea.style.display = 'none';
+            bioView.style.display = '';
+          });
+          bioDelete && bioDelete.addEventListener('click', function(){
+            if (!confirm('Delete your bio?')) return;
+            const val = '';
+            fetch('/api/profile/update/', {
+              method: 'POST',
+              credentials: 'same-origin',
+              headers: {'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') || ''},
+              body: JSON.stringify({field: 'bio', value: val})
+            }).then(r=>r.json()).then(js=>{
+              if (js && js.success) {
+                document.getElementById('profile-bio').textContent = '';
+                if (bioText) bioText.value = '';
+                showToast('Bio deleted', 'success');
+              } else showToast('Failed to delete bio: ' + (js && js.error ? js.error : 'Unknown'), 'error');
+            }).catch(e=>showToast('Failed to delete bio: '+e, 'error'));
+          });
+          bioSave && bioSave.addEventListener('click', function(){
+            let val = '';
+            // if summernote is active, get HTML content
+            try {
+              if (typeof jQuery !== 'undefined' && jQuery('#bio-text').next().hasClass('note-editor')) {
+                val = jQuery('#bio-text').summernote('code') || '';
+                // destroy the editor to restore textarea
+                try { jQuery('#bio-text').summernote('destroy'); } catch(e){}
+              } else {
+                val = bioText.value.trim();
+              }
+            } catch (e) {
+              // fallback to plain textarea value
+              val = bioText.value.trim();
+            }
+            fetch('/api/profile/update/', {
+              method: 'POST',
+              credentials: 'same-origin',
+              headers: {'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') || ''},
+              body: JSON.stringify({field: 'bio', value: val})
+            }).then(r=>r.json()).then(js=>{
+              if (js && js.success) {
+                // save HTML or plain text to view
+                document.getElementById('profile-bio').innerHTML = val;
+                bioEditArea.style.display = 'none';
+                bioView.style.display = '';
+                if (bioText) bioText.value = val;
+                showToast('Bio saved', 'success');
+              } else {
+                showToast('Failed to save bio: ' + (js && js.error ? js.error : 'Unknown'), 'error');
+              }
+            }).catch(e=>showToast('Save failed: '+e, 'error'));
+          });
+        })();
+      </script>
+    </div>
+  </div>
+</div>
+{% endblock %}

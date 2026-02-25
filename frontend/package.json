@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "myproject",
   "version": "1.0.0",
   "description": "InqEd Avatar Panel with Phaser.js",
@@ -45,5 +46,22 @@
     "react-three-fiber": "^6.0.13",
     "three": "^0.182.0",
     "web-vitals": "^5.1.0"
+=======
+  "name": "inclusive-quest-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.0.0"
+>>>>>>> origin/tools/branch-migration-helper
   }
 }

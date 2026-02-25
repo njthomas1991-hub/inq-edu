@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="container">
+  <div class="row justify-content-center align-items-center min-vh-100">
+    <div class="col-12 col-sm-10 col-md-8 col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body p-4">
+          <div class="text-center mb-3">
+            <div class="mb-2">
+              <img src="{% static 'core/images/inq-ed-logo.png' %}" alt="Inclusive Quest" style="height:44px;" />
+            </div>
+            <h3 class="mb-0">Welcome Back</h3>
+            <p class="text-muted small mb-0">Sign in to your Inclusive Quest account</p>
+          </div>
+
+          <form method="post" autocomplete="on" novalidate>
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger py-2">
+                {{ form.non_field_errors|striptags }}
+              </div>
+            {% endif %}
+
+            <div class="mb-3">
+              <small class="text-muted">Students: use the username provided by your teacher. Contact your teacher if you need help.</small>
+            </div>
+
+            {% if form.login %}
+              <div class="mb-3 form-floating">
+                {{ form.login }}
+                <label for="id_login">Username or Email</label>
+                {% if form.login.errors %}<div class="text-danger small">{{ form.login.errors|striptags }}</div>{% endif %}
+              </div>
+            {% elif form.username %}
+              <div class="mb-3 form-floating">
+                {{ form.username }}
+                {{ form.username.errors.as_ul|safe }}
+                <label for="id_username">Username or Email</label>
+              </div>
+            {% else %}
+              <div class="mb-3 form-floating">
+                <input id="id_username" name="username" type="text" class="form-control" required autocomplete="username">
+                <label for="id_username">Username or Email</label>
+              </div>
+            {% endif %}
+
+            {% if form.password %}
+              <div class="mb-3 form-floating">
+                {{ form.password }}
+                <label for="id_password">Password</label>
+                {% if form.password.errors %}<div class="text-danger small">{{ form.password.errors|striptags }}</div>{% endif %}
+              </div>
+            {% else %}
+              <div class="mb-3 form-floating">
+                <input id="id_password" name="password" type="password" class="form-control" required autocomplete="current-password">
+                <label for="id_password">Password</label>
+              </div>
+            {% endif %}
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="remember" id="remember" checked>
+                <label class="form-check-label small" for="remember">Remember me</label>
+              </div>
+              <div><a href="/password-reset/" class="small">Forgot password?</a></div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Sign in</button>
+
+            <div class="text-center my-3">
+              <small class="text-muted">Or sign in with</small>
+              <div class="d-flex gap-2 justify-content-center mt-2">
+                <a href="/accounts/google/login/" class="btn btn-outline-danger btn-sm" aria-label="Sign in with Google"><i class="fab fa-google me-1"></i> Google</a>
+                <a href="/accounts/microsoft/login/" class="btn btn-outline-secondary btn-sm" aria-label="Sign in with Microsoft"><i class="fab fa-microsoft me-1"></i> Microsoft</a>
+              </div>
+            </div>
+
+            <div class="text-center mt-3 small">
+              <span>Don't have an account? <a href="/register/">Register</a></span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  try{
+    var uname = document.querySelector('input[name="username"], input[name="login"], #id_username');
+    if (uname){
+      if (!uname.getAttribute('autocomplete')){
+        if (uname.name && uname.name.toLowerCase().indexOf('email')>-1) uname.setAttribute('autocomplete','email');
+        else uname.setAttribute('autocomplete','username');
+      }
+    }
+    var pwd = document.querySelector('input[name="password"], #id_password');
+    if (pwd){ pwd.setAttribute('autocomplete','current-password'); }
+  }catch(e){}
+});
+</script>
+
+{% endblock %}

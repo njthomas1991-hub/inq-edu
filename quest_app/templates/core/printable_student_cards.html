@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Printable Student Login Cards{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+    <h2>Login cards — {{ class.name }}</h2>
+    <div>
+      <a href="{{ request.path }}" class="btn btn-outline-primary me-2">View HTML</a>
+      <a href="{% url 'print_student_cards_pdf' class.pk %}" class="btn btn-primary me-2">Download PDF</a>
+      <button class="btn btn-secondary me-2" onclick="window.print();">Print Cards</button>
+      <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="btn btn-light">Back</a>
+    </div>
+  </div>
+
+  <style>
+  /* Print-optimized card grid */
+  @media print {
+    .no-print { display: none !important; }
+    .card { page-break-inside: avoid; }
+    body { -webkit-print-color-adjust: exact; }
+  }
+  .card.card-small { width: 280px; height: 160px; margin: 6px; }
+  .card-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+  .card .card-body { padding: 10px; }
+  .username { font-family: monospace; font-size: 1.1rem; }
+  .pw { font-weight: 700; font-size: 1.2rem; font-family: monospace; }
+  </style>
+
+  <div class="card-grid">
+    {% for c in cards %}
+      <div class="card card-small shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <div class="fw-bold">{{ c.name }}</div>
+              <div class="text-muted small">ID: {{ c.id }}</div>
+            </div>
+            <div class="text-end">
+              <div class="small text-muted">Class</div>
+              <div class="fw-bold">{{ class.name }}</div>
+            </div>
+          </div>
+          <hr />
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="small text-muted">Username</div>
+              <div class="username">{{ c.username }}</div>
+            </div>
+            <div>
+              <div class="small text-muted">Password</div>
+              <div class="pw">{{ c.password }}</div>
+            </div>
+          </div>
+          <div class="mt-2 text-end no-print">
+            <button class="btn btn-sm btn-outline-secondary email-card" data-student-id="{{ c.id }}">Email PDF</button>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener('click', function(e){
+  var btn = e.target.closest('.email-card');
+  if (!btn) return;
+  var sid = btn.getAttribute('data-student-id');
+  if (!sid) return;
+  btn.disabled = true;
+  var url = '{% url "email_student_card_pdf" class.pk 0 %}'.replace('/0/', '/' + sid + '/');
+  fetch(url, {method: 'POST', credentials: 'same-origin', headers: {'X-CSRFToken': getCookie('csrftoken') || '', 'Content-Type': 'application/json'}, body: JSON.stringify({})})
+    .then(function(r){ return r.json().then(function(js){ return {status: r.status, json: js}; }); })
+    .then(function(res){
+      var msg = '';
+      if (res.json && res.json.success) msg = 'Emailed successfully'; else msg = (res.json && res.json.error) || 'Email failed';
+      var alert = document.createElement('div');
+      alert.className = 'alert alert-info';
+      alert.textContent = msg;
+      document.querySelector('.container').insertBefore(alert, document.querySelector('.container').firstChild);
+      setTimeout(function(){ try{ alert.remove(); } catch(e){} }, 5000);
+    }).catch(function(){
+      var alert = document.createElement('div');
+      alert.className = 'alert alert-danger';
+      alert.textContent = 'Request failed';
+      document.querySelector('.container').insertBefore(alert, document.querySelector('.container').firstChild);
+      setTimeout(function(){ try{ alert.remove(); } catch(e){} }, 5000);
+    }).finally(function(){ btn.disabled = false; });
+});
+</script>
+{% endblock %}

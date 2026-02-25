@@ -1,0 +1,135 @@
+{% extends 'core/base_teacher.html' %}
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="row g-4">
+    <!-- Classes List -->
+    <div class="col-12">
+      <div class="card mb-3">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="mb-0">Your Classes</h5>
+            <div class="text-muted small">Quick access to your class pages</div>
+          </div>
+          <div>
+            <a href="{% url 'add_class' %}" class="btn btn-primary">Add Class</a>
+          </div>
+        </div>
+        <div class="list-group list-group-flush">
+          {% for cls in classes %}
+            <div class="list-group-item d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+              <div class="w-100 d-flex justify-content-between align-items-start align-items-md-center">
+                <a href="{% url 'class_detail' cls.id %}" class="stretched-link text-decoration-none text-reset">
+                  <div class="fw-semibold"><i class="fas fa-chalkboard me-2 text-secondary"></i> {{ cls.name }}</div>
+                  <div class="text-muted small">{{ cls.level }}{% if cls.subject %} • {{ cls.subject }}{% endif %}</div>
+                </a>
+                <div class="ms-3 d-flex align-items-center">
+                  <span class="badge bg-secondary me-2">{{ cls.students.count }} students</span>
+                  <form method="post" action="{% url 'archive_class' cls.id %}" onsubmit="return confirm('Archive this class?');">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm btn-outline-danger">Archive</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {% empty %}
+            <div class="list-group-item text-muted">No classes yet. Create one to get started.</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    <!-- Student Portfolios -->
+    <div class="col-lg-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-light border-bottom-0">
+          <h5 class="mb-0">Student Portfolios</h5>
+        </div>
+        <div class="card-body p-3">
+          <div class="input-group mb-2">
+            <input type="text" class="form-control form-control-sm" placeholder="Search students...">
+            <button class="btn btn-outline-secondary btn-sm" type="button"><i class="fas fa-search"></i></button>
+          </div>
+          <ul class="list-group list-group-flush portfolio-list scrollable-list">
+            {% for student in students %}
+              <li class="list-group-item d-flex align-items-center justify-content-between">
+                <span><i class="fas fa-user-circle me-2 text-secondary"></i>{{ student.get_full_name|default:student.username }}</span>
+                <a href="{% url 'profile' student.id %}" class="btn btn-outline-primary btn-sm">View</a>
+              </li>
+            {% empty %}
+              <li class="list-group-item text-muted">No students found.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Quests -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-light border-bottom-0">
+          <h5 class="mb-0">Progress Quests</h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="fw-semibold">Class Average Score</span>
+              <span class="badge bg-success">Weekly</span>
+            </div>
+            <!-- Placeholder for chart -->
+            <div class="placeholder-panel">
+              [Chart Placeholder]
+            </div>
+          </div>
+          <div class="mb-3">
+            <h6 class="fw-semibold">Trending Difficult Concepts</h6>
+            <ul class="list-group list-group-flush">
+              {% for concept in trending_concepts %}
+                <li class="list-group-item d-flex align-items-center">
+                  <i class="fas fa-exclamation-circle text-warning me-2"></i>{{ concept.name }}
+                </li>
+              {% empty %}
+                <li class="list-group-item text-muted">No difficult concepts detected.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Discovery Insights -->
+    <div class="col-lg-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-header bg-warning bg-opacity-25 border-bottom-0">
+          <h5 class="mb-0">Discovery Insights</h5>
+        </div>
+        <div class="card-body p-3">
+          <div class="mb-3">
+            <h6 class="fw-semibold">Knowledge Gaps Detected</h6>
+            <ul class="list-group list-group-flush">
+              {% for gap in knowledge_gaps %}
+                <li class="list-group-item d-flex align-items-center justify-content-between">
+                  <span><i class="fas fa-lightbulb text-warning me-2"></i>{{ gap.title }}</span>
+                  <a href="#" class="btn btn-outline-secondary btn-sm">Details</a>
+                </li>
+              {% empty %}
+                <li class="list-group-item text-muted">No knowledge gaps detected.</li>
+              {% endfor %}
+            </ul>
+          </div>
+          <div>
+            <h6 class="fw-semibold">Trending Difficult Concepts</h6>
+            <ul class="list-group list-group-flush">
+              {% for concept in trending_concepts %}
+                <li class="list-group-item d-flex align-items-center">
+                  <i class="fas fa-chart-line text-primary me-2"></i>{{ concept.name }}
+                </li>
+              {% empty %}
+                <li class="list-group-item text-muted">No trending concepts.</li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
