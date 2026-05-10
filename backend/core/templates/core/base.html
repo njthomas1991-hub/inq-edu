@@ -230,8 +230,9 @@
         </div>
     </div>
     <nav class="navbar navbar-light bg-light border-top">
-        <div class="container d-flex align-items-center gap-3">
-            <div class="dropdown">
+        <div class="container d-flex align-items-center gap-3 flex-wrap">
+            <!-- Logo / Mobile Dropdown Toggle -->
+            <div class="dropdown d-md-none">
                 <a class="navbar-brand d-flex align-items-center dropdown-toggle" href="#" id="brandMenu" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <img src="{% static 'core/images/inq-ed-logo.png' %}" alt="Logo" class="img-fluid" style="max-height: 64px;">
                 </a>
@@ -262,22 +263,51 @@
                 </ul>
             </div>
 
-            {% if user.is_authenticated %}
-                <div class="dropdown ms-auto">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        {% include "core/avatar_navbar.html" %}
-                        {{ user.get_full_name|default:user.username }}
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown2">
-                        <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
-                        <li><a class="dropdown-item" href="{% url 'account_settings' %}">Account Settings</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+            <!-- Desktop Logo -->
+            <a href="{% url 'home' %}" class="navbar-brand d-none d-md-flex align-items-center" style="line-height: 0;">
+                <img src="{% static 'core/images/inq-ed-logo.png' %}" alt="Logo" class="img-fluid" style="max-height: 64px;">
+            </a>
+
+            <!-- Horizontal Navbar (Desktop Only) -->
+            <ul class="navbar-nav d-none d-md-flex gap-2 ms-3">
+                <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">About</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="platformsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Platforms</a>
+                    <ul class="dropdown-menu" aria-labelledby="platformsDropdown">
+                        <li class="dropdown-submenu">
+                            <a class="dropdown-item dropdown-toggle" href="#" id="wonderworldDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">WonderWorld</a>
+                            <ul class="dropdown-menu" aria-labelledby="wonderworldDropdown">
+                                <li><a class="dropdown-item" href="{% url 'kindlewick' %}">Kindle Wick</a></li>
+                            </ul>
+                        </li>
+                        <li><a class="dropdown-item" href="{% url 'questopia' %}">Questopia</a></li>
                     </ul>
-                </div>
-            {% else %}
-                <a class="btn btn-primary ms-auto" href="{% url 'signup' %}">Get Started</a>
-            {% endif %}
+                </li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'pricing' %}">Pricing</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'teacher_hub' %}">Teacher Hub</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'contact' %}">Contact</a></li>
+            </ul>
+
+            <!-- User Section -->
+            <div class="ms-auto d-flex align-items-center gap-2">
+                {% if user.is_authenticated %}
+                    <div class="dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% include "core/avatar_navbar.html" %}
+                            {{ user.get_full_name|default:user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown2">
+                            <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'account_settings' %}">Account Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a class="btn btn-primary" href="{% url 'signup' %}">Get Started</a>
+                {% endif %}
+            </div>
         </div>
     </nav>
 </header>
