@@ -98,6 +98,27 @@
     }
 }
 
+/* Large Screen Header Layout */
+@media (min-width: 992px) {
+    .header-container {
+        justify-content: center !important;
+        position: relative;
+    }
+    
+    .header-title {
+        flex-grow: 0 !important;
+        text-align: center !important;
+        margin: 0 auto !important;
+    }
+    
+    .header-actions {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}
+
 /* ========================================
    CSS Variables (Custom Properties)
    ======================================== */
