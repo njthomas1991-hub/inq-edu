@@ -52,11 +52,12 @@ class CustomSignupForm(SignupForm):
     
     def save(self, request):
         user = super(CustomSignupForm, self).save(request)
-        user.role = self.cleaned_data['role']
+        # Use setattr/getattr to avoid static-analysis issues if User extends AbstractUser
+        setattr(user, 'role', self.cleaned_data['role'])
         user.first_name = self.cleaned_data.get('first_name', '')
         user.last_name = self.cleaned_data.get('last_name', '')
-        user.school = self.cleaned_data.get('school', '')
-        user.is_staff = user.role in ['teacher', 'school_admin']
+        setattr(user, 'school', self.cleaned_data.get('school', ''))
+        user.is_staff = getattr(user, 'role', None) in ['teacher', 'school_admin']
         user.save()
         return user
 
@@ -193,7 +194,7 @@ def current_user_api(request):
     if not request.user.is_authenticated:
         return Response({'error': 'Not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
     avatar = getattr(request.user, 'avatar', None)
-    user_data = UserSerializer(request.user).data
+    user_data = dict(UserSerializer(request.user).data)
     user_data['avatar'] = AvatarSerializer(avatar).data if avatar else None
     return Response(user_data)
 # 404 JSON handler for base pages
@@ -609,3 +610,30 @@ def school_admin_analytics_view(request):
     return render(request, "core/school_admin_analytics.html")
 def school_admin_activity_log_view(request):
     return render(request, "core/school_admin_activity_log.html")
+
+def terms_of_use(request):
+    return render(
+        request,
+        'core/terms_of_use.html'
+    )
+
+
+def subscription_details(request):
+    return render(
+        request,
+        'core/subscription_details.html'
+    )
+
+
+def privacy_policy(request):
+    return render(
+        request,
+        'core/privacy_policy.html'
+    )
+
+
+def accessibility_statement(request):
+    return render(
+        request,
+        'core/accessibility_statement.html'
+    )

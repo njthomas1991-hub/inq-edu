@@ -20,6 +20,7 @@ from .views import (
     kindlewick_teacher_progress, kindlewick_teacher_sessions,
     kindlewick_school_admin_progress, kindlewick_school_admin_sessions,
     custom_logout_view
+    , terms_of_use, subscription_details, privacy_policy, accessibility_statement
 )
 
 handler404 = 'core.views.custom_404_view'
@@ -92,4 +93,8 @@ urlpatterns = [
     path("school-admin/classes/", school_admin_classes_view, name="school_admin_classes"),
     path("school-admin/analytics/", school_admin_analytics_view, name="school_admin_analytics"),
     path("school-admin/activity/", school_admin_activity_log_view, name="school_admin_activity_log"),
+    path('terms-of-use/', terms_of_use, name='terms_of_use'),
+    path('subscription-details/', subscription_details, name='subscription_details'),
+    path('privacy-policy/', privacy_policy, name='privacy_policy'),
+    path('accessibility-statement/', accessibility_statement, name='accessibility_statement'),
 ]

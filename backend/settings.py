@@ -29,6 +29,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env_path = os.path.join(BASE_DIR.parent, 'env.py')
 if os.path.isfile(env_path):
     spec = importlib.util.spec_from_file_location('env', env_path)
+    # spec_from_file_location can return None according to its type hints;
+    # guard against that to satisfy type checkers and avoid runtime errors.
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Could not load spec for env module from {env_path}")
     env = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(env)
 
