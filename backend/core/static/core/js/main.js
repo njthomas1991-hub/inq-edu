@@ -111,6 +111,32 @@ if (accessibilityPanel) {
 	});
 }
 
+// Mobile Navigation Dropdown - Ensure logo dropdown works on mobile
+const brandMenu = document.getElementById('brandMenu');
+if (brandMenu) {
+	// Initialize Bootstrap dropdown for the brand menu
+	const brandDropdown = new bootstrap.Dropdown(brandMenu, {
+		autoClose: 'outside'
+	});
+	
+	// Add touch event handler for better mobile support
+	if (brandMenu.parentElement) {
+		brandMenu.parentElement.addEventListener('touchstart', function(e) {
+			if (!brandDropdown._element.classList.contains('show')) {
+				e.preventDefault();
+				brandDropdown.show();
+			}
+		}, { passive: false });
+	}
+	
+	// Close dropdown when clicking outside on mobile
+	document.addEventListener('click', function(e) {
+		if (!e.target.closest('.dropdown') && brandDropdown._element.classList.contains('show')) {
+			brandDropdown.hide();
+		}
+	});
+}
+
 if (largTextToggle) {
 	largTextToggle.addEventListener('change', function() {
 		if (this.checked) {
