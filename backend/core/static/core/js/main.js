@@ -43,12 +43,9 @@ if (themeToggleCheckbox) {
 // Accessibility Features
 const accessibilityToggle = document.getElementById('accessibilityToggle');
 const accessibilityPanel = document.getElementById('accessibilityPanel');
+let accessibilityPanelOpen = false;
 
-// Ensure panel is collapsed by default on page load
-if (accessibilityPanel) {
-	accessibilityPanel.classList.remove('active');
-}
-const closeAccessibility = document.getElementById('closeAccessibility');
+// Accessibility Options - Variable Declarations
 const largTextToggle = document.getElementById('largTextToggle');
 const dyslexiaToggle = document.getElementById('dyslexiaToggle');
 const dyslexiaOptions = document.getElementById('dyslexiaOptions');
@@ -63,34 +60,25 @@ const sttControls = document.getElementById('sttControls');
 const startListeningBtn = document.getElementById('startListeningBtn');
 const sttResult = document.getElementById('sttResult');
 
-console.log('Accessibility elements loaded:', { accessibilityToggle, accessibilityPanel, closeAccessibility });
-
 if (accessibilityToggle && accessibilityPanel) {
-	 accessibilityToggle.addEventListener('click', () => {
-		 console.log('[DEBUG] Accessibility toggle button clicked');
-		 accessibilityPanel.classList.toggle('active');
-		 console.log('[DEBUG] Panel classList:', accessibilityPanel.className);
-		 if (accessibilityPanel.classList.contains('active')) {
-			 setTimeout(() => {
-				 const firstFocusable = accessibilityPanel.querySelector('input, button, [tabindex]:not([tabindex="-1"])');
-				 if (firstFocusable) firstFocusable.focus();
-			 }, 100);
-		 }
-	 });
-} else {
-	console.log('Accessibility toggle or panel not found');
-}
-
-if (closeAccessibility && accessibilityPanel && accessibilityToggle) {
-	closeAccessibility.addEventListener('click', () => {
-		accessibilityPanel.classList.remove('active');
-		accessibilityToggle.focus();
+	accessibilityToggle.addEventListener('click', () => {
+		accessibilityPanelOpen = !accessibilityPanelOpen;
+		if (accessibilityPanelOpen) {
+			accessibilityPanel.style.setProperty('display', 'block', 'important');
+			setTimeout(() => {
+				const firstFocusable = accessibilityPanel.querySelector('input, button, [tabindex]:not([tabindex="-1"])');
+				if (firstFocusable) firstFocusable.focus();
+			}, 100);
+		} else {
+			accessibilityPanel.style.setProperty('display', 'none', 'important');
+		}
 	});
 }
 
 document.addEventListener('keydown', (e) => {
-	if (e.key === 'Escape' && accessibilityPanel && accessibilityPanel.classList.contains('active')) {
-		accessibilityPanel.classList.remove('active');
+	if (e.key === 'Escape' && accessibilityPanelOpen) {
+		accessibilityPanelOpen = false;
+		accessibilityPanel.style.display = 'none';
 		if (accessibilityToggle) accessibilityToggle.focus();
 	}
 	if (e.altKey && e.key === 'a' && accessibilityToggle) {
