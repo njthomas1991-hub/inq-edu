@@ -64,21 +64,31 @@ if (accessibilityToggle && accessibilityPanel) {
 	accessibilityToggle.addEventListener('click', () => {
 		accessibilityPanelOpen = !accessibilityPanelOpen;
 		if (accessibilityPanelOpen) {
-			accessibilityPanel.style.setProperty('display', 'block', 'important');
+			accessibilityPanel.classList.add('active');
 			setTimeout(() => {
 				const firstFocusable = accessibilityPanel.querySelector('input, button, [tabindex]:not([tabindex="-1"])');
 				if (firstFocusable) firstFocusable.focus();
 			}, 100);
 		} else {
-			accessibilityPanel.style.setProperty('display', 'none', 'important');
+			accessibilityPanel.classList.remove('active');
 		}
+	});
+}
+
+// Close accessibility panel button
+const closeAccessibilityBtn = document.getElementById('closeAccessibility');
+if (closeAccessibilityBtn) {
+	closeAccessibilityBtn.addEventListener('click', () => {
+		accessibilityPanelOpen = false;
+		accessibilityPanel.classList.remove('active');
+		if (accessibilityToggle) accessibilityToggle.focus();
 	});
 }
 
 document.addEventListener('keydown', (e) => {
 	if (e.key === 'Escape' && accessibilityPanelOpen) {
 		accessibilityPanelOpen = false;
-		accessibilityPanel.style.display = 'none';
+		accessibilityPanel.classList.remove('active');
 		if (accessibilityToggle) accessibilityToggle.focus();
 	}
 	if (e.altKey && e.key === 'a' && accessibilityToggle) {
