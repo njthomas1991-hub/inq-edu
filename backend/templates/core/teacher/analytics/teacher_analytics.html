@@ -147,7 +147,7 @@
             </table>
         </div>
         {% else %}
-        <div class="alert alert-info mb-0">No game data available yet.</div>
+        {% include "core/components/alerts/alert.html" with type="info" message="No gameplay sessions recorded yet." %}
         {% endif %}
     </div>
 </div>
