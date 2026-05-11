@@ -1,0 +1,302 @@
+{% if user.role == "teacher" %}
+    {% extends "core/base_teacher.html" %}
+{% elif user.role == "school_admin" %}
+    {% extends "core/base_school_admin.html" %}
+{% else %}
+    {% extends "core/base.html" %}
+{% endif %}
+
+{% block title %}Account Settings - INQ-ED{% endblock %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <h1 class="h3 mb-4">
+        Account Settings
+    </h1>
+
+    <div class="row g-4 mb-4">
+
+        <!-- Account Details -->
+        <div class="col-md-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h5 class="card-title mb-3">
+                        Account Details
+                    </h5>
+
+                    <div class="mb-3">
+                        <strong>Email:</strong>
+                        {{ user.email|default:"Not set" }}
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Username:</strong>
+                        {{ user.username }}
+                    </div>
+
+                    <div class="mb-0">
+                        <strong>Role:</strong>
+
+                        <span class="badge bg-primary">
+                            {{ user.role|title }}
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Subscription -->
+        <div class="col-md-6">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body">
+
+                    <h5 class="card-title mb-3">
+                        Subscription
+                    </h5>
+
+                    <div class="mb-3">
+                        <strong>Plan:</strong>
+                        <span class="badge bg-info">
+                            Free Plan
+                        </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <strong>Status:</strong>
+                        <span class="badge bg-success">
+                            Active
+                        </span>
+                    </div>
+
+                    <div class="mb-0">
+                        <strong>Renewal Date:</strong>
+                        N/A
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="row g-4">
+
+        <!-- Security -->
+        <div class="col-md-6">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body">
+
+                    <h6 class="card-title mb-3">
+                        <i class="fas fa-lock"></i>
+                        Security
+                    </h6>
+
+                    <p class="text-muted small mb-3">
+                        Manage your password and account security.
+                    </p>
+
+                    <a
+                        href="{% url 'account_change_password' %}"
+                        class="btn btn-sm btn-outline-primary"
+                    >
+                        Change Password
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Notifications -->
+        <div class="col-md-6">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body">
+
+                    <h6 class="card-title mb-3">
+                        <i class="fas fa-bell"></i>
+                        Notifications
+                    </h6>
+
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox" checked>
+                        <label class="form-check-label">
+                            Email Notifications
+                        </label>
+                    </div>
+
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox" checked>
+                        <label class="form-check-label">
+                            Important Updates
+                        </label>
+                    </div>
+
+                    {% if user.role == "teacher" or user.role == "school_admin" %}
+
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" checked>
+                        <label class="form-check-label">
+                            Class Announcements
+                        </label>
+                    </div>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Privacy -->
+        <div class="col-md-6">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body">
+
+                    <h6 class="card-title mb-3">
+                        <i class="fas fa-shield-alt"></i>
+                        Privacy
+                    </h6>
+
+                    <div class="mb-3">
+
+                        <label class="form-label small">
+                            Profile Visibility
+                        </label>
+
+                        <select class="form-select form-select-sm">
+
+                            <option selected>
+                                Private
+                            </option>
+
+                            <option>
+                                Teachers Only
+                            </option>
+
+                            <option>
+                                Public
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Account Actions -->
+        <div class="col-md-6">
+
+            <div class="card shadow-sm">
+
+                <div class="card-body">
+
+                    <h6 class="card-title mb-3">
+                        <i class="fas fa-cog"></i>
+                        Account
+                    </h6>
+
+                    <p class="text-muted small mb-3">
+                        Manage your account data.
+                    </p>
+
+                    <button class="btn btn-sm btn-outline-secondary me-2">
+                        Download Data
+                    </button>
+
+                    <button
+                        class="btn btn-sm btn-outline-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#deleteAccountModal"
+                    >
+                        Delete Account
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Teacher Only -->
+        {% if user.role == "teacher" %}
+
+        <div class="col-12">
+
+            <div class="card border-primary shadow-sm">
+
+                <div class="card-body">
+
+                    <h5 class="card-title">
+                        Teacher Settings
+                    </h5>
+
+                    <p class="text-muted mb-0">
+                        Manage classroom preferences,
+                        student onboarding,
+                        and teaching notifications.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+        <!-- School Admin Only -->
+        {% if user.role == "school_admin" %}
+
+        <div class="col-12">
+
+            <div class="card border-warning shadow-sm">
+
+                <div class="card-body">
+
+                    <h5 class="card-title">
+                        School Administration
+                    </h5>
+
+                    <p class="text-muted mb-0">
+                        Manage staff permissions,
+                        school analytics,
+                        and organisation settings.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

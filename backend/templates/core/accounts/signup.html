@@ -1,0 +1,228 @@
+{% extends "core/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Inq-Ed Sign Up{% endblock %}
+
+{% block content %}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+
+            <div class="card shadow-sm border-0 rounded-4">
+
+                <div class="card-body p-4 p-lg-5">
+
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <h1 class="fw-bold mb-2">Create Your Account</h1>
+                        <p class="text-muted">
+                            Join Inq-Ed as a student, teacher, or school administrator.
+                        </p>
+                    </div>
+
+                    <!-- Signup Form -->
+                    <form method="post">
+
+                        {% csrf_token %}
+
+                        <!-- Role Selection -->
+                        <div class="mb-4">
+
+                            <label class="form-label fw-semibold mb-3">
+                                Select Account Type
+                            </label>
+
+                            <div class="role-card-group">
+
+                                <!-- Student -->
+                                <div class="role-card mb-3">
+                                    <input
+                                        class="form-check-input"
+                                        type="radio"
+                                        name="role"
+                                        value="student"
+                                        id="role_student"
+                                        checked
+                                    >
+
+                                    <label class="role-label" for="role_student">
+
+                                        <div>
+                                            <div class="fw-semibold">
+                                                Student
+                                            </div>
+
+                                            <div class="text-muted small">
+                                                Access game worlds, avatars,
+                                                progress tracking, and classroom activities.
+                                            </div>
+                                        </div>
+
+                                    </label>
+                                </div>
+
+                                <!-- Teacher -->
+                                <div class="role-card mb-3">
+
+                                    <input
+                                        class="form-check-input"
+                                        type="radio"
+                                        name="role"
+                                        value="teacher"
+                                        id="role_teacher"
+                                    >
+
+                                    <label class="role-label" for="role_teacher">
+
+                                        <div>
+                                            <div class="fw-semibold">
+                                                Teacher
+                                            </div>
+
+                                            <div class="text-muted small">
+                                                Access the Teacher Hub, create students,
+                                                manage classes, and track learning progress.
+                                            </div>
+                                        </div>
+
+                                    </label>
+                                </div>
+
+                                <!-- School Admin -->
+                                <div class="role-card">
+
+                                    <input
+                                        class="form-check-input"
+                                        type="radio"
+                                        name="role"
+                                        value="school_admin"
+                                        id="role_school_admin"
+                                    >
+
+                                    <label class="role-label" for="role_school_admin">
+
+                                        <div>
+                                            <div class="fw-semibold">
+                                                School Administrator
+                                            </div>
+
+                                            <div class="text-muted small">
+                                                Manage school-wide data, teachers,
+                                                classes, analytics, and user accounts.
+                                            </div>
+                                        </div>
+
+                                    </label>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Form Fields -->
+                        <div class="mb-3">
+                            {{ form.first_name|as_crispy_field }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.last_name|as_crispy_field }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.email|as_crispy_field }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.username|as_crispy_field }}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.password1|as_crispy_field }}
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.password2|as_crispy_field }}
+                        </div>
+
+                        <!-- Submit -->
+                        <button
+                            type="submit"
+                            class="btn btn-primary w-100 py-2 fw-semibold"
+                        >
+                            Create Account
+                        </button>
+
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="text-center my-4">
+                        <span class="text-muted small">
+                            Already have an account?
+                        </span>
+                    </div>
+
+                    <!-- Login Buttons -->
+                    <div class="d-grid gap-2">
+
+                        <a
+                            href="/login/?role=student"
+                            class="btn btn-outline-secondary"
+                        >
+                            Student Login
+                        </a>
+
+                        <a
+                            href="/login/?role=teacher"
+                            class="btn btn-outline-secondary"
+                        >
+                            Teacher Login
+                        </a>
+
+                        <a
+                            href="/login/?role=school_admin"
+                            class="btn btn-outline-secondary"
+                        >
+                            School Admin Login
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+
+.role-card {
+    border: 1px solid #dee2e6;
+    border-radius: 16px;
+    padding: 16px;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.role-card:hover {
+    border-color: #0d6efd;
+    background: #f8fbff;
+}
+
+.role-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    width: 100%;
+    cursor: pointer;
+}
+
+.role-card input[type="radio"] {
+    margin-top: 5px;
+}
+
+</style>
+
+{% endblock %}

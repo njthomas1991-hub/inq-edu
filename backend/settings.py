@@ -69,7 +69,6 @@ INSTALLED_APPS = [
     # 'cloudinary_storage',  # Disabled - causes Python 3.14 compatibility issues
     'django.contrib.staticfiles',
     # 'cloudinary',  # Disabled - not used in new PixiJS avatar system
-    'django.contrib.sites',
     'rest_framework',
     'corsheaders',
     'core',
@@ -77,16 +76,13 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.microsoft',
     'crispy_forms',
     'crispy_bootstrap5',
 ]
 
 AUTH_USER_MODEL = 'core.User'
 
-LOGIN_URL = '/teacher/login/'
-LOGIN_REDIRECT_URL = '/teacher/'
+LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = '/'
 
 SITE_ID = 1
@@ -120,16 +116,6 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Prints email
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': {'access_type': 'online'},
-    }
-    ,
-    'microsoft': {
-        'SCOPE': ['User.Read'],
-    }
-}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -153,7 +139,10 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+            'DIRS': [
+                BASE_DIR / 'backend' / 'templates',
+                BASE_DIR / 'templates',
+            ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -229,7 +218,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
-    BASE_DIR / 'core/static',
+    BASE_DIR / 'static',
 ]
 
 # WhiteNoise configuration

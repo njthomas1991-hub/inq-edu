@@ -468,10 +468,7 @@ def hello(request):
 
 def teacher_dashboard_view(request):
     return render(request, "core/teacher_dashboard.html")
-def teacher_signup_view(request):
-    return render(request, "core/teacher_signup.html")
-def student_signup_view(request):
-    return render(request, "core/student_signup.html")
+
 def student_signup_with_details_view(request):
     return render(request, "core/student_signup_with_details.html")
 def create_student_account_view(request):
@@ -501,7 +498,60 @@ def teacher_forum_list_view(request):
 def teacher_forum_detail_view(request):
     return render(request, "core/teacher_forum_detail.html")
 def custom_login_view(request):
-    return render(request, "core/custom_login.html")
+
+    if request.user.is_authenticated:
+        role = getattr(request.user, 'role', None)
+
+        if role == "student":
+            return redirect("student_dashboard")
+
+        elif role == "school_admin":
+            return redirect("school_admin_dashboard")
+
+        return redirect("teacher_dashboard")
+
+    form = AuthenticationForm(request, data=request.POST or None)
+
+    if request.method == "POST":
+
+        if form.is_valid():
+
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
+
+            user = authenticate(
+                request,
+                username=username,
+                password=password
+            )
+
+            if user is not None:
+
+                login(request, user)
+
+                role = getattr(user, 'role', None)
+
+                if role == "student":
+                    return redirect("student_dashboard")
+
+                elif role == "school_admin":
+                    return redirect("school_admin_dashboard")
+
+                return redirect("teacher_dashboard")
+
+            else:
+                messages.error(request, "Invalid username or password.")
+
+        else:
+            messages.error(request, "Invalid username or password.")
+
+    return render(
+        request,
+        "account/login.html",
+        {
+            "form": form
+        }
+    )
 def student_dashboard_view(request):
     return render(request, "core/student_dashboard.html")
 def teacher_forum_delete_view(request):
@@ -531,8 +581,13 @@ def profile_view(request):
         messages.success(request, 'Bio updated successfully!')
         return redirect('profile')
     return render(request, "core/profile.html")
+@login_required
 def account_settings_view(request):
-    return render(request, "core/account_settings.html")
+
+    return render(
+        request,
+        "core/account_settings.html"
+    )
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import Avatar

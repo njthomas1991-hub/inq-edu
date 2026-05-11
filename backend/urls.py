@@ -18,16 +18,22 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.urls import path, include
-from core.views import custom_logout_view
+from core.views import custom_logout_view, custom_login_view, home_page_view, teacher_dashboard_view, student_dashboard_view, school_admin_dashboard_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
-    path('accounts/logout/', custom_logout_view, name='account_logout'),
-    path('accounts/', include('allauth.urls')),
+    path("", home_page_view, name="home"),
+    path("teacher/", teacher_dashboard_view, name="teacher_dashboard"),
+    path("student/", student_dashboard_view, name="student_dashboard"),
+    path("school-admin/", school_admin_dashboard_view, name="school_admin_dashboard"),
     path('summernote/', include('django_summernote.urls')),
-]
+    path("login/", custom_login_view, name="login"),
+    path("logout/", custom_logout_view, name="logout"),
+    path("accounts/", include("allauth.urls")),
+]   
 
 # Serve static files (images/css/js) during development
 if settings.DEBUG:
