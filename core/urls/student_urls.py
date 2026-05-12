@@ -19,12 +19,7 @@ urlpatterns = [
         name="student_signup_guided"
     ),
 
-    path(
-        "api/create-student/",
-        create_student_account_view,
-        name="create_student"
-    ),
-
+  
     path(
         "student/",
         student_dashboard_view,
