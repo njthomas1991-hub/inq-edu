@@ -300,7 +300,43 @@
                            <li>
                             <a
                                 class="dropdown-item"
-                                href="{% url 'platforms' %}"
+                              <li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle"
+       href="#"
+       id="platformDropdown"
+       role="button"
+       data-bs-toggle="dropdown"
+       aria-expanded="false">
+
+        Platforms
+
+    </a>
+
+    <ul class="dropdown-menu">
+
+        <li>
+            <a class="dropdown-item"
+               href="{% url 'kindlewick' %}">
+                Kindlewick
+            </a>
+        </li>
+
+        <li>
+            <a class="dropdown-item"
+               href="{% url 'questopia' %}">
+                Questopia
+            </a>
+        </li>
+
+        <li>
+            <a class="dropdown-item"
+               href="{% url 'wonderworld' %}">
+                Wonderworld
+            </a>
+        </li>
+
+    </ul>
+</li>
                             >
                                 Platforms
                             </a>
