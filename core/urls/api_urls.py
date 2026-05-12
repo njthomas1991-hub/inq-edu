@@ -1,6 +1,6 @@
 from django.urls import path
 
-from core.views.views import (
+from core.views.api_views import (
     hello,
     get_user_avatar,
     save_user_avatar,
@@ -14,6 +14,12 @@ from core.views.views import (
     kindlewick_school_admin_progress,
     kindlewick_school_admin_sessions,
     create_student_account_view,
+)
+
+from core.views.avatar_views import (
+    get_user_avatar,
+    save_user_avatar,
+    randomize_avatar,
 )
 
 urlpatterns = [

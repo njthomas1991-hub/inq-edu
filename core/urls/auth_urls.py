@@ -1,7 +1,7 @@
 from django.urls import path
 from allauth.account import views as allauth_views
 
-from core.views.views import (
+from core.views.auth_views import (
     custom_logout_view,
 )
 
@@ -9,7 +9,7 @@ urlpatterns = [
     path(
         "teacher/signup/",
         allauth_views.SignupView.as_view(
-            template_name="core/teacher_signup.html"
+            template_name="core/auth/teacher_signup.html"
         ),
         name="signup",
     ),
@@ -17,7 +17,7 @@ urlpatterns = [
     path(
         "teacher/login/",
         allauth_views.LoginView.as_view(
-            template_name="core/teacher_login.html"
+            template_name="core/auth/teacher_login.html"
         ),
         name="teacher_login",
     ),

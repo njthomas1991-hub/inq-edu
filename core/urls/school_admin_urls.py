@@ -1,6 +1,6 @@
 from django.urls import path
 
-from core.views.views import (
+from core.views.school_admin_views import (
     school_admin_dashboard_view,
     school_admin_staff_view,
     school_admin_classes_view,
