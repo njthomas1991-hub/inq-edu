@@ -106,9 +106,10 @@ ACCOUNT_LOGIN_REDIRECT_URL = '/teacher/'
 ACCOUNT_SIGNUP_REDIRECT_URL = '/teacher/'  # Redirect to home page after registration
 ACCOUNT_SESSION_REMEMBER = True  # Keep users logged in
 ACCOUNT_FORMS = {
-    'signup': 'core.views.CustomSignupForm',
+    'signup': 'core.forms.auth_forms.CustomSignupForm',
 }
-ACCOUNT_ADAPTER = 'core.adapters.account_adapter.CustomAccountAdapter'
+
+ACCOUNT_ADAPTER = 'core.views.auth_views.CustomAccountAdapter'
 
 # Email settings for development
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Prints emails to console during development

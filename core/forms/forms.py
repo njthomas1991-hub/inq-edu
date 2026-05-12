@@ -3,7 +3,8 @@ from django import forms
 from django_summernote.widgets import SummernoteWidget
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column
-from .models import TeachingResource, User, Class
+from ..models import TeachingResource, User, Class
+
 
 class TeachingResourceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -38,7 +39,7 @@ class TeachingResourceForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Resource title'}),
             'resource_type': forms.Select(attrs={'class': 'form-select'}),
-            'key_stage': forms.Select(choices=TeachingResource.KS_CHOICES, attrs={'class': 'form-select'}),
+            'key_stage': forms.Select(attrs={'class': 'form-select'}),
             'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Subject (optional)'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
             'description': SummernoteWidget(
@@ -62,8 +63,7 @@ class TeachingResourceForm(forms.ModelForm):
             ),
             'notes': forms.Textarea(attrs={'class': 'form-control', 'rows': 2, 'placeholder': 'Additional notes (plain text)'}),
         }
-from django import forms
-from .models import User, Class
+
 
 class ClassForm(forms.ModelForm):
     class Meta:
@@ -75,6 +75,7 @@ class ClassForm(forms.ModelForm):
             'subject': forms.Select(attrs={'class': 'form-select', 'required': True}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Optional description'}),
         }
+
 
 class StudentSignupForm(forms.Form):
     fname = forms.CharField(label='First Name', max_length=150, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First name', 'required': True}))

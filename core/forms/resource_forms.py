@@ -61,7 +61,6 @@ class TeachingResourceForm(forms.ModelForm):
             ),
 
             'key_stage': forms.Select(
-                choices=TeachingResource.KS_CHOICES,
                 attrs={'class': 'form-select'}
             ),
 

@@ -232,7 +232,7 @@
                 {% else %}
 
                     <a
-                        href="{% url 'teacher_login' %}"
+                        href="{% url 'login' %}"
                         class="header-link"
                     >
                         Login
@@ -259,138 +259,109 @@
 
                 <!-- MOBILE NAV -->
 
-                <div class="dropdown d-md-none">
+<div class="dropdown d-md-none">
 
-                    <button
-                        class="logo-button dropdown-toggle"
-                        id="mobileLogoMenu"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                    >
+    <button
+        class="logo-button dropdown-toggle"
+        id="mobileLogoMenu"
+        type="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+    >
 
-                        <img
-                            src="{% static 'core/images/inq-ed-logo.png' %}"
-                            alt="INQ-ED Logo"
-                            class="navbar-logo-img"
-                        >
+        <img
+            src="{% static 'core/images/inq-ed-logo.png' %}"
+            alt="INQ-ED Logo"
+            class="navbar-logo-img"
+        >
 
-                    </button>
+    </button>
 
-                    <ul class="dropdown-menu text-center">
-
-                        <li>
-                            <a
-                                class="dropdown-item"
-                                href="{% url 'home' %}"
-                            >
-                                Home
-                            </a>
-                        </li>
-
-                        <li>
-                            <a
-                                class="dropdown-item"
-                                href="{% url 'about' %}"
-                            >
-                                About
-                            </a>
-                        </li>
-
-                           <li>
-                            <a
-                                class="dropdown-item"
-                              <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle"
-       href="#"
-       id="platformDropdown"
-       role="button"
-       data-bs-toggle="dropdown"
-       aria-expanded="false">
-
-        Platforms
-
-    </a>
-
-    <ul class="dropdown-menu">
+    <ul class="dropdown-menu text-center">
 
         <li>
-            <a class="dropdown-item"
-               href="{% url 'kindlewick' %}">
+            <a
+                class="dropdown-item"
+                href="{% url 'home' %}"
+            >
+                Home
+            </a>
+        </li>
+
+        <li>
+            <a
+                class="dropdown-item"
+                href="{% url 'about' %}"
+            >
+                About
+            </a>
+        </li>
+
+        <!-- Platforms -->
+
+        <li>
+            <span class="dropdown-item-text fw-bold">
+                Platforms
+            </span>
+        </li>
+
+        <li>
+            <a
+                class="dropdown-item ps-4"
+                href="{% url 'kindlewick' %}"
+            >
                 Kindlewick
             </a>
         </li>
 
         <li>
-            <a class="dropdown-item"
-               href="{% url 'questopia' %}">
+            <a
+                class="dropdown-item ps-4"
+                href="{% url 'questopia' %}"
+            >
                 Questopia
             </a>
         </li>
 
         <li>
-            <a class="dropdown-item"
-               href="{% url 'wonderworld' %}">
+            <a
+                class="dropdown-item ps-4"
+                href="{% url 'wonderworld' %}"
+            >
                 Wonderworld
             </a>
         </li>
 
+        <li>
+            <a
+                class="dropdown-item"
+                href="{% url 'pricing' %}"
+            >
+                Pricing
+            </a>
+        </li>
+
+        <li>
+            <a
+                class="dropdown-item"
+                href="{% url 'teacher_hub' %}"
+            >
+                Teacher Hub
+            </a>
+        </li>
+
+        <li>
+            <a
+                class="dropdown-item"
+                href="{% url 'contact' %}"
+            >
+                Contact
+            </a>
+        </li>
+
     </ul>
-</li>
-                            >
-                                Platforms
-                            </a>
-                            
-                            <ul class="dropdown-menu">
-                             <li>
-                                <a class="dropdown-item"
-                                    href="{% url 'kindlewick' %}">
-                                     Kindlewick
-                                </a>
-                             </li>
 
-                             <li>
-                                 <a class="dropdown-item"
-                                    href="{% url 'questopia' %}">
-                                     Questopia
-                                </a>
-                             </li>
-                         </ul>
-                     </li>
-                 </ul>
-             </li>
-         </li>
-
-                        <li>
-                            <a
-                                class="dropdown-item"
-                                href="{% url 'pricing' %}"
-                            >
-                                Pricing
-                            </a>
-                        </li>
-
-                        <li>
-                            <a
-                                class="dropdown-item"
-                                href="{% url 'teacher_hub' %}"
-                            >
-                                Teacher Hub
-                            </a>
-                        </li>
-
-                        <li>
-                            <a
-                                class="dropdown-item"
-                                href="{% url 'contact' %}"
-                            >
-                                Contact
-                            </a>
-                        </li>
-
-                    </ul>
-
-                </div>
+</div>
 
                 <!-- DESKTOP + TABLET NAV -->
 

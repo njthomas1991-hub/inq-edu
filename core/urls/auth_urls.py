@@ -7,19 +7,19 @@ from core.views.auth_views import (
 
 urlpatterns = [
     path(
-        "teacher/signup/",
+        "signup/",
         allauth_views.SignupView.as_view(
-            template_name="core/auth/teacher_signup.html"
+            template_name="core/account/signup.html"
         ),
         name="signup",
     ),
 
     path(
-        "teacher/login/",
+        "login/",
         allauth_views.LoginView.as_view(
-            template_name="core/auth/teacher_login.html"
+            template_name="core/accounts/login.html"
         ),
-        name="teacher_login",
+        name="login",
     ),
 
     path(

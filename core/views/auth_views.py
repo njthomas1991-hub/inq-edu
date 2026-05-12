@@ -2,7 +2,39 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
+from django.urls import reverse
+from allauth.account.adapter import DefaultAccountAdapter
 
+
+class CustomAccountAdapter(DefaultAccountAdapter):
+
+    def get_signup_redirect_url(self, request):
+
+        user = request.user
+
+        if user.is_authenticated:
+
+            if getattr(user, "role", None) == "student":
+                return reverse("student_dashboard")
+
+            if getattr(user, "role", None) == "school_admin":
+                return reverse("school_admin_dashboard")
+
+        return reverse("teacher_dashboard")
+
+    def get_login_redirect_url(self, request):
+
+        user = request.user
+
+        if user.is_authenticated:
+
+            if getattr(user, "role", None) == "student":
+                return reverse("student_dashboard")
+
+            if getattr(user, "role", None) == "school_admin":
+                return reverse("school_admin_dashboard")
+
+        return reverse("teacher_dashboard")
 
 def custom_login_view(request):
 
