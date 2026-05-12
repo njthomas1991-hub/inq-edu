@@ -108,7 +108,7 @@ ACCOUNT_SESSION_REMEMBER = True  # Keep users logged in
 ACCOUNT_FORMS = {
     'signup': 'core.views.CustomSignupForm',
 }
-ACCOUNT_ADAPTER = 'core.views.CustomAccountAdapter'
+ACCOUNT_ADAPTER = 'core.adapters.account_adapter.CustomAccountAdapter'
 
 # Email settings for development
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Prints emails to console during development

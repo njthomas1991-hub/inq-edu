@@ -20,7 +20,7 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
-from core.views import custom_logout_view, custom_login_view, home_page_view, teacher_dashboard_view, student_dashboard_view, school_admin_dashboard_view
+from core.views.views import custom_logout_view, custom_login_view, home_page_view, teacher_dashboard_view, student_dashboard_view, school_admin_dashboard_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),

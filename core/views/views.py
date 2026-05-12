@@ -15,7 +15,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column, Field
 from allauth.account.forms import SignupForm
 from allauth.account.adapter import DefaultAccountAdapter
-from .models import (
+from ..models import (
     User, Class, ClassStudent,
     NewsAnnouncement, HelpTutorial, TeachingResource,
     ForumPost, ForumReply, ResourceComment, Avatar
@@ -178,12 +178,12 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import (
+from ..serializers import (
     UserSerializer, AvatarSerializer, KindlewickGameProgressSerializer, 
     KindlewickGameSessionSerializer, KindlewickGameProgressAdminSerializer,
     KindlewickGameSessionAdminSerializer
 )
-from .models import KindlewickGameProgress, KindlewickGameSession, User
+from ..models import KindlewickGameProgress, KindlewickGameSession, User
 from django.utils import timezone
 
 
@@ -590,7 +590,7 @@ def account_settings_view(request):
     )
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Avatar
+from ..models import Avatar
 import random
 
 def get_user_avatar(request):
@@ -637,7 +637,7 @@ def randomize_avatar(request):
     # Get random choices from model fields
     def rand_choice(choices):
         return random.choice([c[0] for c in choices])
-    from .models import Avatar
+    from ..models import Avatar
     data = {
         'bodyType': rand_choice(Avatar.BODY_TYPES),
         'bodyColor': f"#{random.randint(0, 0xFFFFFF):06X}",
