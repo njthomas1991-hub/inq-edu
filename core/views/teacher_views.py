@@ -19,3 +19,6 @@ def class_detail_view(request):
 
 def add_class_view(request):
     return render(request, "core/teacher/add_class.html")
+
+def account_settings_view(request):
+    return render(request, "core/profile/account_settings.html")    

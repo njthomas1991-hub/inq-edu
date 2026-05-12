@@ -24,6 +24,9 @@ from core.views.teacher_views import (
     teacher_forum_delete_view,
     teacher_forum_reply_edit_view,
     teacher_forum_reply_delete_view,
+)
+
+from core.views.profile_views import (
     profile_view,
     account_settings_view,
 )
