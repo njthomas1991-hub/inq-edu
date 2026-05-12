@@ -20,7 +20,27 @@ from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
-from core.views.views import custom_logout_view, custom_login_view, home_page_view, teacher_dashboard_view, student_dashboard_view, school_admin_dashboard_view
+
+from core.views.auth_views import (
+    custom_login_view,
+    custom_logout_view,
+)
+
+from core.views.public_views import (
+    home_page_view,
+)
+
+from core.views.teacher_views import (
+    teacher_dashboard_view,
+)
+
+from core.views.student_views import (
+    student_dashboard_view,
+)
+
+from core.views.school_admin_views import (
+    school_admin_dashboard_view,
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

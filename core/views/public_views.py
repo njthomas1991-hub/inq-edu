@@ -1,25 +1,37 @@
-from django.urls import path
+from django.shortcuts import render
 
-from core.views.public_views import (
-    home_page_view,
-    about_page_view,
-    kindlewick_page_view,
-    questopia_page_view,
-    pricing_page_view,
-    teacher_hub_view,
-    contact_page_view,
-    wonderworld_page_view,
-    hello,
-)
 
-urlpatterns = [
-    path("", home_page_view, name="home"),
-    path("about/", about_page_view, name="about"),
-    path("kindlewick/", kindlewick_page_view, name="kindlewick"),
-    path("wonderworld/", wonderworld_page_view, name="wonderworld"),
-    path("questopia/", questopia_page_view, name="questopia"),
-    path("pricing/", pricing_page_view, name="pricing"),
-    path("teacher-hub/", teacher_hub_view, name="teacher_hub"),
-    path("contact/", contact_page_view, name="contact"),
-    path("api/hello/", hello, name="api_hello"),
-]
+def home_page_view(request):
+    return render(request, "core/public/home.html")
+
+
+def about_page_view(request):
+    return render(request, "core/public/about.html")
+
+
+def kindlewick_page_view(request):
+    return render(request, "core/public/kindlewick.html")
+
+
+def questopia_page_view(request):
+    return render(request, "core/public/questopia.html")
+
+
+def pricing_page_view(request):
+    return render(request, "core/public/pricing.html")
+
+
+def teacher_hub_view(request):
+    return render(request, "core/public/teacher_hub.html")
+
+
+def contact_page_view(request):
+    return render(request, "core/public/contact.html")
+
+
+def wonderworld_page_view(request):
+    return render(request, "core/public/wonderworld.html")
+
+
+def hello(request):
+    return render(request, "core/public/hello.html")

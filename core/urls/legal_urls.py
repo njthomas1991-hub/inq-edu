@@ -1,6 +1,6 @@
 from django.urls import path
 
-from core.views.views import (
+from core.views.legal_views import (
     terms_of_use,
     subscription_details,
     privacy_policy,

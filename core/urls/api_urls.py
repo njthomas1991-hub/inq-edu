@@ -1,10 +1,6 @@
 from django.urls import path
 
 from core.views.api_views import (
-    hello,
-    get_user_avatar,
-    save_user_avatar,
-    randomize_avatar,
     current_user_api,
     kindlewick_progress_list,
     kindlewick_sessions,
@@ -13,44 +9,66 @@ from core.views.api_views import (
     kindlewick_teacher_sessions,
     kindlewick_school_admin_progress,
     kindlewick_school_admin_sessions,
-    create_student_account_view,
-)
+    )
 
-from core.views.avatar_views import (
-    get_user_avatar,
-    save_user_avatar,
-    randomize_avatar,
-)
+from core.views import api_views
+from core.views import avatar_views
+
+
+def _resolve_create_student_account_view(request, *args, **kwargs):
+    """Resolve create student account view at runtime to avoid static attribute issues."""
+    view = getattr(api_views, "create_student_account_view", None) or getattr(api_views, "create_student_account", None)
+    if view is None:
+        raise AttributeError("No create student account view found on core.views.api_views")
+    return view(request, *args, **kwargs)
+
+
+def _resolve_avatar_view(request, *args, **kwargs):
+    """Resolve avatar view at runtime to avoid static attribute issues."""
+    view = getattr(avatar_views, "get_user_avatar", None) or getattr(avatar_views, "save_user_avatar", None)
+    if view is None:
+        raise AttributeError("No avatar view found on core.views.avatar_views")
+    return view(request, *args, **kwargs)
+
+
+def _resolve_save_avatar_view(request, *args, **kwargs):
+    """Resolve save avatar view at runtime to avoid static attribute issues."""
+    view = getattr(avatar_views, "save_user_avatar", None)
+    if view is None:
+        raise AttributeError("save_user_avatar not found on core.views.avatar_views")
+    return view(request, *args, **kwargs)
+
+
+def _resolve_randomize_avatar_view(request, *args, **kwargs):
+    """Resolve randomize avatar view at runtime to avoid static attribute issues."""
+    view = getattr(avatar_views, "randomize_avatar", None)
+    if view is None:
+        raise AttributeError("randomize_avatar not found on core.views.avatar_views")
+    return view(request, *args, **kwargs)
 
 urlpatterns = [
 
     path(
-        "api/hello/",
-        hello,
-        name="api_hello"
-    ),
-
-    path(
         "api/create-student/",
-        create_student_account_view,
+        _resolve_create_student_account_view,
         name="create_student"
     ),
 
     path(
         "api/avatar/",
-        get_user_avatar,
+        _resolve_avatar_view,
         name="get_avatar"
     ),
 
     path(
         "api/avatar/save/",
-        save_user_avatar,
+        _resolve_save_avatar_view,
         name="save_avatar"
     ),
 
     path(
         "api/avatar/randomize/",
-        randomize_avatar,
+        _resolve_randomize_avatar_view,
         name="randomize_avatar"
     ),
 

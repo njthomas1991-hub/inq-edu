@@ -1,6 +1,7 @@
 from django.urls import path
 
-from core.views.views import (
+from core.views.public_views import (
+    hello,
     home_page_view,
     about_page_view,
     kindlewick_page_view,
@@ -20,4 +21,5 @@ urlpatterns = [
     path("pricing/", pricing_page_view, name="pricing"),
     path("teacher-hub/", teacher_hub_view, name="teacher_hub"),
     path("contact/", contact_page_view, name="contact"),
+    path("api/hello/", hello, name="api_hello"),
 ]
