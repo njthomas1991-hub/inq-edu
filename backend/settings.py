@@ -56,7 +56,9 @@ CSRF_TRUSTED_ORIGINS = [
 CSRF_COOKIE_SECURE = False  # Set to True in production
 CSRF_COOKIE_HTTPONLY = False
 SESSION_COOKIE_SECURE = False  # Set to True in production
-
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_AGE = 630720000 # 20 years in seconds (60 * 60 * 24 * 365 * 20)
+SESSION_SAVE_EVERY_REQUEST = True
 
 # Application definition
 

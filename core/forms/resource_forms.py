@@ -25,14 +25,6 @@ class TeachingResourceForm(forms.ModelForm):
                 Column('status', css_class='col-md-3'),
                 css_class='g-3'
             ),
-            Row(
-                Column('description', css_class='col-12'),
-                css_class='g-3'
-            ),
-            Row(
-                Column('notes', css_class='col-12'),
-                css_class='g-3'
-            ),
         )
 
     class Meta:
@@ -44,8 +36,6 @@ class TeachingResourceForm(forms.ModelForm):
             'key_stage',
             'subject',
             'status',
-            'description',
-            'notes'
         )
 
         widgets = {
@@ -73,33 +63,5 @@ class TeachingResourceForm(forms.ModelForm):
 
             'status': forms.Select(
                 attrs={'class': 'form-select'}
-            ),
-
-            'description': SummernoteWidget(
-                attrs={
-                    'class': 'summernote-description',
-                    'summernote': {
-                        'height': '400',
-                        'toolbar': [
-                            ['style', ['style']],
-                            ['font', ['bold', 'italic', 'underline', 'clear']],
-                            ['fontname', ['fontname']],
-                            ['fontsize', ['fontsize']],
-                            ['color', ['color']],
-                            ['para', ['ul', 'ol', 'paragraph', 'height']],
-                            ['table', ['table']],
-                            ['insert', ['link', 'picture', 'video', 'fileupload', 'paperclip']],
-                            ['view', ['fullscreen', 'codeview', 'help']],
-                        ],
-                    }
-                }
-            ),
-
-            'notes': forms.Textarea(
-                attrs={
-                    'class': 'form-control',
-                    'rows': 2,
-                    'placeholder': 'Additional notes (plain text)'
-                }
             ),
         }
