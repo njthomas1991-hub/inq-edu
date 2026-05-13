@@ -1,4 +1,5 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render render
+
 
 
 def home_page_view(request):
@@ -22,8 +23,19 @@ def pricing_page_view(request):
 
 
 def teacher_hub_view(request):
-    return render(request, "core/public/teacher_hub.html")
 
+    if request.user.is_authenticated:
+
+        if request.user.role == "teacher":
+            return redirect("teacher_dashboard")
+
+        elif request.user.role == "school_admin":
+            return redirect("school_admin_dashboard")
+
+        elif request.user.role == "student":
+            return redirect("student_dashboard")
+
+    return render(request, "core/public/teacher_hub.html")
 
 def contact_page_view(request):
     return render(request, "core/public/contact.html")

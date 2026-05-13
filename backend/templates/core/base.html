@@ -342,12 +342,49 @@
         </li>
 
         <li>
-            <a
-                class="dropdown-item"
-                href="{% url 'teacher_hub' %}"
-            >
-                Teacher Hub
-            </a>
+
+            {% if user.is_authenticated %}
+
+                {% if user.role == "teacher" %}
+
+                    <a
+                        class="dropdown-item"
+                        href="{% url 'teacher_dashboard' %}"
+                    >
+                        Teacher Dashboard
+                    </a>
+
+                {% elif user.role == "school_admin" %}
+
+                    <a
+                        class="dropdown-item"
+                        href="{% url 'school_admin_dashboard' %}"
+                    >
+                        Admin Dashboard
+                    </a>
+
+                {% elif user.role == "student" %}
+
+                    <a
+                        class="dropdown-item"
+                        href="{% url 'student_dashboard' %}"
+                    >
+                        Student Dashboard
+                    </a>
+
+                {% endif %}
+
+            {% else %}
+
+                <a
+                    class="dropdown-item"
+                    href="{% url 'teacher_hub' %}"
+                >
+                    Teacher Hub
+                </a>
+
+            {% endif %}
+
         </li>
 
         <li>
@@ -454,9 +491,35 @@
 
                         <li>
 
-                            <a href="{% url 'teacher_hub' %}">
-                                Teacher Hub
-                            </a>
+                            {% if user.is_authenticated %}
+
+    {% if user.role == "teacher" %}
+
+        <a href="{% url 'teacher_dashboard' %}">
+            Teacher Dashboard
+        </a>
+
+    {% elif user.role == "school_admin" %}
+
+        <a href="{% url 'school_admin_dashboard' %}">
+            Admin Dashboard
+        </a>
+
+    {% elif user.role == "student" %}
+
+        <a href="{% url 'student_dashboard' %}">
+            Student Dashboard
+        </a>
+
+    {% endif %}
+
+{% else %}
+
+    <a href="{% url 'teacher_hub' %}">
+        Teacher Hub
+    </a>
+
+{% endif %}
 
                         </li>
 

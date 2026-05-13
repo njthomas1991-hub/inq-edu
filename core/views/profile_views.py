@@ -23,7 +23,7 @@ def profile_view(request):
 
     return render(
         request,
-        "core/profile.html"
+        "core/profile/profile.html"
     )
 
 
@@ -32,5 +32,5 @@ def account_settings_view(request):
 
     return render(
         request,
-        "core/account_settings.html"
+        "core/profile/account_settings.html"
     )

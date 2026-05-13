@@ -4,7 +4,7 @@ from django.shortcuts import render
 def student_dashboard_view(request):
     return render(
         request,
-        "core/student/dashboard.html"
+        "core/student/student_dashboard.html"
     )
 
 

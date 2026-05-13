@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
-from allauth.account.forms import SignupForm
+from allauth.account.forms import LoginForm as AllauthLoginForm, SignupForm
 
 from core.models import User
 
@@ -26,6 +26,32 @@ class LoginForm(AuthenticationForm):
             }
         )
     )
+
+
+class CustomAllauthLoginForm(AllauthLoginForm):
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        if 'login' in self.fields:
+            self.fields['login'].label = 'Email'
+            self.fields['login'].widget = forms.EmailInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Email',
+                    'autocomplete': 'email',
+                }
+            )
+
+        if 'password' in self.fields:
+            self.fields['password'].widget = forms.PasswordInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Password',
+                    'autocomplete': 'current-password',
+                }
+            )
 
 
 class CustomSignupForm(SignupForm):

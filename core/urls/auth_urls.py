@@ -9,7 +9,7 @@ urlpatterns = [
     path(
         "signup/",
         allauth_views.SignupView.as_view(
-            template_name="account/signup.html"
+            template_name="accounts/signup.html"
         ),
         name="signup",
     ),
@@ -17,7 +17,7 @@ urlpatterns = [
     path(
         "login/",
         allauth_views.LoginView.as_view(
-            template_name="account/login.html"
+            template_name="accounts/login.html"
         ),
         name="login",
     ),

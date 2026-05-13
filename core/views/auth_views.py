@@ -88,7 +88,7 @@ def custom_login_view(request):
 
     return render(
         request,
-        "core/accounts/login.html",
+        "accounts/login.html",
         {
             "form": form
         }
