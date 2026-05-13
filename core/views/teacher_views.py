@@ -1,4 +1,97 @@
-from django.shortcuts import render
+import csv
+
+from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponse, HttpResponseForbidden
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_protect
+
+from core.forms.class_forms import CreateStudentForm
+from core.models import User
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+@csrf_protect
+def add_student_view(request):
+    """
+    Teacher-created student accounts.
+    Creates real User records with role='student', generated password, saved to DB.
+    """
+    if request.method == 'GET':
+        form = CreateStudentForm()
+        return render(request, "core/teacher/add_student.html", {'form': form})
+
+    if request.method == 'POST':
+        form = CreateStudentForm(request.POST)
+
+        if form.is_valid():
+            student = form.save()
+
+            recent_ids = request.session.get('recent_student_ids', [])
+            recent_ids.append(int(student.pk))
+            request.session['recent_student_ids'] = recent_ids[-100:]
+
+            return render(request, "core/teacher/add_student.html", {
+                'form': CreateStudentForm(),
+                'created_student': student,
+            })
+
+        return render(request, "core/teacher/add_student.html", {
+            'form': form,
+        })
+
+    return render(request, "core/teacher/add_student.html", {
+        'form': CreateStudentForm(),
+    })
+
+
+@login_required
+@require_http_methods(["GET"])
+def download_student_login_card_view(request, student_id):
+    """Download a plain-text login card for a student account."""
+    student = get_object_or_404(User, id=student_id, role='student')
+
+    card_lines = [
+        "Inq-Ed Student Login Card",
+        "=========================",
+        f"Student Name: {(student.get_full_name() or student.username).strip()}",
+        f"Username: {student.username}",
+        f"Password: {student.plain_password or '[Password not available]'}",
+        "Login URL: /login/",
+    ]
+
+    response = HttpResponse("\n".join(card_lines), content_type="text/plain; charset=utf-8")
+    response["Content-Disposition"] = f'attachment; filename="student-login-card-{student.username}.txt"'
+    return response
+
+
+@login_required
+@require_http_methods(["GET"])
+def download_recent_student_login_cards_csv_view(request):
+    """Download CSV login cards for recently created student accounts."""
+    if getattr(request.user, 'role', None) not in ['teacher', 'school_admin']:
+        return HttpResponseForbidden("You do not have permission to download student login cards.")
+
+    recent_ids = request.session.get('recent_student_ids', [])
+    students = User.objects.filter(id__in=recent_ids, role='student').order_by('id')
+
+    response = HttpResponse(content_type="text/csv; charset=utf-8")
+    response["Content-Disposition"] = 'attachment; filename="recent-student-login-cards.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(["first_name", "last_name", "username", "password", "login_url"])
+
+    for student in students:
+        writer.writerow([
+            student.first_name,
+            student.last_name,
+            student.username,
+            student.plain_password or "",
+            "/login/",
+        ])
+
+    return response
 
 
 def teacher_dashboard_view(request):

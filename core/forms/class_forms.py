@@ -1,6 +1,74 @@
 from django import forms
+import secrets
+import string
 
 from core.models import Class, User
+
+
+class CreateStudentForm(forms.Form):
+    """Form for teachers to create student accounts"""
+    
+    username = forms.CharField(
+        max_length=150,
+        required=True,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Username',
+            }
+        )
+    )
+    
+    first_name = forms.CharField(
+        max_length=150,
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'First name',
+            }
+        )
+    )
+    
+    last_name = forms.CharField(
+        max_length=150,
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control',
+                'placeholder': 'Last name',
+            }
+        )
+    )
+    
+    def clean_username(self):
+        """Ensure username is unique"""
+        username = self.cleaned_data['username']
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError("This username is already taken.")
+        return username
+    
+    def save(self):
+        """Create a new student user with generated password"""
+        username = self.cleaned_data['username']
+        first_name = self.cleaned_data.get('first_name', '')
+        last_name = self.cleaned_data.get('last_name', '')
+        
+        # Generate a secure random password
+        password_chars = string.ascii_letters + string.digits
+        plain_password = ''.join(secrets.choice(password_chars) for _ in range(12))
+        
+        # Create the user
+        user = User.objects.create_user(
+            username=username,
+            password=plain_password,
+            first_name=first_name,
+            last_name=last_name,
+            role='student',
+            plain_password=plain_password  # Store for display
+        )
+        
+        return user
 
 
 class ClassForm(forms.ModelForm):

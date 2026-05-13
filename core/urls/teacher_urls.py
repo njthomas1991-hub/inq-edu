@@ -4,6 +4,9 @@ from core.views.teacher_views import (
     teacher_dashboard_view,
     teacher_analytics_view,
     add_class_view,
+    add_student_view,
+    download_student_login_card_view,
+    download_recent_student_login_cards_csv_view,
     class_detail_view,
     class_analytics_view,
     student_analytics_view,
@@ -45,6 +48,24 @@ urlpatterns = [
         "teacher/class/add/",
         add_class_view,
         name="add_class"
+    ),
+
+    path(
+        "teacher/student/add/",
+        add_student_view,
+        name="add_student"
+    ),
+
+    path(
+        "teacher/student/<int:student_id>/login-card/",
+        download_student_login_card_view,
+        name="download_student_login_card"
+    ),
+
+    path(
+        "teacher/students/login-cards/download/",
+        download_recent_student_login_cards_csv_view,
+        name="download_recent_student_login_cards"
     ),
 
     path(
