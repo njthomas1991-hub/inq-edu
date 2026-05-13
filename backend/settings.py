@@ -94,10 +94,13 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-ACCOUNT_LOGIN_METHODS = {'email', 'username'}
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_SIGNUP_FIELDS = [
     'email*',
-    'username*',
     'password1*',
     'password2*',
 ]
@@ -108,6 +111,7 @@ ACCOUNT_LOGIN_REDIRECT_URL = '/teacher/'
 ACCOUNT_SIGNUP_REDIRECT_URL = '/teacher/'  # Redirect to home page after registration
 ACCOUNT_SESSION_REMEMBER = True  # Keep users logged in
 ACCOUNT_FORMS = {
+    'login': 'core.forms.auth_forms.CustomAllauthLoginForm',
     'signup': 'core.forms.auth_forms.CustomSignupForm',
 }
 
