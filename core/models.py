@@ -11,8 +11,10 @@ class User(AbstractUser):
         ('student', 'Student'),
         ('school_admin', 'School Admin'),
     )
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
-    school = models.CharField(max_length=255, null=True, blank=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student')
+    school = models.CharField(max_length=255, blank=True)
+    display_name = models.CharField(max_length=255, blank=True)
+    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     bio = models.TextField(null=True, blank=True)
     plain_password = models.CharField(max_length=100, null=True, blank=True, help_text="Plain text password for display purposes (students only)")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -22,7 +24,7 @@ class User(AbstractUser):
         verbose_name_plural = 'Teacher Sign-ups'
 
     def __str__(self):
-        return f"{self.get_full_name() or self.username} ({self.get_role_display()})"
+        return f"{self.username} ({self.role})"
 
 
 # Class Model - Created by teachers
@@ -176,6 +178,10 @@ class TeachingResource(models.Model):
         ('game_setup', 'Game Setup Guide'),
         ('other', 'Other'),
     )
+    VISIBILITY_CHOICES = (
+        ('public', 'Public'),
+        ('school', 'School Only'),
+    )
     
     title = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
@@ -188,6 +194,7 @@ class TeachingResource(models.Model):
     key_stage = models.IntegerField(null=True, blank=True, help_text="Key Stage (1-4)")
     subject = models.CharField(max_length=100, blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='draft')
+    visibility = models.CharField(max_length=10, choices=VISIBILITY_CHOICES, default='school', help_text="Share with everyone or just your school")
     featured = models.BooleanField(default=False, help_text="Featured resource")
     likes = models.ManyToManyField(User, related_name='liked_resources', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -326,7 +333,7 @@ class Avatar(models.Model):
         ('gradient', 'Gradient'),
     )
     
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='avatar')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='monster_avatar')
     
     # Body
     body_type = models.CharField(max_length=20, choices=BODY_TYPES, default='blob')

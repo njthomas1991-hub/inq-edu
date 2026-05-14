@@ -1,13 +1,14 @@
 from rest_framework import serializers
 from .models import (
     User, Class, ClassStudent, Avatar,
-    KindlewickGameProgress, KindlewickGameSession
+    KindlewickGameProgress, KindlewickGameSession,
+    TeachingResource
 )
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'role']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'role', 'school', 'display_name', 'avatar']
 
 
 class AvatarSerializer(serializers.ModelSerializer):
@@ -69,3 +70,13 @@ class KindlewickGameSessionAdminSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'user_detail', 'game_type', 'game_type_display', 'level', 'score', 
                   'tokens_earned', 'playtime', 'completed', 'session_data', 'created_at', 'finished_at']
         read_only_fields = ['id', 'created_at']
+
+
+class TeachingResourceSerializer(serializers.ModelSerializer):
+    author_name = serializers.CharField(source='author.get_full_name', read_only=True)
+    visibility_display = serializers.CharField(source='get_visibility_display', read_only=True)
+    
+    class Meta:
+        model = TeachingResource
+        fields = ['id', 'title', 'slug', 'author', 'author_name', 'content', 'excerpt', 'image', 'file', 'resource_type', 'key_stage', 'subject', 'status', 'visibility', 'visibility_display', 'featured', 'created_at', 'updated_at', 'published_at']
+        read_only_fields = ['id', 'slug', 'created_at', 'updated_at']

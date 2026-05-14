@@ -49,7 +49,14 @@
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-2">
                                 <h5 class="card-title">{{ resource.title }}</h5>
-                                <span class="badge bg-secondary">{{ resource.get_resource_type_display }}</span>
+                                <div class="d-flex gap-2">
+                                    <span class="badge bg-secondary">{{ resource.get_resource_type_display }}</span>
+                                    {% if resource.visibility == 'public' %}
+                                        <span class="badge bg-success">Public</span>
+                                    {% else %}
+                                        <span class="badge bg-info">School Only</span>
+                                    {% endif %}
+                                </div>
                             </div>
                             <p class="card-text text-muted">{{ resource.excerpt|default:resource.content|truncatewords:25 }}</p>
                             <div class="small text-muted">Shared by {{ resource.author.get_full_name|default:resource.author.username }}</div>

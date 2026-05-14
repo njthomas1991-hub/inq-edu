@@ -1,35 +1,59 @@
 {% extends "core/base.html" %}
 
+{% block title %}Profile - INQ-ED{% endblock %}
+
 {% block content %}
-
 <div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" alt="Profile avatar" class="rounded-circle" width="72" height="72">
+                        {% else %}
+                            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:72px;height:72px;">
+                                <i class="fas fa-user fa-lg"></i>
+                            </div>
+                        {% endif %}
 
-    {% if user.role == "teacher" %}
+                        <div>
+                            <h1 class="h3 mb-1">Profile</h1>
+                            <span class="badge bg-primary text-uppercase">{{ user.role|default:"user" }}</span>
+                        </div>
+                    </div>
 
-        <h1>Teacher Profile</h1>
+                    <form method="post" enctype="multipart/form-data" class="row g-3">
+                        {% csrf_token %}
 
-    {% elif user.role == "school_admin" %}
+                        <div class="col-md-6">
+                            <label class="form-label">Name</label>
+                            {{ form.display_name }}
+                        </div>
 
-        <h1>School Admin Profile</h1>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            {{ form.email }}
+                        </div>
 
-    {% elif user.role == "student" %}
+                        <div class="col-md-6">
+                            <label class="form-label">School</label>
+                            {{ form.school }}
+                        </div>
 
-        <h1>Student Profile</h1>
+                        <div class="col-md-6">
+                            <label class="form-label">Avatar</label>
+                            {{ form.avatar }}
+                        </div>
 
-    {% else %}
-
-        <h1>User Profile</h1>
-
-    {% endif %}
-
-    <p>
-        Username: {{ user.username }}
-    </p>
-
-    <p>
-        Email: {{ user.email }}
-    </p>
-
+                        <div class="col-12 d-flex flex-wrap gap-2 mt-2">
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <a href="{% url 'password_change' %}" class="btn btn-outline-secondary">Change Password</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
-
 {% endblock %}

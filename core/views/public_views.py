@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, render render
+from django.shortcuts import redirect, render
 
 
 

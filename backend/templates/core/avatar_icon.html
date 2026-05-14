@@ -1,6 +1,6 @@
-{% if user.avatar and user.avatar.avatar_image %}
+{% if user.avatar %}
     <img
-        src="{{ user.avatar.avatar_image.url }}"
+        src="{{ user.avatar.url }}"
         alt="Avatar"
         class="rounded-circle"
         width="40"

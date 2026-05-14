@@ -25,6 +25,11 @@ class TeachingResourceForm(forms.ModelForm):
                 Column('status', css_class='col-md-3'),
                 css_class='g-3'
             ),
+            Row(
+                Column('visibility', css_class='col-md-6'),
+                Column('featured', css_class='col-md-6'),
+                css_class='g-3'
+            ),
         )
 
     class Meta:
@@ -36,6 +41,8 @@ class TeachingResourceForm(forms.ModelForm):
             'key_stage',
             'subject',
             'status',
+            'visibility',
+            'featured',
         )
 
         widgets = {
@@ -63,5 +70,13 @@ class TeachingResourceForm(forms.ModelForm):
 
             'status': forms.Select(
                 attrs={'class': 'form-select'}
+            ),
+
+            'visibility': forms.Select(
+                attrs={'class': 'form-select'}
+            ),
+
+            'featured': forms.CheckboxInput(
+                attrs={'class': 'form-check-input'}
             ),
         }

@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from core.models import (
+    Avatar,
     KindlewickGameProgress,
     KindlewickGameSession,
     User,
@@ -25,16 +26,15 @@ from core.serializers import (
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def current_user_api(request):
-
-    avatar = getattr(request.user, 'avatar', None)
-
     user_data = dict(
         UserSerializer(request.user).data
     )
 
-    user_data['avatar'] = (
-        AvatarSerializer(avatar).data
-        if avatar else None
+    monster_avatar = Avatar.objects.filter(user=request.user).first()
+
+    user_data['monster_avatar'] = (
+        AvatarSerializer(monster_avatar).data
+        if monster_avatar else None
     )
 
     return Response(user_data)

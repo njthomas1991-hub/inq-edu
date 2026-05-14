@@ -16,6 +16,11 @@
                 </div>
                 <div class="d-flex align-items-center gap-2">
                     <span class="badge bg-secondary">{{ resource.get_resource_type_display }}</span>
+                    {% if resource.visibility == 'public' %}
+                        <span class="badge bg-success">Public</span>
+                    {% else %}
+                        <span class="badge bg-info">School Only</span>
+                    {% endif %}
                     {% if resource.author == request.user or request.user.is_superuser %}
                         <a href="{% url 'teacher_resource_edit' resource.slug %}" class="btn btn-sm btn-outline-primary">Edit</a>
                         <form method="post" action="{% url 'teacher_resource_delete' resource.slug %}" onsubmit="return confirm('Delete this resource?');" style="display:inline;">

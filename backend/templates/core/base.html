@@ -105,26 +105,13 @@
 
             {% if user.avatar %}
 
-                {% if user.avatar.avatar_image %}
-
                     <img
-                        src="{{ user.avatar.avatar_image.url }}"
+                        src="{{ user.avatar.url }}"
                         alt="User Avatar"
                         class="rounded-circle"
                         width="32"
                         height="32"
                     >
-
-                {% else %}
-
-                    <div
-                        class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
-                        style="width:32px;height:32px;"
-                    >
-                        <i class="fas fa-user"></i>
-                    </div>
-
-                {% endif %}
 
             {% else %}
 
