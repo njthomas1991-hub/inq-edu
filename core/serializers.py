@@ -2,13 +2,22 @@ from rest_framework import serializers
 from .models import (
     User, Class, ClassStudent, Avatar,
     KindlewickGameProgress, KindlewickGameSession,
-    TeachingResource
+    TeachingResource, School
 )
 
+class SchoolSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = School
+        fields = ['id', 'name', 'slug', 'logo', 'subscription_tier', 'description']
+        read_only_fields = ['id', 'slug']
+
+
 class UserSerializer(serializers.ModelSerializer):
+    school_detail = SchoolSerializer(source='school', read_only=True)
+    
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'role', 'school', 'display_name', 'avatar']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'role', 'school', 'school_detail', 'display_name', 'avatar']
 
 
 class AvatarSerializer(serializers.ModelSerializer):

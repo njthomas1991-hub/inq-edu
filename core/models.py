@@ -4,6 +4,43 @@ from django.utils import timezone
 from django.utils.text import slugify
 # Cloudinary removed - not used in new avatar system
 
+# School Model - Multi-tenant organization
+class School(models.Model):
+    SUBSCRIPTION_CHOICES = (
+        ('free', 'Free'),
+        ('pro', 'Pro'),
+        ('enterprise', 'Enterprise'),
+    )
+    
+    name = models.CharField(max_length=255, unique=True)
+    slug = models.SlugField(unique=True, blank=True)
+    logo = models.ImageField(upload_to='school_logos/', blank=True, null=True)
+    description = models.TextField(blank=True)
+    
+    # Subscription & Billing
+    subscription_tier = models.CharField(max_length=20, choices=SUBSCRIPTION_CHOICES, default='free')
+    subscription_active = models.BooleanField(default=True)
+    billing_email = models.EmailField(blank=True)
+    
+    # Settings (stored as JSON for flexibility)
+    settings = models.JSONField(default=dict, blank=True)
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
 # User Model - Teachers and Students
 class User(AbstractUser):
     ROLE_CHOICES = (
@@ -12,7 +49,7 @@ class User(AbstractUser):
         ('school_admin', 'School Admin'),
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student')
-    school = models.CharField(max_length=255, blank=True)
+    school = models.ForeignKey(School, on_delete=models.PROTECT, null=True, blank=True, related_name='users')
     display_name = models.CharField(max_length=255, blank=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     bio = models.TextField(null=True, blank=True)
@@ -83,7 +120,7 @@ class ClassStudent(models.Model):
 # SchoolAnalyticsProfile Model - School admins who can access multiple teachers' data
 class SchoolAnalyticsProfile(models.Model):
     teacher = models.OneToOneField(User, on_delete=models.CASCADE, limit_choices_to={'role': 'teacher'}, related_name='analytics_profile')
-    school = models.CharField(max_length=255)
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name='analytics_profiles')
     can_access_all_teachers = models.BooleanField(default=True, help_text="Access all teachers' data in the same school")
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -91,7 +128,7 @@ class SchoolAnalyticsProfile(models.Model):
         verbose_name_plural = "School Analytics Profiles"
 
     def __str__(self):
-        return f"{self.teacher.get_full_name() or self.teacher.username} (Admin) - {self.school}"
+        return f"{self.teacher.get_full_name() or self.teacher.username} (Admin) - {self.school.name}"
 
 
 # NewsAnnouncement Model - Admin only

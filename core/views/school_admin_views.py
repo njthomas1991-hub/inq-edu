@@ -18,22 +18,25 @@ def school_admin_dashboard_view(request):
     if forbidden:
         return forbidden
 
-    school_name = request.user.school
+    school = request.user.school
+    if not school:
+        return HttpResponseForbidden("You do not have an assigned school.")
 
-    teachers = User.objects.filter(role="teacher", school=school_name)
-    students = User.objects.filter(role="student", school=school_name)
-    classes = Class.objects.filter(teacher__school=school_name).select_related("teacher")
-    resources = TeachingResource.objects.filter(author__school=school_name).select_related("author")
+    teachers = User.objects.filter(role="teacher", school=school)
+    students = User.objects.filter(role="student", school=school)
+    classes = Class.objects.filter(teacher__school=school).select_related("teacher")
+    resources = TeachingResource.objects.filter(author__school=school).select_related("author")
 
     return render(request, "core/school_admin/dashboard.html", {
-        "school_name": school_name,
+        "school_name": school.name,
+        "school": school,
         "teachers_count": teachers.count(),
         "students_count": students.count(),
         "classes_count": classes.count(),
         "resources_count": resources.count(),
         "recent_classes": classes.order_by("-created_at")[:5],
         "recent_logins": User.objects.filter(
-            school=school_name,
+            school=school,
             last_login__isnull=False,
         ).order_by("-last_login")[:5],
     })
@@ -45,11 +48,15 @@ def school_admin_staff_view(request):
     if forbidden:
         return forbidden
 
-    school_name = request.user.school
-    teachers = User.objects.filter(role="teacher", school=school_name).annotate(class_count=Count("classes_taught"))
+    school = request.user.school
+    if not school:
+        return HttpResponseForbidden("You do not have an assigned school.")
+
+    teachers = User.objects.filter(role="teacher", school=school).annotate(class_count=Count("classes_taught"))
 
     return render(request, "core/school_admin/staff.html", {
-        "school_name": school_name,
+        "school_name": school.name,
+        "school": school,
         "teachers": teachers,
     })
 
@@ -60,11 +67,15 @@ def school_admin_classes_view(request):
     if forbidden:
         return forbidden
 
-    school_name = request.user.school
-    classes = Class.objects.filter(teacher__school=school_name).select_related("teacher").annotate(student_count=Count("students"))
+    school = request.user.school
+    if not school:
+        return HttpResponseForbidden("You do not have an assigned school.")
+
+    classes = Class.objects.filter(teacher__school=school).select_related("teacher").annotate(student_count=Count("students"))
 
     return render(request, "core/school_admin/classes.html", {
-        "school_name": school_name,
+        "school_name": school.name,
+        "school": school,
         "classes": classes,
     })
 
@@ -75,9 +86,12 @@ def school_admin_analytics_view(request):
     if forbidden:
         return forbidden
 
-    school_name = request.user.school
-    classes = Class.objects.filter(teacher__school=school_name)
-    students = User.objects.filter(role="student", school=school_name)
+    school = request.user.school
+    if not school:
+        return HttpResponseForbidden("You do not have an assigned school.")
+
+    classes = Class.objects.filter(teacher__school=school)
+    students = User.objects.filter(role="student", school=school)
 
     subject_breakdown = []
     for subject_value, subject_label in Class.SUBJECT_CHOICES:
@@ -92,7 +106,8 @@ def school_admin_analytics_view(request):
             key_stage_breakdown.append({"label": key_stage_label, "count": count})
 
     return render(request, "core/school_admin/analytics.html", {
-        "school_name": school_name,
+        "school_name": school.name,
+        "school": school,
         "classes_count": classes.count(),
         "total_students": students.count(),
         "subject_breakdown": subject_breakdown,
