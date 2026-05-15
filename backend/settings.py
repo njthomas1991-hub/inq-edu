@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.sites',
     'django.contrib.sessions',
     'django.contrib.messages',
     # 'cloudinary_storage',  # Disabled - causes Python 3.14 compatibility issues
@@ -114,8 +115,16 @@ ACCOUNT_FORMS = {
 
 ACCOUNT_ADAPTER = 'core.views.auth_views.CustomAccountAdapter'
 
-# Email settings for development
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Prints emails to console during development
+# Email settings
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
+#EMAIL_HOST = "smtp.gmail.com"
+#EMAIL_PORT = 587
+#EMAIL_USE_TLS = True
+#EMAIL_HOST_USER = "your@email.com"
+#EMAIL_HOST_PASSWORD = "yzldqelqjmwmqkbj"
+#DEFAULT_FROM_EMAIL = "INQ-ED <your@email.com>"
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
 CRISPY_TEMPLATE_PACK = 'bootstrap5'

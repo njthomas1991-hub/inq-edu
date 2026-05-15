@@ -43,6 +43,64 @@ if (themeToggleCheckbox) {
 document.addEventListener('DOMContentLoaded', () => {
 
     /* ========================================
+       AUTH PASSWORD TOGGLE
+    ======================================== */
+
+    const passwordToggleButtons =
+        document.querySelectorAll(
+            '.password-toggle'
+        );
+
+    passwordToggleButtons.forEach(
+        (toggleButton) => {
+
+            const wrapper =
+                toggleButton.closest(
+                    '.password-wrapper'
+                );
+
+            if (!wrapper) {
+                return;
+            }
+
+            const passwordInput =
+                wrapper.querySelector(
+                    'input'
+                );
+
+            if (!passwordInput) {
+                return;
+            }
+
+            toggleButton.addEventListener(
+                'click',
+                () => {
+
+                    const isPassword =
+                        passwordInput.type ===
+                        'password';
+
+                    passwordInput.type =
+                        isPassword ? 'text' : 'password';
+
+                    const icon =
+                        toggleButton.querySelector(
+                            'i'
+                        );
+
+                    if (icon) {
+                        icon.className = isPassword
+                            ? 'fa-solid fa-eye-slash'
+                            : 'fa-solid fa-eye';
+                    }
+
+                }
+            );
+
+        }
+    );
+
+    /* ========================================
        ACCESSIBILITY PANEL
     ======================================== */
 

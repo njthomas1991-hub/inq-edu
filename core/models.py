@@ -49,7 +49,7 @@ class User(AbstractUser):
         ('school_admin', 'School Admin'),
     )
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student')
-    school = models.ForeignKey(School, on_delete=models.PROTECT, null=True, blank=True, related_name='users')
+    school = models.CharField(max_length=255, blank=True)
     display_name = models.CharField(max_length=255, blank=True)
     avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     bio = models.TextField(null=True, blank=True)
