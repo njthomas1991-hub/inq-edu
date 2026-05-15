@@ -925,8 +925,8 @@ form .btn-row .btn {
 }
 
 /* ========================================
-    Authentication Forms
-    ======================================== */
+   Authentication Layout
+   ======================================== */
 
 .auth-page-wrapper {
     min-height: calc(100vh - 140px);
@@ -934,19 +934,18 @@ form .btn-row .btn {
     justify-content: center;
     align-items: center;
     padding: var(--spacing-2xl);
+    width: 100%;
 }
 
 .auth-card {
     width: 100%;
     max-width: 520px;
+    margin: 0 auto;
     background: var(--theme-bg-2);
     border: 1px solid var(--theme-border);
     border-radius: var(--radius-xl);
     padding: var(--spacing-2xl);
     box-shadow: var(--shadow-xl);
-    transition:
-        background-color var(--transition-base),
-        border-color var(--transition-base);
 }
 
 .auth-header {
