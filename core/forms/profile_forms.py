@@ -12,7 +12,7 @@ class ProfileForm(forms.ModelForm):
             "display_name",
             "email",
             "school",
-            "avatar",
+            "bio",
         ]
 
         widgets = {
@@ -24,5 +24,8 @@ class ProfileForm(forms.ModelForm):
             ),
             "school": forms.TextInput(
                 attrs={"class": "form-control"}
+            ),
+            "bio": forms.Textarea(
+                attrs={"class": "form-control", "rows": 4}
             ),
         }

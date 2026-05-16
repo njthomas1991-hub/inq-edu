@@ -4,26 +4,26 @@
 
 {% block content %}
 <div class="container py-5">
-    <div class="row justify-content-center">
+    <div class="row justify-content-center g-4">
+        <div class="col-lg-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h1 class="h4 mb-3">Avatar</h1>
+                    {% include "core/components/avatar/avatar_display.html" with avatar=avatar %}
+                    <a href="{% url 'profile_avatar' %}" class="btn btn-primary-custom mt-3">Build Avatar</a>
+                </div>
+            </div>
+        </div>
+
         <div class="col-lg-8">
             <div class="card shadow-sm">
                 <div class="card-body p-4">
-                    <div class="d-flex align-items-center gap-3 mb-4">
-                        {% if user.avatar %}
-                            <img src="{{ user.avatar.url }}" alt="Profile avatar" class="rounded-circle" width="72" height="72">
-                        {% else %}
-                            <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center" style="width:72px;height:72px;">
-                                <i class="fas fa-user fa-lg"></i>
-                            </div>
-                        {% endif %}
-
-                        <div>
-                            <h1 class="h3 mb-1">Profile</h1>
-                            <span class="badge bg-primary text-uppercase">{{ user.role|default:"user" }}</span>
-                        </div>
+                    <div class="mb-4">
+                        <h1 class="h3 mb-1">Profile</h1>
+                        <span class="badge bg-primary text-uppercase">{{ user.role|default:"user" }}</span>
                     </div>
 
-                    <form method="post" enctype="multipart/form-data" class="row g-3">
+                    <form method="post" class="row g-3">
                         {% csrf_token %}
 
                         <div class="col-md-6">
@@ -41,13 +41,14 @@
                             {{ form.school }}
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label">Avatar</label>
-                            {{ form.avatar }}
+                        <div class="col-12">
+                            <label class="form-label">Bio</label>
+                            {{ form.bio }}
                         </div>
 
                         <div class="col-12 d-flex flex-wrap gap-2 mt-2">
                             <button type="submit" class="btn btn-primary">Save Changes</button>
+                            <a href="{% url 'settings_avatar' %}" class="btn btn-outline-secondary">Open Avatar Settings</a>
                             <a href="{% url 'password_change' %}" class="btn btn-outline-secondary">Change Password</a>
                         </div>
                     </form>

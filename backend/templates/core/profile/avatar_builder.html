@@ -1,0 +1,218 @@
+{% extends "core/base.html" %}
+
+{% block title %}Avatar Builder - INQ-ED{% endblock %}
+
+{% block content %}
+<div class="container py-5 avatar-builder-page">
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-3">
+                        <div>
+                            <h1 class="h4 mb-1">Avatar Builder</h1>
+                            <p class="text-muted mb-0">Build a layered avatar that renders everywhere without image uploads.</p>
+                        </div>
+                        <span class="badge bg-info-subtle text-info-emphasis rounded-pill">Live preview</span>
+                    </div>
+
+                    <div class="avatar-builder-preview mb-3">
+                        <div class="avatar-builder-preview-shell">
+                            {% include "core/components/avatar/avatar_display.html" with avatar=avatar %}
+                        </div>
+                    </div>
+
+                    <div class="avatar-builder-summary card border-0 bg-body-tertiary mb-3">
+                        <div class="card-body py-3">
+                            <div class="d-flex flex-wrap gap-2" id="avatarSummary"></div>
+                        </div>
+                    </div>
+
+                    <div class="small text-muted">
+                        Rendering uses layered HTML and JSON config, so the same avatar can appear in profile cards, navbars, and dashboards.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <form method="post" class="card shadow-sm avatar-builder-form">
+                {% csrf_token %}
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <h2 class="h5 mb-1">Head</h2>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Skin tone</label>
+                                {{ form.skin }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Expression</label>
+                                {{ form.expression }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h2 class="h5 mb-1">Hair</h2>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Style</label>
+                                {{ form.hair }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Color</label>
+                                {{ form.hair_color }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h2 class="h5 mb-1">Eyes</h2>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Eye style</label>
+                                {{ form.eyes }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Mouth</label>
+                                {{ form.mouth }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h2 class="h5 mb-1">Clothes</h2>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Outfit</label>
+                                {{ form.outfit }}
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Background</label>
+                                {{ form.background }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h2 class="h5 mb-1">Accessories</h2>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Accessory</label>
+                                {{ form.accessory }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="avatar-builder-actions d-flex flex-wrap gap-2">
+                        <button type="submit" class="btn btn-primary-custom">Save Avatar</button>
+                        <button type="button" class="btn btn-secondary-custom" id="randomizeAvatarBtn" data-randomize-url="{% url 'randomize_avatar' %}">Randomize</button>
+                        <a href="{% url 'profile' %}" class="btn btn-secondary-custom">Back to Profile</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    const form = document.querySelector('.avatar-builder-form');
+    const preview = document.querySelector('.avatar-builder-preview .avatar-render');
+    const summary = document.getElementById('avatarSummary');
+    const randomizeButton = document.getElementById('randomizeAvatarBtn');
+
+    if (!form || !preview) {
+        return;
+    }
+
+    const fields = ['skin', 'hair', 'hair_color', 'eyes', 'mouth', 'outfit', 'accessory', 'background', 'expression'];
+
+    const fieldLabels = {
+        skin: 'Skin',
+        hair: 'Hair',
+        hair_color: 'Hair color',
+        eyes: 'Eyes',
+        mouth: 'Mouth',
+        outfit: 'Clothes',
+        accessory: 'Accessory',
+        background: 'Background',
+        expression: 'Expression',
+    };
+
+    function slugifyClassName(value) {
+        return String(value || '').toLowerCase().replace(/[^a-z0-9_\-]/g, '-');
+    }
+
+    function syncPreview() {
+        const baseClasses = ['avatar-render', 'avatar-render--lg'];
+        const chips = [];
+
+        fields.forEach((field) => {
+            const input = form.querySelector(`[name="${field}"]`);
+            if (input) {
+                const value = slugifyClassName(input.value);
+                baseClasses.push(`avatar-${field}-${value}`);
+                chips.push(`<span class="badge text-bg-light border avatar-summary-chip">${fieldLabels[field]}: ${value.replaceAll('_', ' ')}</span>`);
+            }
+        });
+
+        preview.className = baseClasses.join(' ');
+
+        if (summary) {
+            summary.innerHTML = chips.join('');
+        }
+    }
+
+    function applyConfig(config) {
+        fields.forEach((field) => {
+            const input = form.querySelector(`[name="${field}"]`);
+            if (input && config[field]) {
+                input.value = config[field];
+            }
+        });
+        syncPreview();
+    }
+
+    async function randomizeAvatar() {
+        if (!randomizeButton) {
+            return;
+        }
+
+        const previousLabel = randomizeButton.textContent;
+        randomizeButton.disabled = true;
+        randomizeButton.textContent = 'Randomizing...';
+
+        try {
+            const response = await fetch(randomizeButton.dataset.randomizeUrl, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+            });
+
+            if (!response.ok) {
+                throw new Error(`Randomize request failed with ${response.status}`);
+            }
+
+            const payload = await response.json();
+            applyConfig(payload.avatar_config || {});
+        } catch (error) {
+            console.error('Unable to randomize avatar:', error);
+        } finally {
+            randomizeButton.disabled = false;
+            randomizeButton.textContent = previousLabel;
+        }
+    }
+
+    form.querySelectorAll('select').forEach((input) => {
+        input.addEventListener('change', syncPreview);
+    });
+
+    if (randomizeButton) {
+        randomizeButton.addEventListener('click', randomizeAvatar);
+    }
+
+    syncPreview();
+})();
+</script>
+{% endblock %}

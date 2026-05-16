@@ -51,7 +51,6 @@ class User(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student')
     school = models.CharField(max_length=255, blank=True)
     display_name = models.CharField(max_length=255, blank=True)
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
     bio = models.TextField(null=True, blank=True)
     plain_password = models.CharField(max_length=100, null=True, blank=True, help_text="Plain text password for display purposes (students only)")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -62,6 +61,112 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.username} ({self.role})"
+
+
+def default_avatar_config():
+    return {
+        "skin": "light_2",
+        "hair": "curly_long",
+        "hair_color": "brown",
+        "eyes": "round",
+        "mouth": "smile",
+        "outfit": "hoodie_blue",
+        "accessory": "glasses",
+        "background": "sky_blue",
+        "expression": "happy",
+    }
+
+
+class Avatar(models.Model):
+    SKIN_CHOICES = (
+        ("light_1", "Light 1"),
+        ("light_2", "Light 2"),
+        ("medium_1", "Medium 1"),
+        ("medium_2", "Medium 2"),
+        ("dark_1", "Dark 1"),
+        ("dark_2", "Dark 2"),
+    )
+    HAIR_CHOICES = (
+        ("curly_long", "Curly Long"),
+        ("curly_short", "Curly Short"),
+        ("straight", "Straight"),
+        ("braids", "Braids"),
+        ("buzz", "Buzz Cut"),
+        ("bald", "Bald"),
+    )
+    HAIR_COLOR_CHOICES = (
+        ("black", "Black"),
+        ("brown", "Brown"),
+        ("blonde", "Blonde"),
+        ("red", "Red"),
+        ("auburn", "Auburn"),
+    )
+    EYES_CHOICES = (
+        ("round", "Round"),
+        ("almond", "Almond"),
+        ("sparkly", "Sparkly"),
+        ("sleepy", "Sleepy"),
+        ("wide", "Wide"),
+    )
+    MOUTH_CHOICES = (
+        ("smile", "Smile"),
+        ("grin", "Grin"),
+        ("laugh", "Laugh"),
+        ("surprised", "Surprised"),
+        ("neutral", "Neutral"),
+    )
+    OUTFIT_CHOICES = (
+        ("hoodie_blue", "Blue Hoodie"),
+        ("tee_green", "Green Tee"),
+        ("uniform", "Uniform"),
+        ("jacket_red", "Red Jacket"),
+        ("dress_yellow", "Yellow Dress"),
+    )
+    ACCESSORY_CHOICES = (
+        ("none", "None"),
+        ("glasses", "Glasses"),
+        ("headphones", "Headphones"),
+        ("hat", "Hat"),
+        ("bow", "Bow"),
+    )
+    BACKGROUND_CHOICES = (
+        ("sky_blue", "Sky Blue"),
+        ("sunset", "Sunset"),
+        ("mint", "Mint"),
+        ("lavender", "Lavender"),
+        ("paper", "Paper"),
+    )
+    EXPRESSION_CHOICES = (
+        ("happy", "Happy"),
+        ("calm", "Calm"),
+        ("excited", "Excited"),
+        ("focused", "Focused"),
+        ("playful", "Playful"),
+    )
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='avatar_profile')
+    avatar_config = models.JSONField(default=default_avatar_config, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Avatar'
+        verbose_name_plural = 'Avatars'
+
+    def __str__(self):
+        return f"{self.user.username}'s avatar"
+
+    @property
+    def config(self):
+        merged = default_avatar_config()
+        merged.update(self.avatar_config or {})
+        return merged
+
+    def save(self, *args, **kwargs):
+        merged = default_avatar_config()
+        merged.update(self.avatar_config or {})
+        self.avatar_config = merged
+        super().save(*args, **kwargs)
 
 
 # Class Model - Created by teachers

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
-from .models import (User, Class, ClassStudent, SchoolAnalyticsProfile, 
+from .models import (User, Avatar, Class, ClassStudent, SchoolAnalyticsProfile,
                      NewsAnnouncement, HelpTutorial, TeachingResource, ForumPost, ForumReply, ResourceComment)
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django_summernote.admin import SummernoteModelAdmin
@@ -8,6 +8,24 @@ from django_summernote.admin import SummernoteModelAdmin
 
 # Unregister the Group model from admin
 admin.site.unregister(Group)
+
+
+@admin.register(Avatar)
+class AvatarAdmin(admin.ModelAdmin):
+    list_display = ('user', 'created_at', 'updated_at')
+    search_fields = ('user__username', 'user__email')
+    readonly_fields = ('created_at', 'updated_at')
+    fieldsets = (
+        ('Owner', {
+            'fields': ('user',)
+        }),
+        ('Avatar Config', {
+            'fields': ('avatar_config',)
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at')
+        }),
+    )
 
 
 # News & Announcements - Admin only

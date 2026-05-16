@@ -13,17 +13,22 @@ class SchoolSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    school_detail = SchoolSerializer(source='school', read_only=True)
+    school_detail = serializers.SerializerMethodField()
+
+    def get_school_detail(self, obj):
+        if not obj.school:
+            return None
+        return {'name': obj.school}
     
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'role', 'school', 'school_detail', 'display_name', 'avatar']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'role', 'school', 'school_detail', 'display_name', 'bio']
 
 
 class AvatarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Avatar
-        fields = '__all__'
+        fields = ['id', 'user', 'avatar_config', 'created_at', 'updated_at']
         read_only_fields = ('id', 'created_at', 'updated_at')
 
 

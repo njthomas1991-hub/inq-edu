@@ -29,11 +29,6 @@ from core.views.teacher_views import (
     teacher_forum_reply_delete_view,
 )
 
-from core.views.profile_views import (
-    profile_view,
-    account_settings_view,
-)
-
 urlpatterns = [
 
     path("teacher/", teacher_dashboard_view, name="teacher_dashboard"),
@@ -188,15 +183,4 @@ urlpatterns = [
         name="teacher_forum_reply_delete"
     ),
 
-    path(
-        "profile/",
-        profile_view,
-        name="profile"
-    ),
-
-    path(
-        "account-settings/",
-        account_settings_view,
-        name="account_settings"
-    ),
 ]
