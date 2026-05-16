@@ -1,37 +1,60 @@
 from django.urls import path
-from django.contrib.auth.views import PasswordChangeDoneView
-from django.contrib.auth.views import PasswordChangeView
-from allauth.account import views as allauth_views
+
+from django.contrib.auth.views import (
+    PasswordChangeDoneView,
+    PasswordChangeView,
+)
+
 from django.contrib.auth import views as auth_views
 
-
-from core.views.auth_views import (
-    custom_logout_view,
+from allauth.account.views import (
+    LoginView,
+    SignupView,
 )
+
+from core.views.auth_views import custom_logout_view
 from core.forms.auth_forms import CustomPasswordChangeForm
 
+
 urlpatterns = [
+
+    # -------------------------
+    # SIGNUP
+    # -------------------------
+
     path(
         "signup/",
-        allauth_views.SignupView.as_view(
-            template_name="accounts/signup.html"
+        SignupView.as_view(
+            template_name="core/account/signup.html"
         ),
         name="signup",
     ),
 
+    # -------------------------
+    # LOGIN
+    # -------------------------
+
     path(
         "login/",
-        allauth_views.LoginView.as_view(
-            template_name="accounts/login.html"
+        LoginView.as_view(
+            template_name="core/account/login.html"
         ),
         name="login",
     ),
+
+    # -------------------------
+    # LOGOUT
+    # -------------------------
 
     path(
         "logout/",
         custom_logout_view,
         name="logout",
     ),
+
+    # -------------------------
+    # PASSWORD CHANGE
+    # -------------------------
 
     path(
         "password/change/",
@@ -50,37 +73,41 @@ urlpatterns = [
         name="password_change_done"
     ),
 
-path(
-    "password-reset/",
-    auth_views.PasswordResetView.as_view(
-        template_name="core/account/password_reset.html",
-        email_template_name="core/account/password_reset_email.html",
-        subject_template_name="core/account/password_reset_subject.txt",
-    ),
-    name="password_reset",
-),
+    # -------------------------
+    # PASSWORD RESET
+    # -------------------------
 
-path(
-    "password-reset/done/",
-    auth_views.PasswordResetDoneView.as_view(
-        template_name="core/account/password_reset_done.html",
+    path(
+        "password-reset/",
+        auth_views.PasswordResetView.as_view(
+            template_name="core/account/password_reset.html",
+            email_template_name="core/account/password_reset_email.html",
+            subject_template_name="core/account/password_reset_subject.txt",
+        ),
+        name="password_reset",
     ),
-    name="password_reset_done",
-),
 
-path(
-    "reset/<uidb64>/<token>/",
-    auth_views.PasswordResetConfirmView.as_view(
-        template_name="core/account/password_reset_confirm.html",
+    path(
+        "password-reset/done/",
+        auth_views.PasswordResetDoneView.as_view(
+            template_name="core/account/password_reset_done.html",
+        ),
+        name="password_reset_done",
     ),
-    name="password_reset_confirm",
-),
 
-path(
-    "reset/done/",
-    auth_views.PasswordResetCompleteView.as_view(
-        template_name="core/account/password_reset_complete.html",
+    path(
+        "reset/<uidb64>/<token>/",
+        auth_views.PasswordResetConfirmView.as_view(
+            template_name="core/account/password_reset_confirm.html",
+        ),
+        name="password_reset_confirm",
     ),
-    name="password_reset_complete",
-),
+
+    path(
+        "reset/done/",
+        auth_views.PasswordResetCompleteView.as_view(
+            template_name="core/account/password_reset_complete.html",
+        ),
+        name="password_reset_complete",
+    ),
 ]

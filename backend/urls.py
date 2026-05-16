@@ -52,6 +52,7 @@ urlpatterns = [
     path('summernote/', include('django_summernote.urls')),
     path("login/", custom_login_view, name="login"),
     path("logout/", custom_logout_view, name="logout"),
+    path("", include("core.urls.auth_urls")),
     path("accounts/", include("allauth.urls")),
 ]   
 
