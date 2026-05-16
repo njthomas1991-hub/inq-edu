@@ -1,31 +1,63 @@
 {% extends "core/base.html" %}
 
-{% block title %}{% block auth_page_title %}INQ-ED{% endblock %}{% endblock %}
+{% block title %}
+    {% block auth_page_title %}INQ-ED{% endblock %}
+{% endblock %}
 
 {% block content %}
+
 <div class="auth-page-wrapper">
+
     <div class="auth-card {% block auth_card_class %}{% endblock %}">
+
+        <!-- Header -->
         <div class="auth-header">
-            <h1>{% block auth_heading %}Account{% endblock %}</h1>
+
+            <h1>
+                {% block auth_heading %}
+                    Account
+                {% endblock %}
+            </h1>
+
             {% block auth_subheading %}{% endblock %}
+
         </div>
 
+        <!-- Main Auth Body -->
         {% block auth_body %}
-        <form method="post">
+
+        <form method="post" class="auth-form">
+
             {% csrf_token %}
 
+            <!-- Non-field errors -->
             {% if form.non_field_errors %}
                 <div class="alert alert-danger mb-3">
                     {{ form.non_field_errors }}
                 </div>
             {% endif %}
 
-            {% block auth_fields %}{% endblock %}
-            {% block auth_actions %}{% endblock %}
+            <!-- Form Fields -->
+            <div class="auth-fields">
+                {% block auth_fields %}{% endblock %}
+            </div>
+
+            <!-- Buttons / Actions -->
+            <div class="form-actions">
+                {% block auth_actions %}{% endblock %}
+            </div>
+
         </form>
+
         {% endblock %}
 
-        {% block auth_links %}{% endblock %}
+        <!-- Footer Links -->
+        <div class="auth-links-wrapper">
+            {% block auth_links %}{% endblock %}
+        </div>
+
     </div>
+
 </div>
+
 {% endblock %}
