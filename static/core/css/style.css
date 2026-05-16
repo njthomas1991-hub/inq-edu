@@ -1305,6 +1305,14 @@ select:focus-visible {
 
 @media (max-width: 768px) {
 
+    .auth-page-wrapper {
+
+        align-items: flex-start;
+
+        padding-top: 4rem;
+
+    }
+
     .top-header {
 
         flex-direction: column;
