@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from allauth.account.forms import LoginForm as AllauthLoginForm, SignupForm
 
 from core.models import User
@@ -50,6 +50,40 @@ class CustomAllauthLoginForm(AllauthLoginForm):
                     'class': 'form-control',
                     'placeholder': 'Password',
                     'autocomplete': 'current-password',
+                }
+            )
+
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        if 'old_password' in self.fields:
+            self.fields['old_password'].widget = forms.PasswordInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Current password',
+                    'autocomplete': 'current-password',
+                }
+            )
+
+        if 'new_password1' in self.fields:
+            self.fields['new_password1'].widget = forms.PasswordInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'New password',
+                    'autocomplete': 'new-password',
+                }
+            )
+
+        if 'new_password2' in self.fields:
+            self.fields['new_password2'].widget = forms.PasswordInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Confirm new password',
+                    'autocomplete': 'new-password',
                 }
             )
 

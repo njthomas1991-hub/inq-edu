@@ -8,6 +8,7 @@ from django.contrib.auth import views as auth_views
 from core.views.auth_views import (
     custom_logout_view,
 )
+from core.forms.auth_forms import CustomPasswordChangeForm
 
 urlpatterns = [
     path(
@@ -35,6 +36,7 @@ urlpatterns = [
     path(
         "password/change/",
         PasswordChangeView.as_view(
+            form_class=CustomPasswordChangeForm,
             template_name="core/account/password_change.html"
         ),
         name="password_change"

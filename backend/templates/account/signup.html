@@ -133,13 +133,74 @@
             </div>
 
             <div class="mb-3">
-                {{ form.password1|as_crispy_field }}
-            </div>
 
-            <div class="mb-4">
-                {{ form.password2|as_crispy_field }}
-            </div>
+    <label for="id_password1" class="form-label">
+        Password
+    </label>
 
+    <div class="password-wrapper">
+
+        <input
+            type="password"
+            name="password1"
+            id="id_password1"
+            class="form-control"
+            autocomplete="new-password"
+            required
+        >
+
+        <button
+            type="button"
+            class="password-toggle"
+            aria-label="Toggle password visibility"
+        >
+            <i class="fa-solid fa-eye"></i>
+        </button>
+
+    </div>
+
+    {% if form.password1.errors %}
+        <div class="text-danger small mt-1">
+            {{ form.password1.errors }}
+        </div>
+    {% endif %}
+
+</div>
+
+           <div class="mb-4">
+
+    <label for="id_password2" class="form-label">
+        Confirm Password
+    </label>
+
+    <div class="password-wrapper">
+
+        <input
+            type="password"
+            name="password2"
+            id="id_password2"
+            class="form-control"
+            autocomplete="new-password"
+            required
+        >
+
+        <button
+            type="button"
+            class="password-toggle"
+            aria-label="Toggle password visibility"
+        >
+            <i class="fa-solid fa-eye"></i>
+        </button>
+
+    </div>
+
+    {% if form.password2.errors %}
+        <div class="text-danger small mt-1">
+            {{ form.password2.errors }}
+        </div>
+    {% endif %}
+
+</div>
             <!-- Submit -->
             <button
                 type="submit"
@@ -161,21 +222,21 @@
         <div class="d-grid gap-2">
 
             <a
-                href="/login/?role=student"
-                class="btn-secondary-custom w-100"
-            >
+                href="{% url 'login' %}?role=student"
+                class="btn-secondary-custom w-100">
+            
                 Student Login
             </a>
 
             <a
-                href="/login/?role=teacher"
+                href="{% url 'login' %}?role=teacher"
                 class="btn-secondary-custom w-100"
             >
                 Teacher Login
             </a>
 
             <a
-                href="/login/?role=school_admin"
+                href="{% url 'login' %}?role=school_admin"
                 class="btn-secondary-custom w-100"
             >
                 School Admin Login
