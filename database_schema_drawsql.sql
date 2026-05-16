@@ -158,7 +158,7 @@ CREATE TABLE "core_teachingresource" (
     "image" VARCHAR(100),
     "file" VARCHAR(100),
     "resource_type" VARCHAR(20) NOT NULL CHECK (resource_type IN ('lesson_plan', 'activity', 'worksheet', 'physical_material', 'game_setup', 'other')) DEFAULT 'other',
-    "key_stage" INTEGER,
+    "year_ks" INTEGER,
     "subject" VARCHAR(100),
     "status" VARCHAR(10) NOT NULL CHECK (status IN ('draft', 'published')) DEFAULT 'draft',
     "featured" BOOLEAN NOT NULL DEFAULT FALSE,

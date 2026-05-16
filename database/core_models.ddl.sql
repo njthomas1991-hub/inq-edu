@@ -97,7 +97,7 @@ CREATE TABLE core_teachingresource (
     notes TEXT,
     description TEXT,
     resource_type VARCHAR(20) NOT NULL DEFAULT 'other',
-    key_stage VARCHAR(10),
+    year_ks VARCHAR(10),
     document VARCHAR(255),
     subject VARCHAR(100),
     status VARCHAR(10) NOT NULL DEFAULT 'draft',

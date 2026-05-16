@@ -84,10 +84,10 @@ class ClassModelTestCase(TestCase):
         self.assertEqual(self.class1.teacher, self.teacher)
         self.assertEqual(self.class1.subject, 'maths')
     
-    def test_key_stage_label(self):
-        """Test key_stage_label property"""
-        self.assertEqual(self.class1.key_stage_label, 'KS2')
-        self.assertEqual(self.class2.key_stage_label, 'KS3')
+    def test_year_ks_label(self):
+        """Test year_ks_label property"""
+        self.assertEqual(self.class1.year_ks_label, 'KS2')
+        self.assertEqual(self.class2.year_ks_label, 'KS3')
     
     def test_subject_label(self):
         """Test subject_label property"""

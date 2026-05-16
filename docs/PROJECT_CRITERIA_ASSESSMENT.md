@@ -55,7 +55,7 @@
   - OneToOne for Avatar/SchoolAnalyticsProfile
 - ✅ **Constraints:** 
   - `unique_together = ('student', 'clazz')`
-  - Choice field constraints (KEY_STAGE_CHOICES, SUBJECT_CHOICES)
+  - Choice field constraints (year_ks_CHOICES, SUBJECT_CHOICES)
 - ✅ **Django ORM Usage:** All queries use ORM (`Class.objects.filter()`, `select_related()`, `prefetch_related()`)
 
 **Evidence Files:** `backend/core/models.py`, `database_schema_drawsql.sql`, `DATABASE_SCHEMA_README.md`
@@ -137,7 +137,7 @@
 **Evidence:**
 - ✅ **Well-Organized Schema:** 12 tables with clear relationships documented
 - ✅ **Consistent Data Types:** VARCHAR for strings, INTEGER for choices, BIGINT for IDs, TIMESTAMP for dates
-- ✅ **Constraints:** CHECK constraints for role/subject/key_stage choices
+- ✅ **Constraints:** CHECK constraints for role/subject/year_ks choices
 - ✅ **Migrations:** 30+ migration files tracking all schema changes
   - Files: `backend/core/migrations/0001_initial.py` through `0032_alter_class_subject.py`
 - ✅ **Version Control:** All migrations tracked in Git
@@ -220,7 +220,7 @@
 
 **Validation Features:**
 - ✅ Built-in Django validation (required fields, max_length, etc.)
-- ✅ Choice field constraints (role, subject, key_stage)
+- ✅ Choice field constraints (role, subject, year_ks)
 - ✅ Model-level validation via model fields
 - ✅ Form rendering with Bootstrap classes for user-friendly design
 - ✅ Error handling in views (try-except blocks)
@@ -307,7 +307,7 @@
 
 **Required Actions:**
 1. Create Django unit tests for:
-   - Model methods (User.role, Class.key_stage_label, Avatar.to_dict)
+   - Model methods (User.role, Class.year_ks_label, Avatar.to_dict)
    - View functions (CRUD operations)
    - Authentication flows (login, signup, role redirect)
    - Access control (unauthorized access attempts)
@@ -317,7 +317,7 @@
        def test_class_creation(self):
            teacher = User.objects.create(username='teacher1', role='teacher')
            clazz = Class.objects.create(name='Math 101', teacher=teacher, subject='maths', year_ks=2)
-           self.assertEqual(clazz.key_stage_label, 'KS2')
+           self.assertEqual(clazz.year_ks_label, 'KS2')
    ```
 3. Run tests: `python manage.py test`
 4. Document test coverage percentage
@@ -472,7 +472,7 @@
   - Administration: SchoolAnalyticsProfile
 - ✅ **Django ORM Implementation:**
   - Proper field types and relationships
-  - Model methods: `key_stage_label`, `subject_label`, `to_dict()`
+  - Model methods: `year_ks_label`, `subject_label`, `to_dict()`
   - Meta classes with ordering, verbose names
 - ✅ **Advanced Features:**
   - Abstract inheritance: `User(AbstractUser)`

@@ -82,7 +82,7 @@ class ClassForm(forms.ModelForm):
             'subject',
             'description'
         ]
-
+    
         widgets = {
             'name': forms.TextInput(
                 attrs={
@@ -93,7 +93,7 @@ class ClassForm(forms.ModelForm):
             ),
 
             'year_ks': forms.Select(
-                choices=Class.KEY_STAGE_CHOICES,
+                choices=Class.YEAR_KS_CHOICES,
                 attrs={
                     'class': 'form-select',
                     'required': True
@@ -101,6 +101,7 @@ class ClassForm(forms.ModelForm):
             ),
 
             'subject': forms.Select(
+                choices=Class.SUBJECT_CHOICES,
                 attrs={
                     'class': 'form-select',
                     'required': True
@@ -110,7 +111,7 @@ class ClassForm(forms.ModelForm):
             'description': forms.Textarea(
                 attrs={
                     'class': 'form-control',
-                    'rows': 3,
+                    'rows': 4,
                     'placeholder': 'Optional description'
                 }
             ),

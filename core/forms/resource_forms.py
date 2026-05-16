@@ -20,7 +20,7 @@ class TeachingResourceForm(forms.ModelForm):
             ),
             Row(
                 Column('resource_type', css_class='col-md-3'),
-                Column('key_stage', css_class='col-md-3'),
+                Column('year_ks', css_class='col-md-3'),
                 Column('subject', css_class='col-md-3'),
                 Column('status', css_class='col-md-3'),
                 css_class='g-3'
@@ -38,7 +38,7 @@ class TeachingResourceForm(forms.ModelForm):
         fields = (
             'title',
             'resource_type',
-            'key_stage',
+            'year_ks',
             'subject',
             'status',
             'visibility',
@@ -57,7 +57,7 @@ class TeachingResourceForm(forms.ModelForm):
                 attrs={'class': 'form-select'}
             ),
 
-            'key_stage': forms.Select(
+            'year_ks': forms.Select(
                 attrs={'class': 'form-select'}
             ),
 

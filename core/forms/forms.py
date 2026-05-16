@@ -18,7 +18,7 @@ class TeachingResourceForm(forms.ModelForm):
             ),
             Row(
                 Column('resource_type', css_class='col-md-3'),
-                Column('key_stage', css_class='col-md-3'),
+                Column('year_ks', css_class='col-md-3'),
                 Column('subject', css_class='col-md-3'),
                 Column('status', css_class='col-md-3'),
                 css_class='g-3'
@@ -27,11 +27,11 @@ class TeachingResourceForm(forms.ModelForm):
 
     class Meta:
         model = TeachingResource
-        fields = ('title', 'resource_type', 'key_stage', 'subject', 'status')
+        fields = ('title', 'resource_type', 'year_ks', 'subject', 'status')
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Resource title'}),
             'resource_type': forms.Select(attrs={'class': 'form-select'}),
-            'key_stage': forms.Select(attrs={'class': 'form-select'}),
+            'year_ks': forms.Select(attrs={'class': 'form-select'}),
             'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Subject (optional)'}),
             'status': forms.Select(attrs={'class': 'form-select'}),
         }
@@ -43,7 +43,7 @@ class ClassForm(forms.ModelForm):
         fields = ['name', 'year_ks', 'subject', 'description']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter class name', 'required': True}),
-            'year_ks': forms.Select(choices=Class.KEY_STAGE_CHOICES, attrs={'class': 'form-select', 'required': True}),
+            'year_ks': forms.Select(choices=Class.year_ks_CHOICES, attrs={'class': 'form-select', 'required': True}),
             'subject': forms.Select(attrs={'class': 'form-select', 'required': True}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Optional description'}),
         }

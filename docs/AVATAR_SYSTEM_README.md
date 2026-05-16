@@ -23,9 +23,7 @@ A ClassDojo-style monster avatar system built with **PixiJS** for rendering and 
 
 #### Models ([models.py](backend/core/models.py))
 
-```python
-class Avatar(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='avatar')
+
     
     # Trait selections
     body_type = models.CharField(max_length=20, choices=BODY_TYPES, default='round_blue')

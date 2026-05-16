@@ -116,7 +116,7 @@ Educational platform database with 11 core tables supporting teachers, students,
 - `title`, `slug`, `content`, `excerpt`
 - `author_id` (FK → core_user)
 - `resource_type` ('lesson_plan', 'activity', 'worksheet', 'physical_material', 'game_setup', 'other')
-- `key_stage` (1-4)
+- `year_ks` (1-4)
 - `subject`
 - `image`, `file` (uploads)
 - `status` ('draft', 'published')

@@ -92,5 +92,5 @@ class TeachingResourceSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = TeachingResource
-        fields = ['id', 'title', 'slug', 'author', 'author_name', 'content', 'excerpt', 'image', 'file', 'resource_type', 'key_stage', 'subject', 'status', 'visibility', 'visibility_display', 'featured', 'created_at', 'updated_at', 'published_at']
+        fields = ['id', 'title', 'slug', 'author', 'author_name', 'content', 'excerpt', 'image', 'file', 'resource_type', 'year_ks', 'subject', 'status', 'visibility', 'visibility_display', 'featured', 'created_at', 'updated_at', 'published_at']
         read_only_fields = ['id', 'slug', 'created_at', 'updated_at']

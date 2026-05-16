@@ -1,94 +1,68 @@
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 
-from core.forms.avatar_forms import AvatarBuilderForm
-from core.forms.profile_forms import ProfileForm
-from core.models import Avatar, default_avatar_config
+from core.models import Avatar
 
 
 @login_required
 def profile_view(request):
 
-    avatar, _ = Avatar.objects.get_or_create(
-        user=request.user,
-        defaults={"avatar_config": default_avatar_config()},
+    avatar, created = Avatar.objects.get_or_create(
+        user=request.user
     )
 
-    if request.method == "POST":
-
-        form = ProfileForm(
-            request.POST,
-            instance=request.user
-        )
-
-        if form.is_valid():
-
-            form.save()
-
-            messages.success(
-                request,
-                "Profile updated successfully."
-            )
-
-            return redirect("profile")
-
-    else:
-
-        form = ProfileForm(instance=request.user)
+    context = {
+        "avatar": avatar,
+    }
 
     return render(
         request,
         "core/profile/profile.html",
-        {
-            "form": form,
-            "avatar": avatar,
-        }
+        context,
     )
 
-
-@login_required
-def account_settings_view(request):
-
-    return render(
-        request,
-        "core/profile/account_settings.html"
-    )
+from core.models import Avatar
 
 
 @login_required
 def avatar_builder_view(request):
 
-    avatar, _ = Avatar.objects.get_or_create(
-        user=request.user,
-        defaults={"avatar_config": default_avatar_config()},
+    avatar, created = Avatar.objects.get_or_create(
+        user=request.user
     )
 
     if request.method == "POST":
 
-        form = AvatarBuilderForm(request.POST)
+        avatar.avatar_type = request.POST.get(
+            "avatar_type",
+            avatar.avatar_type,
+        )
 
-        if form.is_valid():
-            avatar.avatar_config = form.to_avatar_config()
-            avatar.save()
+        avatar.body_color = request.POST.get(
+            "body_color",
+            avatar.body_color,
+        )
 
-            messages.success(
-                request,
-                "Avatar updated successfully."
-            )
+        avatar.eye_type = request.POST.get(
+            "eye_type",
+            avatar.eye_type,
+        )
 
-            return redirect(request.path)
+        avatar.mouth_type = request.POST.get(
+            "mouth_type",
+            avatar.mouth_type,
+        )
 
-    else:
+        avatar.save()
 
-        form = AvatarBuilderForm(initial=avatar.config)
+        return redirect("profile")
+
+    context = {
+        "avatar": avatar,
+    }
 
     return render(
         request,
-        "core/profile/avatar_builder.html",
-        {
-            "form": form,
-            "avatar": avatar,
-            "avatar_config": avatar.config,
-        }
+        "profiles/avatar_builder.html",
+        context,
     )

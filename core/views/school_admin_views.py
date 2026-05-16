@@ -99,11 +99,11 @@ def school_admin_analytics_view(request):
         if count:
             subject_breakdown.append({"label": subject_label, "count": count})
 
-    key_stage_breakdown = []
-    for key_stage_value, key_stage_label in Class.KEY_STAGE_CHOICES:
-        count = classes.filter(year_ks=key_stage_value).count()
+    year_ks_breakdown = []
+    for year_ks_value, year_ks_label in Class.year_ks_CHOICES:
+        count = classes.filter(year_ks=year_ks_value).count()
         if count:
-            key_stage_breakdown.append({"label": key_stage_label, "count": count})
+            year_ks_breakdown.append({"label": year_ks_label, "count": count})
 
     return render(request, "core/school_admin/analytics.html", {
         "school_name": school.name,
@@ -111,7 +111,7 @@ def school_admin_analytics_view(request):
         "classes_count": classes.count(),
         "total_students": students.count(),
         "subject_breakdown": subject_breakdown,
-        "key_stage_breakdown": key_stage_breakdown,
+        "year_ks_breakdown": year_ks_breakdown,
         "classes": classes.select_related("teacher"),
         "per_game_stats": [],
     })

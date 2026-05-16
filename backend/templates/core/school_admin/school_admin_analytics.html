@@ -78,8 +78,8 @@
                     <h5 class="mb-0"><i class="bi bi-bar-chart"></i> Classes by Key Stage</h5>
                 </div>
                 <div class="card-body">
-                    {% if key_stage_breakdown %}
-                        {% for item in key_stage_breakdown %}
+                    {% if year_ks_breakdown %}
+                        {% for item in year_ks_breakdown %}
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between mb-1">
                                     <span><strong>{{ item.label }}</strong></span>
@@ -127,7 +127,7 @@
                                         <tr>
                                             <td><strong>{{ class.name }}</strong></td>
                                             <td><span class="badge bg-primary">{{ class.subject_label }}</span></td>
-                                            <td><span class="badge bg-secondary">{{ class.key_stage_label }}</span></td>
+                                            <td><span class="badge bg-secondary">{{ class.year_ks_label }}</span></td>
                                             <td>
                                                 <a href="{% url 'school_admin_staff' %}#teacher-{{ class.teacher.id }}">
                                                     {{ class.teacher.get_full_name|default:class.teacher.username }}
