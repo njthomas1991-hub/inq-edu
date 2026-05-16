@@ -1,251 +1,152 @@
-{% extends "core/base.html" %}
+{% extends "core/account/auth_base.html" %}
 {% load crispy_forms_tags %}
 
-{% block title %}Inq-Ed Sign Up{% endblock %}
+{% block auth_page_title %}Create Account - INQ-ED{% endblock %}
 
-{% block content %}
+{% block auth_card_class %}signup-auth-card{% endblock %}
 
-<div class="auth-page-wrapper">
-    <div class="auth-card signup-auth-card">
+{% block auth_heading %}
+Create Your Account
+{% endblock %}
 
-        <!-- Header -->
-        <div class="auth-header">
-            <h1>Create Your Account</h1>
-            <p>
-                Join Inq-Ed as a student, teacher, or school administrator.
-            </p>
-        </div>
+{% block auth_subheading %}
+<p>
+    Join INQ-ED as a student, teacher, or school administrator.
+</p>
+{% endblock %}
 
-        <!-- Signup Form -->
-        <form method="post">
+{% block auth_body %}
 
-            {% csrf_token %}
+<form method="post">
 
-            <!-- Role Selection -->
-            <div class="mb-4">
+    {% csrf_token %}
 
-                <label class="form-label fw-semibold mb-3">
-                    Select Account Type
-                </label>
-
-                <div class="role-card-group">
-
-                                <!-- Student -->
-                                <div class="role-card mb-3">
-                                    <input
-                                        class="form-check-input"
-                                        type="radio"
-                                        name="role"
-                                        value="student"
-                                        id="role_student"
-                                        checked
-                                    >
-
-                                    <label class="role-label" for="role_student">
-
-                                        <div>
-                                            <div class="fw-semibold">
-                                                Student
-                                            </div>
-
-                                            <div class="text-muted small">
-                                                Access game worlds, avatars,
-                                                progress tracking, and classroom activities.
-                                            </div>
-                                        </div>
-
-                                    </label>
-                                </div>
-
-                                <!-- Teacher -->
-                                <div class="role-card mb-3">
-
-                                    <input
-                                        class="form-check-input"
-                                        type="radio"
-                                        name="role"
-                                        value="teacher"
-                                        id="role_teacher"
-                                    >
-
-                                    <label class="role-label" for="role_teacher">
-
-                                        <div>
-                                            <div class="fw-semibold">
-                                                Teacher
-                                            </div>
-
-                                            <div class="text-muted small">
-                                                Access the Teacher Hub, create students,
-                                                manage classes, and track learning progress.
-                                            </div>
-                                        </div>
-
-                                    </label>
-                                </div>
-
-                                <!-- School Admin -->
-                                <div class="role-card">
-
-                                    <input
-                                        class="form-check-input"
-                                        type="radio"
-                                        name="role"
-                                        value="school_admin"
-                                        id="role_school_admin"
-                                    >
-
-                                    <label class="role-label" for="role_school_admin">
-
-                                        <div>
-                                            <div class="fw-semibold">
-                                                School Administrator
-                                            </div>
-
-                                            <div class="text-muted small">
-                                                Manage school-wide data, teachers,
-                                                classes, analytics, and user accounts.
-                                            </div>
-                                        </div>
-
-                                    </label>
-                                </div>
-
-                </div>
-
-            </div>
-
-            <!-- Form Fields -->
-            <div class="mb-3">
-                {{ form.first_name|as_crispy_field }}
-            </div>
-
-            <div class="mb-3">
-                {{ form.last_name|as_crispy_field }}
-            </div>
-
-            <div class="mb-3">
-                {{ form.email|as_crispy_field }}
-            </div>
-
-            <div class="mb-3">
-                {{ form.username|as_crispy_field }}
-            </div>
-
-            <div class="mb-3">
-
-    <label for="id_password1" class="form-label">
-        Password
-    </label>
-
-    <div class="password-wrapper">
-
-        <input
-            type="password"
-            name="password1"
-            id="id_password1"
-            class="form-control"
-            autocomplete="new-password"
-            required
-        >
-
-        <button
-            type="button"
-            class="password-toggle"
-            aria-label="Toggle password visibility"
-        >
-            <i class="fa-solid fa-eye"></i>
-        </button>
-
-    </div>
-
-    {% if form.password1.errors %}
-        <div class="text-danger small mt-1">
-            {{ form.password1.errors }}
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger mb-3">
+            {{ form.non_field_errors }}
         </div>
     {% endif %}
 
-</div>
-
-           <div class="mb-4">
-
-    <label for="id_password2" class="form-label">
-        Confirm Password
-    </label>
-
-    <div class="password-wrapper">
-
-        <input
-            type="password"
-            name="password2"
-            id="id_password2"
-            class="form-control"
-            autocomplete="new-password"
-            required
-        >
-
-        <button
-            type="button"
-            class="password-toggle"
-            aria-label="Toggle password visibility"
-        >
-            <i class="fa-solid fa-eye"></i>
-        </button>
-
+    <!-- Role -->
+    <div class="auth-field-group">
+        {{ form.role|as_crispy_field }}
     </div>
 
-    {% if form.password2.errors %}
-        <div class="text-danger small mt-1">
-            {{ form.password2.errors }}
-        </div>
-    {% endif %}
+    <!-- First Name -->
+    <div class="auth-field-group">
+        {{ form.first_name|as_crispy_field }}
+    </div>
 
-</div>
-            <!-- Submit -->
+    <!-- Last Name -->
+    <div class="auth-field-group">
+        {{ form.last_name|as_crispy_field }}
+    </div>
+
+    <!-- Email -->
+    <div class="auth-field-group">
+        {{ form.email|as_crispy_field }}
+    </div>
+
+    <!-- School -->
+    <div class="auth-field-group">
+        {{ form.school|as_crispy_field }}
+    </div>
+
+    <!-- Password -->
+    <div class="auth-field-group">
+
+        {{ form.password1.label_tag }}
+
+        <div class="password-wrapper">
+            {{ form.password1 }}
+
             <button
-                type="submit"
-                class="btn-primary-custom w-100 py-2 fw-semibold"
+                type="button"
+                class="password-toggle"
+                aria-label="Toggle password visibility"
             >
-                Create Account
+                <i class="fa-solid fa-eye"></i>
             </button>
-
-        </form>
-
-        <!-- Divider -->
-        <div class="text-center my-4">
-            <span class="text-muted small">
-                Already have an account?
-            </span>
         </div>
 
-        <!-- Login Buttons -->
-        <div class="d-grid gap-2">
+        {% if form.password1.errors %}
+            <div class="text-danger small mt-1">
+                {{ form.password1.errors }}
+            </div>
+        {% endif %}
 
-            <a
-                href="{% url 'login' %}?role=student"
-                class="btn-secondary-custom w-100">
-            
-                Student Login
-            </a>
+    </div>
 
-            <a
-                href="{% url 'login' %}?role=teacher"
-                class="btn-secondary-custom w-100"
+    <!-- Confirm Password -->
+    <div class="auth-field-group">
+
+        {{ form.password2.label_tag }}
+
+        <div class="password-wrapper">
+            {{ form.password2 }}
+
+            <button
+                type="button"
+                class="password-toggle"
+                aria-label="Toggle password visibility"
             >
-                Teacher Login
-            </a>
-
-            <a
-                href="{% url 'login' %}?role=school_admin"
-                class="btn-secondary-custom w-100"
-            >
-                School Admin Login
-            </a>
-
+                <i class="fa-solid fa-eye"></i>
+            </button>
         </div>
 
+        {% if form.password2.errors %}
+            <div class="text-danger small mt-1">
+                {{ form.password2.errors }}
+            </div>
+        {% endif %}
+
     </div>
+
+    <!-- Submit -->
+    <button
+        type="submit"
+        class="auth-submit-btn"
+    >
+        Create Account
+    </button>
+
+</form>
+
+{% endblock %}
+
+{% block auth_links %}
+
+<div class="auth-links">
+
+    <p class="mb-3">
+        Already have an account?
+    </p>
+
+    <div class="d-grid gap-2">
+
+        <a
+            href="{% url 'login' %}?role=student"
+            class="btn-secondary-custom w-100"
+        >
+            Student Login
+        </a>
+
+        <a
+            href="{% url 'login' %}?role=teacher"
+            class="btn-secondary-custom w-100"
+        >
+            Teacher Login
+        </a>
+
+        <a
+            href="{% url 'login' %}?role=school_admin"
+            class="btn-secondary-custom w-100"
+        >
+            School Admin Login
+        </a>
+
     </div>
+
 </div>
 
 {% endblock %}

@@ -235,7 +235,7 @@ class AuthenticationTestCase(TestCase):
         """Test that unauthenticated users are redirected to login"""
         response = self.client.get(reverse('teacher_dashboard'))
         self.assertEqual(response.status_code, 302)  # Redirect
-        self.assertIn('/accounts/login/', response.url)
+        self.assertIn('/account/login/', response.url)
 
 
 # ============================================================================

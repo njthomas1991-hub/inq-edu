@@ -95,13 +95,26 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
-ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+
+ACCOUNT_EMAIL_REQUIRED = True
+
+ACCOUNT_USERNAME_REQUIRED = False
+
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
-ACCOUNT_SIGNUP_FIELDS = [
-    'email*',
-    'password1*',
-    'password2*',
-]
+
+ACCOUNT_EMAIL_VERIFICATION = "none"
+
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+
+ACCOUNT_SESSION_REMEMBER = True
+
+ACCOUNT_LOGIN_REDIRECT_URL = "/teacher/"
+
+ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+
+ACCOUNT_SIGNUP_REDIRECT_URL = "/teacher/"
+
 ACCOUNT_EMAIL_VERIFICATION = 'none'  # No email verification required
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_LOGOUT_REDIRECT_URL = '/'
@@ -153,9 +166,9 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
             'DIRS': [
-                BASE_DIR / 'backend' / 'templates',
                 BASE_DIR / 'templates',
             ],
+
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

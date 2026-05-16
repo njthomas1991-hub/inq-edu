@@ -8,6 +8,12 @@
 <p>Welcome back to INQ-ED</p>
 {% endblock %}
 
+{% if form.errors %}
+    <div class="alert alert-danger">
+        {{ form.errors }}
+    </div>
+{% endif %}
+
 {% block auth_fields %}
 {% if form.non_field_errors %}
 <div class="alert alert-danger">

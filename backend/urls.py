@@ -53,7 +53,7 @@ urlpatterns = [
     path("login/", custom_login_view, name="login"),
     path("logout/", custom_logout_view, name="logout"),
     path("", include("core.urls.auth_urls")),
-    path("accounts/", include("allauth.urls")),
+    path("account/", include("allauth.urls")),
 ]   
 
 # Serve static files (images/css/js) during development
