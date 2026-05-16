@@ -27,9 +27,114 @@ Create Your Account
         </div>
     {% endif %}
 
-    <!-- Role -->
+    <!-- Role Selection -->
     <div class="auth-field-group">
-        {{ form.role|as_crispy_field }}
+
+        <label class="form-label fw-semibold mb-3">
+            Select Account Type
+        </label>
+
+        <div class="role-card-group">
+
+            <!-- Student -->
+            <div class="role-card">
+
+                <label class="role-label" for="id_role_0">
+
+                    <input
+                        class="form-check-input role-radio"
+                        type="radio"
+                        name="role"
+                        value="student"
+                        id="id_role_0"
+                        checked
+                    >
+
+                    <div class="role-content">
+
+                        <div class="fw-semibold">
+                            Student
+                        </div>
+
+                        <div class="text-muted small">
+                            Access game worlds, avatars,
+                            progress tracking, and classroom activities.
+                        </div>
+
+                    </div>
+
+                </label>
+
+            </div>
+
+            <!-- Teacher -->
+            <div class="role-card">
+
+                <label class="role-label" for="id_role_1">
+
+                    <input
+                        class="form-check-input role-radio"
+                        type="radio"
+                        name="role"
+                        value="teacher"
+                        id="id_role_1"
+                    >
+
+                    <div class="role-content">
+
+                        <div class="fw-semibold">
+                            Teacher
+                        </div>
+
+                        <div class="text-muted small">
+                            Access the Teacher Hub, create students,
+                            manage classes, and track learning progress.
+                        </div>
+
+                    </div>
+
+                </label>
+
+            </div>
+
+            <!-- School Admin -->
+            <div class="role-card">
+
+                <label class="role-label" for="id_role_2">
+
+                    <input
+                        class="form-check-input role-radio"
+                        type="radio"
+                        name="role"
+                        value="school_admin"
+                        id="id_role_2"
+                    >
+
+                    <div class="role-content">
+
+                        <div class="fw-semibold">
+                            School Administrator
+                        </div>
+
+                        <div class="text-muted small">
+                            Manage school-wide users, analytics,
+                            teachers, classes, and reporting.
+                        </div>
+
+                    </div>
+
+                </label>
+
+            </div>
+
+        </div>
+
+        {% if form.role.errors %}
+            <div class="text-danger small mt-2">
+                {{ form.role.errors }}
+            </div>
+        {% endif %}
+
     </div>
 
     <!-- First Name -->
@@ -58,6 +163,7 @@ Create Your Account
         {{ form.password1.label_tag }}
 
         <div class="password-wrapper">
+
             {{ form.password1 }}
 
             <button
@@ -67,6 +173,7 @@ Create Your Account
             >
                 <i class="fa-solid fa-eye"></i>
             </button>
+
         </div>
 
         {% if form.password1.errors %}
@@ -83,6 +190,7 @@ Create Your Account
         {{ form.password2.label_tag }}
 
         <div class="password-wrapper">
+
             {{ form.password2 }}
 
             <button
@@ -92,6 +200,7 @@ Create Your Account
             >
                 <i class="fa-solid fa-eye"></i>
             </button>
+
         </div>
 
         {% if form.password2.errors %}
@@ -125,21 +234,21 @@ Create Your Account
     <div class="d-grid gap-2">
 
         <a
-            href="{% url 'login' %}?role=student"
+            href="{% url 'account_login' %}?role=student"
             class="btn-secondary-custom w-100"
         >
             Student Login
         </a>
 
         <a
-            href="{% url 'login' %}?role=teacher"
+            href="{% url 'account_login' %}?role=teacher"
             class="btn-secondary-custom w-100"
         >
             Teacher Login
         </a>
 
         <a
-            href="{% url 'login' %}?role=school_admin"
+            href="{% url 'account_login' %}?role=school_admin"
             class="btn-secondary-custom w-100"
         >
             School Admin Login

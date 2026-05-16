@@ -27,7 +27,7 @@ urlpatterns = [
         SignupView.as_view(
             template_name="core/account/signup.html"
         ),
-        name="signup",
+        name="account_signup",
     ),
 
     # -------------------------
@@ -39,7 +39,7 @@ urlpatterns = [
         LoginView.as_view(
             template_name="core/account/login.html"
         ),
-        name="login",
+        name="account_login",
     ),
 
     # -------------------------
@@ -49,7 +49,7 @@ urlpatterns = [
     path(
         "logout/",
         custom_logout_view,
-        name="logout",
+        name="account_logout",
     ),
 
     # -------------------------
