@@ -3,27 +3,29 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
+
 {{ page_title }}
+
 {% endblock %}
 
 {% block content %}
 
 <div class="container py-4">
 
-    <!-- BACK BUTTON -->
+    <!-- BACK -->
 
     <a
         class="btn btn-link px-0 mb-3 text-decoration-none"
         href="{{ cancel_url }}"
     >
 
-        <i class="fas fa-arrow-left"></i>
+        <i class="fas fa-arrow-left me-1"></i>
 
         {{ back_text }}
 
     </a>
 
-    <!-- FORM CARD -->
+    <!-- CARD -->
 
     <div class="card shadow-sm border-0 rounded-4">
 
@@ -41,8 +43,11 @@
 
                 <p class="text-muted mb-0">
 
-                    Share resources, ideas and discussions
-                    with other educators safely and professionally.
+                    Share teaching resources,
+                    ideas,
+                    discussions
+                    and professional support
+                    safely and collaboratively.
 
                 </p>
 
@@ -52,7 +57,7 @@
 
             {% if object %}
 
-                <div class="bg-light rounded p-3 mb-4">
+                <div class="bg-light border rounded-4 p-3 mb-4">
 
                     <div class="row g-3">
 
@@ -104,7 +109,7 @@
 
             {% endif %}
 
-            <!-- DISCUSSION INFO -->
+            <!-- DISCUSSION -->
 
             {% if discussion_title %}
 
@@ -126,23 +131,239 @@
 
             <form
                 method="post"
-
-                {% if multipart %}
-                    enctype="multipart/form-data"
-                {% endif %}
+                enctype="multipart/form-data"
             >
 
                 {% csrf_token %}
 
-                <!-- FORM CONTENT -->
+                <!-- TITLE -->
 
-                <div class="mb-4">
+                {% if form.title %}
 
-                    {{ form|crispy }}
+                    <div class="mb-4">
+
+                        {{ form.title|as_crispy_field }}
+
+                    </div>
+
+                {% endif %}
+
+                <!-- DESCRIPTION -->
+
+                {% if form.description %}
+
+                    <div class="mb-4">
+
+                        {{ form.description|as_crispy_field }}
+
+                    </div>
+
+                {% endif %}
+
+                <!-- CONTENT -->
+
+                {% if form.content %}
+
+                    <div class="mb-4">
+
+                        {{ form.content|as_crispy_field }}
+
+                    </div>
+
+                {% endif %}
+
+                <!-- FILES -->
+
+                <div class="row g-3 mb-4">
+
+                    {% if form.uploaded_file %}
+
+                        <div class="col-md-6">
+
+                            {{ form.uploaded_file|as_crispy_field }}
+
+                        </div>
+
+                    {% endif %}
+
+                    {% if form.image %}
+
+                        <div class="col-md-6">
+
+                            {{ form.image|as_crispy_field }}
+
+                        </div>
+
+                    {% endif %}
 
                 </div>
 
-                <!-- MODERATION NOTICE -->
+                <!-- EXISTING FILE -->
+
+                {% if object.uploaded_file %}
+
+                    <div class="alert alert-light border mb-4">
+
+                        <strong>
+
+                            Current File:
+
+                        </strong>
+
+                        <a
+                            href="{{ object.uploaded_file.url }}"
+                            target="_blank"
+                            class="ms-2"
+                        >
+
+                            View Uploaded File
+
+                        </a>
+
+                    </div>
+
+                {% endif %}
+
+                <!-- EXISTING IMAGE -->
+
+                {% if object.image %}
+
+                    <div class="mb-4">
+
+                        <img
+                            src="{{ object.image.url }}"
+                            class="img-fluid rounded shadow-sm"
+                            style="max-height: 240px;"
+                            alt="Uploaded image"
+                        >
+
+                    </div>
+
+                {% endif %}
+
+                <!-- RESOURCE SETTINGS -->
+
+                <div class="row g-3 mb-4">
+
+                    {% if form.resource_type %}
+
+                        <div class="col-md-6">
+
+                            {{ form.resource_type|as_crispy_field }}
+
+                        </div>
+
+                    {% endif %}
+
+                    {% if form.subject %}
+
+                        <div class="col-md-6">
+
+                            {{ form.subject|as_crispy_field }}
+
+                        </div>
+
+                    {% endif %}
+
+                    {% if form.year_ks %}
+
+                        <div class="col-md-6">
+
+                            {{ form.year_ks|as_crispy_field }}
+
+                        </div>
+
+                    {% endif %}
+
+                    {% if form.status %}
+
+                        <div class="col-md-6">
+
+                            {{ form.status|as_crispy_field }}
+
+                        </div>
+
+                    {% endif %}
+
+                    {% if form.visibility %}
+
+                        <div class="col-md-6">
+
+                            {{ form.visibility|as_crispy_field }}
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+                <!-- CHECKBOXES -->
+
+                <div class="row g-3 mb-4">
+
+                    {% if form.featured %}
+
+                        <div class="col-md-6">
+
+                            <div class="form-check">
+
+                                {{ form.featured }}
+
+                                <label class="form-check-label ms-2">
+
+                                    Featured Content
+
+                                </label>
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+                    {% if form.allow_comments %}
+
+                        <div class="col-md-6">
+
+                            <div class="form-check">
+
+                                {{ form.allow_comments }}
+
+                                <label class="form-check-label ms-2">
+
+                                    Allow Comments
+
+                                </label>
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+                    {% if form.allow_replies %}
+
+                        <div class="col-md-6">
+
+                            <div class="form-check">
+
+                                {{ form.allow_replies }}
+
+                                <label class="form-check-label ms-2">
+
+                                    Allow Replies
+
+                                </label>
+
+                            </div>
+
+                        </div>
+
+                    {% endif %}
+
+                </div>
+
+                <!-- MODERATION -->
 
                 <div class="alert alert-warning border-0 shadow-sm mb-4">
 
@@ -164,40 +385,49 @@
 
                             <p class="mb-2">
 
-                                All uploaded resources, files,
-                                images and discussion posts are
-                                reviewed regularly by moderators.
+                                All uploaded resources,
+                                files,
+                                comments,
+                                forum discussions
+                                and images are reviewed regularly.
 
                             </p>
 
                             <ul class="mb-2">
 
                                 <li>
-                                    Follow safeguarding expectations
+
+                                    Follow safeguarding guidance
+
                                 </li>
 
                                 <li>
-                                    Respect equality and diversity
-                                    guidelines
+
+                                    Respect equality and diversity expectations
+
                                 </li>
 
                                 <li>
-                                    Do not upload copyrighted
-                                    materials without permission
+
+                                    Avoid copyrighted material
+
                                 </li>
 
                                 <li>
+
                                     Maintain professional conduct
-                                    at all times
+
                                 </li>
 
                             </ul>
 
-                            <p class="mb-0 small text-muted">
+                            <p class="small text-muted mb-0">
 
-                                Content that breaches platform
-                                policies may be edited, removed,
-                                restricted or escalated.
+                                Content that breaches platform policy
+                                may be edited,
+                                restricted,
+                                removed
+                                or escalated.
 
                             </p>
 
@@ -207,7 +437,7 @@
 
                 </div>
 
-                <!-- FILE GUIDANCE -->
+                <!-- UPLOAD GUIDANCE -->
 
                 <div class="alert alert-info border-0 mb-4">
 
@@ -217,8 +447,13 @@
 
                     </strong>
 
-                    PDF, PowerPoint, Word documents,
-                    worksheets, ZIP files and images.
+                    PDF,
+                    PowerPoint,
+                    Word,
+                    ZIP,
+                    worksheet,
+                    image
+                    and classroom resource files.
 
                 </div>
 
@@ -260,6 +495,40 @@
 
 {% block extra_js %}
 
-    {{ form.media }}
+{{ form.media }}
+
+<style>
+
+.note-editor,
+.note-toolbar,
+.note-editable {
+
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+}
+
+.note-editable {
+
+    min-height: 300px !important;
+    overflow-y: auto !important;
+}
+
+.note-editable img,
+.note-editable table {
+
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+@media (max-width: 576px) {
+
+    .note-editable {
+
+        min-height: 220px !important;
+    }
+}
+
+</style>
 
 {% endblock %}

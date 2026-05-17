@@ -492,8 +492,11 @@ def teacher_resources_list_view(request):
         author=request.user
     )
 
+    form = TeachingResourceForm()
+
     context = {
         "resources": resources,
+        "form": form,
     }
 
     return render(
@@ -501,7 +504,6 @@ def teacher_resources_list_view(request):
         "core/teacher/resources/teacher_resources_list.html",
         context,
     )
-
 
 @login_required
 def teacher_resource_create_view(request):
@@ -660,7 +662,8 @@ def teacher_forum_list_view(request):
     )
 
     context = {
-        "forum_posts": forum_posts,
+    "posts": forum_posts,
+    "form": ForumPostForm(),
     }
 
     return render(
@@ -676,7 +679,8 @@ def teacher_forum_create_view(request):
     if request.method == "POST":
 
         form = ForumPostForm(
-            request.POST
+            request.POST,
+            request.FILES,
         )
 
         if form.is_valid():
@@ -731,7 +735,6 @@ def teacher_forum_detail_view(request, pk):
         context,
     )
 
-
 @login_required
 def teacher_forum_edit_view(request, pk):
 
@@ -745,6 +748,7 @@ def teacher_forum_edit_view(request, pk):
 
         form = ForumPostForm(
             request.POST,
+            request.FILES,
             instance=forum_post,
         )
 
@@ -765,7 +769,7 @@ def teacher_forum_edit_view(request, pk):
     else:
 
         form = ForumPostForm(
-            instance=forum_post
+            instance=forum_post,
         )
 
     context = {
@@ -778,7 +782,6 @@ def teacher_forum_edit_view(request, pk):
         "core/teacher/forum/teacher_forum_form.html",
         context,
     )
-
 
 @login_required
 def teacher_forum_delete_view(request, pk):

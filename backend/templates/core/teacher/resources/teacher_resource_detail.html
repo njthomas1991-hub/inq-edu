@@ -192,7 +192,7 @@
 
             <!-- ATTACHMENTS -->
 
-            {% if resource.file %}
+            {% if resource.uploaded_file %}
 
                 <div class="alert alert-info border-0 shadow-sm mb-4">
 
@@ -258,7 +258,7 @@
 
             <div class="content">
 
-                {{ resource.content|safe }}
+                {{ resource.description|safe }}
 
             </div>
 

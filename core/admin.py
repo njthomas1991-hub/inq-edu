@@ -12,11 +12,17 @@ from .models import (
     ClassStudent,
     TeachingResource,
     ResourceComment,
+    ResourceLike,
     ForumPost,
     ForumReply,
+    ForumPostLike,
     NewsAnnouncement,
     HelpTutorial,
     SchoolAnalyticsProfile,
+    StudentAnalytics,
+    ClassAnalytics,
+    ResourceAnalytics,
+    ForumAnalytics,
     KindlewickGameProgress,
     KindlewickGameSession,
 )
@@ -49,15 +55,17 @@ class UserAdmin(BaseUserAdmin):
 
     model = User
 
-    llist_display = (
-    'username',
-    'first_name',
-    'last_name',
-    'role',
-    'school',
-    'is_staff',
-    'is_active',
-)
+    list_display = (
+        'username',
+        'first_name',
+        'last_name',
+        'role',
+        'school',
+        'level',
+        'tokens',
+        'is_staff',
+        'is_active',
+    )
 
     list_filter = (
         'role',
@@ -95,6 +103,7 @@ class UserAdmin(BaseUserAdmin):
                     'email',
                     'display_name',
                     'bio',
+                    'profile_image',
                 )
             }
         ),
@@ -105,6 +114,18 @@ class UserAdmin(BaseUserAdmin):
                 'fields': (
                     'role',
                     'school',
+                )
+            }
+        ),
+
+        (
+            'Gamification',
+            {
+                'fields': (
+                    'total_xp',
+                    'level',
+                    'streak',
+                    'tokens',
                 )
             }
         ),
@@ -128,88 +149,17 @@ class UserAdmin(BaseUserAdmin):
                 'fields': (
                     'last_login',
                     'date_joined',
+                    'created_at',
+                    'updated_at',
                 )
             }
         ),
     )
 
-    add_fieldsets = (
-        (
-            None,
-            {
-                'classes': ('wide',),
-                'fields': (
-                    'username',
-                    'email',
-                    'password1',
-                    'password2',
-                    'role',
-                    'school',
-                ),
-            },
-        ),
+    readonly_fields = (
+        'created_at',
+        'updated_at',
     )
-
-    def get_queryset(self, request):
-
-        qs = super().get_queryset(request)
-
-        if request.user.is_superuser:
-            return qs
-
-        if _is_teacher(request.user):
-            return qs.filter(role='student')
-
-        return qs.none()
-
-    def has_view_permission(self, request, obj=None):
-
-        if request.user.is_superuser:
-            return True
-
-        if _is_teacher(request.user):
-
-            if obj is None:
-                return True
-
-            return obj.role == 'student'
-
-        return False
-
-    def has_add_permission(self, request):
-
-        return (
-            request.user.is_superuser
-            or _is_teacher(request.user)
-        )
-
-    def has_change_permission(self, request, obj=None):
-
-        if request.user.is_superuser:
-            return True
-
-        if _is_teacher(request.user):
-
-            if obj is None:
-                return True
-
-            return obj.role == 'student'
-
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-
-        if request.user.is_superuser:
-            return True
-
-        if _is_teacher(request.user):
-
-            if obj is None:
-                return True
-
-            return obj.role == 'student'
-
-        return False
 
 
 # =====================================================
@@ -236,14 +186,14 @@ class SchoolAdmin(admin.ModelAdmin):
         'subscription_active',
     )
 
+    readonly_fields = (
+        'created_at',
+        'updated_at',
+    )
+
     prepopulated_fields = {
         'slug': ('name',)
     }
-
-    readonly_fields = (
-        'created_at',
-        'updated_at'
-    )
 
 
 # =====================================================
@@ -255,13 +205,7 @@ class AvatarAdmin(admin.ModelAdmin):
 
     list_display = (
         'user',
-        'created_at',
         'updated_at',
-    )
-
-    search_fields = (
-        'user__username',
-        'user__email',
     )
 
     readonly_fields = (
@@ -269,39 +213,9 @@ class AvatarAdmin(admin.ModelAdmin):
         'updated_at',
     )
 
-    fieldsets = (
-        (
-            'User',
-            {
-                'fields': (
-                    'user',
-                )
-            }
-        ),
-
-        (
-            'Avatar Configuration',
-            {
-                'fields': (
-                    'avatar_config',
-                )
-            }
-        ),
-
-        (
-            'Metadata',
-            {
-                'fields': (
-                    'created_at',
-                    'updated_at',
-                )
-            }
-        ),
-    )
-
 
 # =====================================================
-# CLASS STUDENT INLINE
+# CLASS INLINE
 # =====================================================
 
 class ClassStudentInline(admin.TabularInline):
@@ -346,18 +260,6 @@ class ClassAdmin(admin.ModelAdmin):
 
     inlines = [ClassStudentInline]
 
-    def get_queryset(self, request):
-
-        qs = super().get_queryset(request)
-
-        if request.user.is_superuser:
-            return qs
-
-        if _is_teacher(request.user):
-            return qs.filter(teacher=request.user)
-
-        return qs.none()
-
 
 # =====================================================
 # CLASS STUDENT ADMIN
@@ -372,28 +274,22 @@ class ClassStudentAdmin(admin.ModelAdmin):
         'date_joined',
     )
 
-    list_filter = (
-        'date_joined',
-    )
-
     search_fields = (
         'student__username',
         'clazz__name',
     )
 
-    readonly_fields = (
-        'date_joined',
-    )
-
 
 # =====================================================
-# TEACHING RESOURCE ADMIN
+# RESOURCE ADMIN
 # =====================================================
 
 @admin.register(TeachingResource)
 class TeachingResourceAdmin(SummernoteModelAdmin):
 
-    summernote_fields = ('content',)
+    summernote_fields = (
+        'description',
+    )
 
     list_display = (
         'title',
@@ -409,8 +305,6 @@ class TeachingResourceAdmin(SummernoteModelAdmin):
 
     list_filter = (
         'resource_type',
-        'subject',
-        'year_ks',
         'visibility',
         'status',
         'featured',
@@ -418,7 +312,7 @@ class TeachingResourceAdmin(SummernoteModelAdmin):
 
     search_fields = (
         'title',
-        'content',
+        'description',
         'subject',
     )
 
@@ -426,10 +320,6 @@ class TeachingResourceAdmin(SummernoteModelAdmin):
         'created_at',
         'updated_at',
         'published_at',
-    )
-
-    filter_horizontal = (
-        'likes',
     )
 
     prepopulated_fields = {
@@ -443,8 +333,7 @@ class TeachingResourceAdmin(SummernoteModelAdmin):
                 'fields': (
                     'title',
                     'slug',
-                    'excerpt',
-                    'content',
+                    'description',
                 )
             }
         ),
@@ -454,7 +343,7 @@ class TeachingResourceAdmin(SummernoteModelAdmin):
             {
                 'fields': (
                     'image',
-                    'file',
+                    'uploaded_file',
                 )
             }
         ),
@@ -477,16 +366,18 @@ class TeachingResourceAdmin(SummernoteModelAdmin):
                 'fields': (
                     'status',
                     'featured',
+                    'allow_comments',
                     'published_at',
                 )
             }
         ),
 
         (
-            'Engagement',
+            'Moderation',
             {
                 'fields': (
-                    'likes',
+                    'is_flagged',
+                    'moderation_notes',
                 )
             }
         ),
@@ -502,67 +393,6 @@ class TeachingResourceAdmin(SummernoteModelAdmin):
             }
         ),
     )
-
-    def save_model(self, request, obj, form, change):
-
-        if not obj.pk:
-            obj.author = request.user
-
-        super().save_model(request, obj, form, change)
-
-    def get_queryset(self, request):
-
-        qs = super().get_queryset(request)
-
-        if request.user.is_superuser:
-            return qs
-
-        if _is_teacher(request.user):
-            return qs
-
-        return qs.none()
-
-    def has_view_permission(self, request, obj=None):
-
-        return (
-            request.user.is_superuser
-            or _is_teacher(request.user)
-        )
-
-    def has_add_permission(self, request):
-
-        return (
-            request.user.is_superuser
-            or _is_teacher(request.user)
-        )
-
-    def has_change_permission(self, request, obj=None):
-
-        if request.user.is_superuser:
-            return True
-
-        if _is_teacher(request.user):
-
-            if obj is None:
-                return True
-
-            return obj.author == request.user
-
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-
-        if request.user.is_superuser:
-            return True
-
-        if _is_teacher(request.user):
-
-            if obj is None:
-                return False
-
-            return obj.author == request.user
-
-        return False
 
 
 # =====================================================
@@ -582,16 +412,19 @@ class ResourceCommentAdmin(admin.ModelAdmin):
         'content',
     )
 
-    readonly_fields = (
+
+# =====================================================
+# RESOURCE LIKE ADMIN
+# =====================================================
+
+@admin.register(ResourceLike)
+class ResourceLikeAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'resource',
+        'user',
         'created_at',
     )
-
-    def save_model(self, request, obj, form, change):
-
-        if not obj.pk:
-            obj.author = request.user
-
-        super().save_model(request, obj, form, change)
 
 
 # =====================================================
@@ -615,11 +448,16 @@ class ForumReplyInline(admin.TabularInline):
 # =====================================================
 
 @admin.register(ForumPost)
-class ForumPostAdmin(admin.ModelAdmin):
+class ForumPostAdmin(SummernoteModelAdmin):
+
+    summernote_fields = (
+        'description',
+    )
 
     list_display = (
         'title',
         'author',
+        'visibility',
         'is_pinned',
         'is_locked',
         'views',
@@ -627,13 +465,14 @@ class ForumPostAdmin(admin.ModelAdmin):
     )
 
     list_filter = (
+        'visibility',
         'is_pinned',
         'is_locked',
     )
 
     search_fields = (
         'title',
-        'content',
+        'description',
     )
 
     readonly_fields = (
@@ -650,8 +489,19 @@ class ForumPostAdmin(admin.ModelAdmin):
             {
                 'fields': (
                     'title',
-                    'content',
+                    'description',
                     'image',
+                    'uploaded_file',
+                )
+            }
+        ),
+
+        (
+            'Settings',
+            {
+                'fields': (
+                    'visibility',
+                    'allow_replies',
                 )
             }
         ),
@@ -662,6 +512,8 @@ class ForumPostAdmin(admin.ModelAdmin):
                 'fields': (
                     'is_pinned',
                     'is_locked',
+                    'is_flagged',
+                    'moderation_notes',
                 )
             }
         ),
@@ -671,6 +523,7 @@ class ForumPostAdmin(admin.ModelAdmin):
             {
                 'fields': (
                     'views',
+                    'likes_count',
                 )
             }
         ),
@@ -686,13 +539,6 @@ class ForumPostAdmin(admin.ModelAdmin):
             }
         ),
     )
-
-    def save_model(self, request, obj, form, change):
-
-        if not obj.pk:
-            obj.author = request.user
-
-        super().save_model(request, obj, form, change)
 
 
 # =====================================================
@@ -712,16 +558,19 @@ class ForumReplyAdmin(admin.ModelAdmin):
         'content',
     )
 
-    readonly_fields = (
+
+# =====================================================
+# FORUM POST LIKE ADMIN
+# =====================================================
+
+@admin.register(ForumPostLike)
+class ForumPostLikeAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'post',
+        'user',
         'created_at',
     )
-
-    def save_model(self, request, obj, form, change):
-
-        if not obj.pk:
-            obj.author = request.user
-
-        super().save_model(request, obj, form, change)
 
 
 # =====================================================
@@ -731,19 +580,14 @@ class ForumReplyAdmin(admin.ModelAdmin):
 @admin.register(NewsAnnouncement)
 class NewsAnnouncementAdmin(SummernoteModelAdmin):
 
-    summernote_fields = ('content',)
+    summernote_fields = (
+        'content',
+    )
 
     list_display = (
         'title',
         'author',
-        'status',
-        'featured',
-        'published_at',
-    )
-
-    list_filter = (
-        'status',
-        'featured',
+        'created_at',
     )
 
     search_fields = (
@@ -760,71 +604,22 @@ class NewsAnnouncementAdmin(SummernoteModelAdmin):
         'slug': ('title',)
     }
 
-    fieldsets = (
-        (
-            'Content',
-            {
-                'fields': (
-                    'title',
-                    'slug',
-                    'excerpt',
-                    'content',
-                    'image',
-                )
-            }
-        ),
-
-        (
-            'Publishing',
-            {
-                'fields': (
-                    'status',
-                    'featured',
-                    'published_at',
-                )
-            }
-        ),
-
-        (
-            'Metadata',
-            {
-                'fields': (
-                    'author',
-                    'created_at',
-                    'updated_at',
-                )
-            }
-        ),
-    )
-
-    def save_model(self, request, obj, form, change):
-
-        if not obj.pk:
-            obj.author = request.user
-
-        super().save_model(request, obj, form, change)
-
 
 # =====================================================
-# HELP TUTORIAL ADMIN
+# HELP ADMIN
 # =====================================================
 
 @admin.register(HelpTutorial)
 class HelpTutorialAdmin(SummernoteModelAdmin):
 
-    summernote_fields = ('content',)
+    summernote_fields = (
+        'content',
+    )
 
     list_display = (
         'title',
         'author',
-        'status',
-        'featured',
         'created_at',
-    )
-
-    list_filter = (
-        'status',
-        'featured',
     )
 
     search_fields = (
@@ -841,48 +636,69 @@ class HelpTutorialAdmin(SummernoteModelAdmin):
         'slug': ('title',)
     }
 
-    fieldsets = (
-        (
-            'Content',
-            {
-                'fields': (
-                    'title',
-                    'slug',
-                    'excerpt',
-                    'content',
-                    'image',
-                )
-            }
-        ),
 
-        (
-            'Publishing',
-            {
-                'fields': (
-                    'status',
-                    'featured',
-                )
-            }
-        ),
+# =====================================================
+# STUDENT ANALYTICS
+# =====================================================
 
-        (
-            'Metadata',
-            {
-                'fields': (
-                    'author',
-                    'created_at',
-                    'updated_at',
-                )
-            }
-        ),
+@admin.register(StudentAnalytics)
+class StudentAnalyticsAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'student',
+        'games_played',
+        'total_score',
+        'engagement_score',
+        'updated_at',
     )
 
-    def save_model(self, request, obj, form, change):
 
-        if not obj.pk:
-            obj.author = request.user
+# =====================================================
+# CLASS ANALYTICS
+# =====================================================
 
-        super().save_model(request, obj, form, change)
+@admin.register(ClassAnalytics)
+class ClassAnalyticsAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'clazz',
+        'total_students',
+        'average_xp',
+        'average_engagement',
+        'updated_at',
+    )
+
+
+# =====================================================
+# RESOURCE ANALYTICS
+# =====================================================
+
+@admin.register(ResourceAnalytics)
+class ResourceAnalyticsAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'resource',
+        'views',
+        'downloads',
+        'likes',
+        'updated_at',
+    )
+
+
+# =====================================================
+# FORUM ANALYTICS
+# =====================================================
+
+@admin.register(ForumAnalytics)
+class ForumAnalyticsAdmin(admin.ModelAdmin):
+
+    list_display = (
+        'post',
+        'views',
+        'replies',
+        'likes',
+        'updated_at',
+    )
 
 
 # =====================================================
@@ -893,28 +709,16 @@ class HelpTutorialAdmin(SummernoteModelAdmin):
 class SchoolAnalyticsProfileAdmin(admin.ModelAdmin):
 
     list_display = (
-        'teacher',
         'school',
-        'can_access_all_teachers',
-        'created_at',
-    )
-
-    list_filter = (
-        'school',
-        'can_access_all_teachers',
-    )
-
-    search_fields = (
-        'teacher__username',
-    )
-
-    readonly_fields = (
-        'created_at',
+        'total_teachers',
+        'total_students',
+        'average_engagement',
+        'updated_at',
     )
 
 
 # =====================================================
-# GAME PROGRESS ADMIN
+# GAME PROGRESS
 # =====================================================
 
 @admin.register(KindlewickGameProgress)
@@ -925,23 +729,12 @@ class KindlewickGameProgressAdmin(admin.ModelAdmin):
         'game_type',
         'current_level',
         'score',
-        'tokens_earned',
         'completed',
-        'updated_at',
-    )
-
-    list_filter = (
-        'game_type',
-        'completed',
-    )
-
-    search_fields = (
-        'user__username',
     )
 
 
 # =====================================================
-# GAME SESSION ADMIN
+# GAME SESSION
 # =====================================================
 
 @admin.register(KindlewickGameSession)
@@ -952,15 +745,5 @@ class KindlewickGameSessionAdmin(admin.ModelAdmin):
         'game_type',
         'level',
         'score',
-        'completed',
         'created_at',
-    )
-
-    list_filter = (
-        'game_type',
-        'completed',
-    )
-
-    search_fields = (
-        'user__username',
     )

@@ -3,7 +3,17 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
-Edit Resource - Teaching Resources
+
+{% if resource %}
+
+    Edit Resource - Teaching Resources
+
+{% else %}
+
+    Add Resource - Teaching Resources
+
+{% endif %}
+
 {% endblock %}
 
 {% block content %}
@@ -18,12 +28,12 @@ Edit Resource - Teaching Resources
 
             <a
                 class="btn btn-link px-0 mb-3 text-decoration-none"
-                href="{% url 'teacher_resource_detail' resource.slug %}"
+                href="{% url 'teacher_resources_list' %}"
             >
 
-                <i class="fas fa-arrow-left"></i>
+                <i class="fas fa-arrow-left me-1"></i>
 
-                Back to Resource
+                Back to Resources
 
             </a>
 
@@ -39,14 +49,26 @@ Edit Resource - Teaching Resources
 
                         <h1 class="h3 mb-2">
 
-                            Edit Teaching Resource
+                            {% if resource %}
+
+                                Edit Teaching Resource
+
+                            {% else %}
+
+                                Create Teaching Resource
+
+                            {% endif %}
 
                         </h1>
 
                         <p class="text-muted mb-0">
 
-                            Update your teaching resource,
-                            supporting files and discussion content.
+                            Share worksheets,
+                            lesson activities,
+                            presentations,
+                            revision materials
+                            and teaching ideas
+                            with other educators.
 
                         </p>
 
@@ -73,63 +95,80 @@ Edit Resource - Teaching Resources
 
                         <div class="mb-4">
 
-                            <label
-                                for="summernote-description"
-                                class="form-label fw-semibold"
-                            >
-
-                                Description
-
-                            </label>
-
-                            {% if form.description %}
-
-                                <textarea
-                                    id="summernote-description"
-                                    name="description"
-                                    class="summernote-editor form-control"
-                                    rows="8"
-                                >{{ form.description.value|default_if_none:"" }}</textarea>
-
-                            {% else %}
-
-                                <div class="alert alert-warning">
-
-                                    Description field missing from form.
-
-                                </div>
-
-                            {% endif %}
+                            {{ form.description|as_crispy_field }}
 
                         </div>
 
-                        <!-- NOTES -->
+                        <!-- UPLOADS -->
 
-                        {% if form.notes %}
+                        <div class="row g-3 mb-4">
 
-                            <div class="mb-4">
+                            <div class="col-md-6">
 
-                                <label
-                                    for="summernote-notes"
-                                    class="form-label fw-semibold"
+                                {% if form.uploaded_file %}
+
+                                    {{ form.uploaded_file|as_crispy_field }}
+
+                                {% endif %}
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                {% if form.image %}
+
+                                    {{ form.image|as_crispy_field }}
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                        <!-- EXISTING FILE -->
+
+                        {% if resource.uploaded_file %}
+
+                            <div class="alert alert-light border mb-4">
+
+                                <strong>
+
+                                    Current File:
+
+                                </strong>
+
+                                <a
+                                    href="{{ resource.uploaded_file.url }}"
+                                    target="_blank"
+                                    class="ms-2"
                                 >
 
-                                    Notes
+                                    View Uploaded File
 
-                                </label>
-
-                                <textarea
-                                    id="summernote-notes"
-                                    name="notes"
-                                    class="summernote-editor form-control"
-                                    rows="8"
-                                >{{ form.notes.value|default_if_none:"" }}</textarea>
+                                </a>
 
                             </div>
 
                         {% endif %}
 
-                        <!-- FORM FIELDS -->
+                        <!-- IMAGE PREVIEW -->
+
+                        {% if resource.image %}
+
+                            <div class="mb-4">
+
+                                <img
+                                    src="{{ resource.image.url }}"
+                                    class="img-fluid rounded shadow-sm"
+                                    style="max-height: 240px;"
+                                    alt="{{ resource.title }}"
+                                >
+
+                            </div>
+
+                        {% endif %}
+
+                        <!-- CLASSIFICATION -->
 
                         <div class="row g-3 mb-4">
 
@@ -141,13 +180,13 @@ Edit Resource - Teaching Resources
 
                             <div class="col-md-6">
 
-                                {{ form.year_ks|as_crispy_field }}
+                                {{ form.subject|as_crispy_field }}
 
                             </div>
 
                             <div class="col-md-6">
 
-                                {{ form.subject|as_crispy_field }}
+                                {{ form.year_ks|as_crispy_field }}
 
                             </div>
 
@@ -183,82 +222,31 @@ Edit Resource - Teaching Resources
 
                         </div>
 
-                        <!-- FILES -->
+                        <!-- COMMENTS -->
 
-                        <div class="mb-4">
-
-                            <label
-                                for="resource-files"
-                                class="form-label fw-semibold"
-                            >
-
-                                Upload Files
-
-                            </label>
-
-                            <input
-                                type="file"
-                                name="files"
-                                id="resource-files"
-                                class="form-control"
-                                multiple
-                            >
-
-                            <div class="form-text mt-2">
-
-                                Upload worksheets, PDFs,
-                                PowerPoints, ZIP files,
-                                images or supporting materials.
-
-                            </div>
-
-                        </div>
-
-                        <!-- EXISTING FILES -->
-
-                        {% if resource.files.exists %}
+                        {% if form.allow_comments %}
 
                             <div class="mb-4">
 
-                                <h6 class="mb-3">
+                                <div class="form-check">
 
-                                    Existing Files
+                                    {{ form.allow_comments }}
 
-                                </h6>
+                                    <label
+                                        class="form-check-label ms-2"
+                                    >
 
-                                <ul class="list-group">
+                                        Allow comments and discussion
 
-                                    {% for f in resource.files.all %}
+                                    </label>
 
-                                        <li class="list-group-item">
-
-                                            <a
-                                                href="{{ f.file.url }}"
-                                                target="_blank"
-                                            >
-
-                                                {{ f.file.name }}
-
-                                            </a>
-
-                                        </li>
-
-                                    {% endfor %}
-
-                                </ul>
+                                </div>
 
                             </div>
 
                         {% endif %}
 
-                        <!-- FILE PREVIEWS -->
-
-                        <div
-                            id="file-previews"
-                            class="mb-4"
-                        ></div>
-
-                        <!-- MODERATION NOTICE -->
+                        <!-- MODERATION -->
 
                         <div class="alert alert-warning border-0 shadow-sm mb-4">
 
@@ -274,44 +262,52 @@ Edit Resource - Teaching Resources
 
                                     <h5 class="mb-2">
 
-                                        Community Guidelines
+                                        Community & Professional Guidelines
 
                                     </h5>
 
                                     <p class="mb-2">
 
-                                        All uploaded resources and
-                                        discussion posts are reviewed
-                                        regularly by moderators.
+                                        All uploaded resources,
+                                        files and comments
+                                        are reviewed regularly.
 
                                     </p>
 
                                     <ul class="mb-2">
 
                                         <li>
-                                            Follow safeguarding policies
+
+                                            Follow safeguarding guidance
+
                                         </li>
 
                                         <li>
-                                            Respect equality and diversity
-                                            guidance
+
+                                            Respect equality and diversity policies
+
                                         </li>
 
                                         <li>
-                                            Avoid copyrighted content
+
+                                            Avoid copyrighted material
+
                                         </li>
 
                                         <li>
+
                                             Maintain professional conduct
+
                                         </li>
 
                                     </ul>
 
                                     <p class="small text-muted mb-0">
 
-                                        Content may be edited,
-                                        removed or restricted if it
-                                        breaches platform policy.
+                                        Resources that breach policy
+                                        may be edited,
+                                        restricted
+                                        or removed.
 
                                     </p>
 
@@ -332,12 +328,20 @@ Edit Resource - Teaching Resources
 
                                 <i class="fas fa-save me-2"></i>
 
-                                Save Changes
+                                {% if resource %}
+
+                                    Save Changes
+
+                                {% else %}
+
+                                    Create Resource
+
+                                {% endif %}
 
                             </button>
 
                             <a
-                                href="{% url 'teacher_resource_detail' resource.slug %}"
+                                href="{% url 'teacher_resources_list' %}"
                                 class="btn btn-outline-secondary px-4"
                             >
 
@@ -370,7 +374,7 @@ Edit Resource - Teaching Resources
 .summernote-wrapper {
 
     width: 100%;
-    max-width: 900px;
+    max-width: 950px;
     margin: 0 auto;
 }
 
@@ -391,7 +395,7 @@ Edit Resource - Teaching Resources
 
 .note-editable {
 
-    height: 300px !important;
+    min-height: 320px !important;
     overflow-y: auto !important;
 }
 
@@ -402,198 +406,14 @@ Edit Resource - Teaching Resources
     height: auto !important;
 }
 
-#file-previews img {
-
-    max-width: 120px;
-    border-radius: 8px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-}
-
 @media (max-width: 576px) {
 
     .note-editable {
 
-        height: 220px !important;
+        min-height: 220px !important;
     }
 }
 
 </style>
-
-<script>
-
-document.addEventListener(
-    'DOMContentLoaded',
-    function () {
-
-        // SUMMERNOTE
-
-        $('.summernote-editor').each(
-            function () {
-
-                try {
-
-                    $(this).summernote({
-
-                        height: 300,
-
-                        minHeight: 300,
-
-                        maxHeight: 400,
-
-                        disableResizeEditor: true,
-
-                        toolbar: [
-
-                            ['style', ['style']],
-
-                            [
-                                'font',
-                                [
-                                    'bold',
-                                    'italic',
-                                    'underline',
-                                    'clear'
-                                ]
-                            ],
-
-                            [
-                                'fontname',
-                                ['fontname']
-                            ],
-
-                            [
-                                'fontsize',
-                                ['fontsize']
-                            ],
-
-                            [
-                                'color',
-                                ['color']
-                            ],
-
-                            [
-                                'para',
-                                [
-                                    'ul',
-                                    'ol',
-                                    'paragraph',
-                                    'height'
-                                ]
-                            ],
-
-                            [
-                                'table',
-                                ['table']
-                            ],
-
-                            [
-                                'insert',
-                                [
-                                    'link',
-                                    'picture',
-                                    'video'
-                                ]
-                            ],
-
-                            [
-                                'view',
-                                [
-                                    'fullscreen',
-                                    'codeview',
-                                    'help'
-                                ]
-                            ],
-                        ],
-                    });
-
-                } catch (e) {
-
-                    console.error(
-                        'Summernote error:',
-                        e
-                    );
-                }
-            }
-        );
-
-        // FILE PREVIEWS
-
-        const fileInput =
-            document.getElementById(
-                'resource-files'
-            );
-
-        const previews =
-            document.getElementById(
-                'file-previews'
-            );
-
-        if (fileInput) {
-
-            fileInput.addEventListener(
-                'change',
-                function () {
-
-                    previews.innerHTML = '';
-
-                    Array.from(this.files).forEach(
-                        file => {
-
-                            if (
-                                file.type.startsWith(
-                                    'image/'
-                                )
-                            ) {
-
-                                const reader =
-                                    new FileReader();
-
-                                reader.onload =
-                                    function (e) {
-
-                                        const img =
-                                            document.createElement(
-                                                'img'
-                                            );
-
-                                        img.src =
-                                            e.target.result;
-
-                                        previews.appendChild(
-                                            img
-                                        );
-                                    };
-
-                                reader.readAsDataURL(
-                                    file
-                                );
-
-                            } else {
-
-                                const item =
-                                    document.createElement(
-                                        'div'
-                                    );
-
-                                item.className =
-                                    'small text-muted mb-1';
-
-                                item.textContent =
-                                    file.name;
-
-                                previews.appendChild(
-                                    item
-                                );
-                            }
-                        }
-                    );
-                }
-            );
-        }
-    }
-);
-
-</script>
 
 {% endblock %}

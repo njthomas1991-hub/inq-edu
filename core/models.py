@@ -1,4 +1,6 @@
+
 import random
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
@@ -8,6 +10,8 @@ from django.utils.text import slugify
 # =====================================================
 # HELPERS
 # =====================================================
+
+
 def default_avatar_config():
 
     return {
@@ -22,80 +26,6 @@ def default_avatar_config():
         "pattern_color": "#FF1493",
     }
 
-AVATAR_STYLES = [
-        ("monster", "Monster"),
-        ("human", "Human"),
-        ("robot", "Robot"),
-        ("animal", "Animal"),
-    ]
-
-BODY_TYPES = [
-        ("blob", "Blob"),
-        ("round", "Round"),
-        ("square", "Square"),
-        ("slim", "Slim"),
-    ]
-
-EYE_TYPES = [
-        ("big_round", "Big Round"),
-        ("sleepy", "Sleepy"),
-        ("angry", "Angry"),
-        ("star", "Star"),
-        ("pixel", "Pixel"),
-    ]
-
-MOUTH_TYPES = [
-        ("happy", "Happy"),
-        ("sad", "Sad"),
-        ("smile", "Smile"),
-        ("open", "Open"),
-        ("fangs", "Fangs"),
-    ]
-
-HEAD_DECORATIONS = [
-        ("none", "None"),
-        ("horns", "Horns"),
-        ("hat", "Hat"),
-        ("crown", "Crown"),
-        ("antenna", "Antenna"),
-    ]
-
-PATTERNS = [
-        ("solid", "Solid"),
-        ("spots", "Spots"),
-        ("stripes", "Stripes"),
-        ("zigzag", "Zigzag"),
-    ]
-
-def randomize(self):
-
-        self.avatar_config = {
-            "avatar_style": random.choice(self.AVATAR_STYLES)[0],
-            "body_type": random.choice(self.BODY_TYPES)[0],
-            "body_color": random.choice([
-                "#FF6B9D",
-                "#6BCBFF",
-                "#6BFF95",
-                "#FFD93D",
-                "#B28DFF",
-            ]),
-            "eye_type": random.choice(self.EYE_TYPES)[0],
-            "mouth_type": random.choice(self.MOUTH_TYPES)[0],
-            "head_decoration": random.choice(self.HEAD_DECORATIONS)[0],
-            "decoration_color": random.choice([
-                "#FFB347",
-                "#FF6B6B",
-                "#4D96FF",
-                "#9D4EDD",
-            ]),
-            "pattern": random.choice(self.PATTERNS)[0],
-            "pattern_color": random.choice([
-                "#FFFFFF",
-                "#222222",
-                "#FFD93D",
-                "#00C2A8",
-            ]),
-        }
 
 # =====================================================
 # SCHOOL MODEL
@@ -110,8 +40,15 @@ class School(models.Model):
         ('enterprise', 'Enterprise'),
     )
 
-    name = models.CharField(max_length=255, unique=True)
-    slug = models.SlugField(unique=True, blank=True)
+    name = models.CharField(
+        max_length=255,
+        unique=True
+    )
+
+    slug = models.SlugField(
+        unique=True,
+        blank=True
+    )
 
     logo = models.ImageField(
         upload_to='school_logos/',
@@ -119,7 +56,9 @@ class School(models.Model):
         null=True
     )
 
-    description = models.TextField(blank=True)
+    description = models.TextField(
+        blank=True
+    )
 
     subscription_tier = models.CharField(
         max_length=20,
@@ -127,19 +66,33 @@ class School(models.Model):
         default='free'
     )
 
-    subscription_active = models.BooleanField(default=True)
+    subscription_active = models.BooleanField(
+        default=True
+    )
 
-    billing_email = models.EmailField(blank=True)
+    billing_email = models.EmailField(
+        blank=True
+    )
 
-    settings = models.JSONField(default=dict, blank=True)
+    settings = models.JSONField(
+        default=dict,
+        blank=True
+    )
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
 
     class Meta:
+
         ordering = ['name']
 
     def __str__(self):
+
         return self.name
 
     def save(self, *args, **kwargs):
@@ -177,10 +130,6 @@ class User(AbstractUser):
         related_name='users'
     )
 
-    # =====================================================
-    # PROFILE
-    # =====================================================
-
     display_name = models.CharField(
         max_length=255,
         blank=True
@@ -197,20 +146,11 @@ class User(AbstractUser):
         null=True
     )
 
-    # =====================================================
-    # STUDENT LOGIN SUPPORT
-    # =====================================================
-
     plain_password = models.CharField(
         max_length=255,
         blank=True,
-        null=True,
-        help_text="Temporary readable classroom password."
+        null=True
     )
-
-    # =====================================================
-    # GAMIFICATION
-    # =====================================================
 
     total_xp = models.IntegerField(
         default=0
@@ -233,10 +173,6 @@ class User(AbstractUser):
         blank=True
     )
 
-    # =====================================================
-    # ACTIVITY
-    # =====================================================
-
     last_active = models.DateTimeField(
         blank=True,
         null=True
@@ -250,17 +186,9 @@ class User(AbstractUser):
         auto_now=True
     )
 
-    # =====================================================
-    # META
-    # =====================================================
-
     class Meta:
 
         ordering = ['username']
-
-    # =====================================================
-    # METHODS
-    # =====================================================
 
     def __str__(self):
 
@@ -274,56 +202,17 @@ class User(AbstractUser):
             f"{self.last_name}"
         ).strip()
 
-        return (
-            full
-            if full
-            else self.username
-        )
+        return full if full else self.username
 
     @property
     def initials(self):
 
-        first = (
-            self.first_name[:1]
-            if self.first_name
-            else ""
-        )
+        first = self.first_name[:1] if self.first_name else ""
+        last = self.last_name[:1] if self.last_name else ""
 
-        last = (
-            self.last_name[:1]
-            if self.last_name
-            else ""
-        )
+        return f"{first}{last}".upper()
 
-        return (
-            f"{first}{last}"
-        ).upper()
 
-    def add_xp(self, amount):
-
-        self.total_xp += amount
-
-        self.level = max(
-            1,
-            (self.total_xp // 100) + 1
-        )
-
-        self.save()
-
-    def add_tokens(self, amount):
-
-        self.tokens += amount
-        self.save()
-
-    def increment_streak(self):
-
-        self.streak += 1
-        self.save()
-
-    def reset_streak(self):
-
-        self.streak = 0
-        self.save()
 # =====================================================
 # AVATAR MODEL
 # =====================================================
@@ -342,27 +231,17 @@ class Avatar(models.Model):
         blank=True
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
-    class Meta:
-        verbose_name = 'Avatar'
-        verbose_name_plural = 'Avatars'
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
 
     def __str__(self):
+
         return f"{self.user.username}'s avatar"
-
-    @property
-    def config(self):
-
-        config = default_avatar_config()
-        config.update(self.avatar_config or {})
-
-        # Teachers/admins default to human avatars
-        if self.user.role in ['teacher', 'school_admin']:
-            config['avatar_style'] = 'human'
-
-        return config
 
 
 # =====================================================
@@ -390,13 +269,14 @@ class Class(models.Model):
         ('computing', 'Computing'),
     )
 
-    name = models.CharField(max_length=255)
+    name = models.CharField(
+        max_length=255
+    )
 
     teacher = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='classes_taught',
-        limit_choices_to={'role': 'teacher'}
+        related_name='classes_taught'
     )
 
     subject = models.CharField(
@@ -409,14 +289,20 @@ class Class(models.Model):
         choices=YEAR_KS_CHOICES
     )
 
-    description = models.TextField(blank=True)
+    description = models.TextField(
+        blank=True
+    )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     class Meta:
+
         ordering = ['name']
 
     def __str__(self):
+
         return self.name
 
 
@@ -430,8 +316,7 @@ class ClassStudent(models.Model):
     student = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='enrolled_classes',
-        limit_choices_to={'role': 'student'}
+        related_name='enrolled_classes'
     )
 
     clazz = models.ForeignKey(
@@ -440,12 +325,16 @@ class ClassStudent(models.Model):
         related_name='students'
     )
 
-    date_joined = models.DateTimeField(auto_now_add=True)
+    date_joined = models.DateTimeField(
+        auto_now_add=True
+    )
 
     class Meta:
+
         unique_together = ('student', 'clazz')
 
     def __str__(self):
+
         return f"{self.student.username} -> {self.clazz.name}"
 
 
@@ -461,41 +350,19 @@ class TeachingResource(models.Model):
         ('published', 'Published'),
     )
 
-    RESOURCE_TYPE_CHOICES = (
-        ('lesson_plan', 'Lesson Plan'),
-        ('worksheet', 'Worksheet'),
-        ('activity', 'Activity'),
-        ('presentation', 'Presentation'),
-        ('assessment', 'Assessment'),
-        ('other', 'Other'),
-    )
-
-    KEY_STAGE_CHOICES = (
-        ("0", "EYFS"),
-        ("1", "KS1"),
-        ("2", "KS2"),
-        ("3", "KS3"),
-        ("4", "KS4"),
-    )
-
-    SUBJECT_CHOICES = (
-        ("english", "English"),
-        ("maths", "Maths"),
-        ("science", "Science"),
-        ("humanities", "Humanities"),
-        ("art", "Art"),
-        ("computing", "Computing"),
-        ("general", "General"),
-    )
-
     VISIBILITY_CHOICES = (
         ('public', 'Public'),
         ('school', 'School Only'),
     )
 
-    title = models.CharField(max_length=255)
+    title = models.CharField(
+        max_length=255
+    )
 
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(
+        unique=True,
+        blank=True
+    )
 
     author = models.ForeignKey(
         User,
@@ -503,9 +370,15 @@ class TeachingResource(models.Model):
         related_name='resources'
     )
 
-    content = models.TextField(blank=True)
+    description = models.TextField(
+        blank=True
+    )
 
-    excerpt = models.TextField(blank=True)
+    uploaded_file = models.FileField(
+        upload_to='resources/uploads/',
+        blank=True,
+        null=True
+    )
 
     image = models.ImageField(
         upload_to='resources/images/',
@@ -513,28 +386,19 @@ class TeachingResource(models.Model):
         null=True
     )
 
-    file = models.FileField(
-        upload_to='resources/files/',
-        blank=True,
-        null=True
-    )
-
     resource_type = models.CharField(
-        max_length=30,
-        choices=RESOURCE_TYPE_CHOICES,
+        max_length=100,
         default='other'
     )
 
     subject = models.CharField(
-        max_length=50,
-        choices=SUBJECT_CHOICES,
-        default='general',
+        max_length=100,
+        blank=True
     )
 
     year_ks = models.CharField(
-        max_length=1,
-        choices=KEY_STAGE_CHOICES,
-        default='2',
+        max_length=50,
+        blank=True
     )
 
     visibility = models.CharField(
@@ -549,22 +413,45 @@ class TeachingResource(models.Model):
         default='draft'
     )
 
-    featured = models.BooleanField(default=False)
+    featured = models.BooleanField(
+        default=False
+    )
 
-    likes = models.ManyToManyField(
-        User,
-        related_name='liked_resources',
+    allow_comments = models.BooleanField(
+        default=True
+    )
+
+    likes_count = models.IntegerField(
+        default=0
+    )
+
+    is_flagged = models.BooleanField(
+        default=False
+    )
+
+    moderation_notes = models.TextField(
         blank=True
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    published_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    published_at = models.DateTimeField(
+        blank=True,
+        null=True
+    )
 
     class Meta:
+
         ordering = ['-created_at']
 
     def __str__(self):
+
         return self.title
 
     def save(self, *args, **kwargs):
@@ -576,40 +463,6 @@ class TeachingResource(models.Model):
             self.published_at = timezone.now()
 
         super().save(*args, **kwargs)
-
-        description = models.TextField(
-    blank=True
-)
-
-uploaded_file = models.FileField(
-    upload_to='resources/uploads/',
-    blank=True,
-    null=True
-)
-
-allow_comments = models.BooleanField(
-    default=True
-)
-
-likes_count = models.IntegerField(
-    default=0
-)
-
-updated_by = models.ForeignKey(
-    User,
-    on_delete=models.SET_NULL,
-    null=True,
-    blank=True,
-    related_name='updated_resources'
-)
-
-moderation_notes = models.TextField(
-    blank=True
-)
-
-is_flagged = models.BooleanField(
-    default=False
-)
 
 
 # =====================================================
@@ -627,20 +480,32 @@ class ResourceComment(models.Model):
 
     author = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
-        related_name='resource_comments'
+        on_delete=models.CASCADE
     )
 
     content = models.TextField()
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
 
     def __str__(self):
+
         return f"Comment by {self.author.username}"
 
-    class ResourceLike(models.Model):
 
-        resource = models.ForeignKey(
+# =====================================================
+# RESOURCE LIKES
+# =====================================================
+
+
+class ResourceLike(models.Model):
+
+    resource = models.ForeignKey(
         TeachingResource,
         on_delete=models.CASCADE,
         related_name='resource_likes'
@@ -657,18 +522,9 @@ class ResourceComment(models.Model):
 
     class Meta:
 
-        unique_together = (
-            'resource',
-            'user',
-        )
+        unique_together = ('resource', 'user')
 
-    def __str__(self):
 
-        return (
-            f"{self.user.username} "
-            f"liked {self.resource.title}"
-        )
-    
 # =====================================================
 # FORUM POSTS
 # =====================================================
@@ -676,7 +532,18 @@ class ResourceComment(models.Model):
 
 class ForumPost(models.Model):
 
-    title = models.CharField(max_length=255)
+    VISIBILITY_CHOICES = (
+        ('public', 'Public'),
+        ('school', 'School Only'),
+    )
+
+    title = models.CharField(
+        max_length=255
+    )
+
+    description = models.TextField(
+        blank=True
+    )
 
     author = models.ForeignKey(
         User,
@@ -684,53 +551,67 @@ class ForumPost(models.Model):
         related_name='forum_posts'
     )
 
-    content = models.TextField()
-
     image = models.ImageField(
-        upload_to='forum_posts/',
+        upload_to='forum/images/',
         blank=True,
         null=True
     )
 
-    is_pinned = models.BooleanField(default=False)
-    is_locked = models.BooleanField(default=False)
+    uploaded_file = models.FileField(
+        upload_to='forum/uploads/',
+        blank=True,
+        null=True
+    )
 
-    views = models.IntegerField(default=0)
+    visibility = models.CharField(
+        max_length=20,
+        choices=VISIBILITY_CHOICES,
+        default='public'
+    )
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    allow_replies = models.BooleanField(
+        default=True
+    )
+
+    likes_count = models.IntegerField(
+        default=0
+    )
+
+    is_pinned = models.BooleanField(
+        default=False
+    )
+
+    is_locked = models.BooleanField(
+        default=False
+    )
+
+    is_flagged = models.BooleanField(
+        default=False
+    )
+
+    moderation_notes = models.TextField(
+        blank=True
+    )
+
+    views = models.IntegerField(
+        default=0
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
 
     class Meta:
+
         ordering = ['-is_pinned', '-updated_at']
 
     def __str__(self):
+
         return self.title
-    
-    description = models.TextField(
-    blank=True
-)
-
-uploaded_file = models.FileField(
-    upload_to='forum/uploads/',
-    blank=True,
-    null=True
-)
-
-likes_count = models.IntegerField(
-    default=0
-)
-
-allow_replies = models.BooleanField(
-    default=True
-)
-
-is_flagged = models.BooleanField(
-    default=False
-)
-
-moderation_notes = models.TextField(
-    blank=True
-)
 
 
 # =====================================================
@@ -748,24 +629,36 @@ class ForumReply(models.Model):
 
     author = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
-        related_name='forum_replies'
+        on_delete=models.CASCADE
     )
 
     content = models.TextField()
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
 
     def __str__(self):
+
         return f"Reply by {self.author.username}"
 
-    class ForumPostLike(models.Model):
 
-        post = models.ForeignKey(
-            ForumPost,
-            on_delete=models.CASCADE,
-            related_name='post_likes'
-        )
+# =====================================================
+# FORUM POST LIKES
+# =====================================================
+
+
+class ForumPostLike(models.Model):
+
+    post = models.ForeignKey(
+        ForumPost,
+        on_delete=models.CASCADE,
+        related_name='post_likes'
+    )
 
     user = models.ForeignKey(
         User,
@@ -778,17 +671,8 @@ class ForumReply(models.Model):
 
     class Meta:
 
-        unique_together = (
-            'post',
-            'user',
-        )
+        unique_together = ('post', 'user')
 
-    def __str__(self):
-
-        return (
-            f"{self.user.username} "
-            f"liked {self.post.title}"
-        )
 
 # =====================================================
 # NEWS ANNOUNCEMENTS
@@ -797,24 +681,21 @@ class ForumReply(models.Model):
 
 class NewsAnnouncement(models.Model):
 
-    STATUS_CHOICES = (
-        ('draft', 'Draft'),
-        ('published', 'Published'),
+    title = models.CharField(
+        max_length=255
     )
 
-    title = models.CharField(max_length=255)
-
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(
+        unique=True,
+        blank=True
+    )
 
     author = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
-        related_name='news_posts'
+        on_delete=models.CASCADE
     )
 
     content = models.TextField()
-
-    excerpt = models.TextField(blank=True)
 
     image = models.ImageField(
         upload_to='news/',
@@ -822,22 +703,16 @@ class NewsAnnouncement(models.Model):
         null=True
     )
 
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='draft'
+    created_at = models.DateTimeField(
+        auto_now_add=True
     )
 
-    featured = models.BooleanField(default=False)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    published_at = models.DateTimeField(blank=True, null=True)
-
-    class Meta:
-        ordering = ['-created_at']
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
 
     def __str__(self):
+
         return self.title
 
 
@@ -848,24 +723,21 @@ class NewsAnnouncement(models.Model):
 
 class HelpTutorial(models.Model):
 
-    STATUS_CHOICES = (
-        ('draft', 'Draft'),
-        ('published', 'Published'),
+    title = models.CharField(
+        max_length=255
     )
 
-    title = models.CharField(max_length=255)
-
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(
+        unique=True,
+        blank=True
+    )
 
     author = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
-        related_name='tutorials'
+        on_delete=models.CASCADE
     )
 
     content = models.TextField()
-
-    excerpt = models.TextField(blank=True)
 
     image = models.ImageField(
         upload_to='tutorials/',
@@ -873,66 +745,25 @@ class HelpTutorial(models.Model):
         null=True
     )
 
-    status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='draft'
+    created_at = models.DateTimeField(
+        auto_now_add=True
     )
 
-    featured = models.BooleanField(default=False)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['-created_at']
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
 
     def __str__(self):
+
         return self.title
 
 
 # =====================================================
-# SCHOOL ANALYTICS
-# =====================================================
-
-
-class SchoolAnalyticsProfile(models.Model):
-
-    teacher = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name='analytics_profile'
-    )
-
-    school = models.ForeignKey(
-        School,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='analytics_profiles'
-    )
-
-    can_access_all_teachers = models.BooleanField(default=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.teacher.username} analytics"
-
-
-# =====================================================
-# KINDLEWICK GAME PROGRESS
+# GAME PROGRESS
 # =====================================================
 
 
 class KindlewickGameProgress(models.Model):
-
-    GAME_TYPES = (
-        ('map', 'Map Exploration'),
-        ('castle', 'Wizard Castle'),
-        ('potions', 'Prefixes Potions'),
-        ('grid', 'Grid Coordinator'),
-    )
 
     user = models.ForeignKey(
         User,
@@ -941,31 +772,36 @@ class KindlewickGameProgress(models.Model):
     )
 
     game_type = models.CharField(
-        max_length=50,
-        choices=GAME_TYPES
+        max_length=100
     )
 
-    current_level = models.IntegerField(default=1)
+    current_level = models.IntegerField(
+        default=1
+    )
 
-    score = models.IntegerField(default=0)
+    score = models.IntegerField(
+        default=0
+    )
 
-    tokens_earned = models.IntegerField(default=0)
+    tokens_earned = models.IntegerField(
+        default=0
+    )
 
-    total_playtime = models.IntegerField(default=0)
+    total_playtime = models.IntegerField(
+        default=0
+    )
 
-    completed = models.BooleanField(default=False)
+    completed = models.BooleanField(
+        default=False
+    )
 
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ('user', 'game_type')
-
-    def __str__(self):
-        return f"{self.user.username} - {self.game_type}"
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
 
 
 # =====================================================
-# KINDLEWICK GAME SESSION
+# GAME SESSION
 # =====================================================
 
 
@@ -977,27 +813,337 @@ class KindlewickGameSession(models.Model):
         related_name='game_sessions'
     )
 
-    game_type = models.CharField(max_length=50)
+    game_type = models.CharField(
+        max_length=100
+    )
 
-    level = models.IntegerField(default=1)
+    level = models.IntegerField(
+        default=1
+    )
 
-    score = models.IntegerField(default=0)
+    score = models.IntegerField(
+        default=0
+    )
 
-    playtime = models.IntegerField(default=0)
+    playtime = models.IntegerField(
+        default=0
+    )
 
-    session_data = models.JSONField(default=dict, blank=True)
+    session_data = models.JSONField(
+        default=dict,
+        blank=True
+    )
 
-    completed = models.BooleanField(default=False)
+    completed = models.BooleanField(
+        default=False
+    )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+# =====================================================
+# STUDENT ANALYTICS
+# =====================================================
+
+
+class StudentAnalytics(models.Model):
+
+    student = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='student_analytics'
+    )
+
+    total_logins = models.IntegerField(
+        default=0
+    )
+
+    lessons_completed = models.IntegerField(
+        default=0
+    )
+
+    resources_viewed = models.IntegerField(
+        default=0
+    )
+
+    forum_posts = models.IntegerField(
+        default=0
+    )
+
+    forum_replies = models.IntegerField(
+        default=0
+    )
+
+    games_played = models.IntegerField(
+        default=0
+    )
+
+    total_score = models.IntegerField(
+        default=0
+    )
+
+    attendance_percentage = models.FloatField(
+        default=100
+    )
+
+    engagement_score = models.FloatField(
+        default=0
+    )
+
+    last_seen = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+
+        verbose_name_plural = (
+            'Student Analytics'
+        )
 
     def __str__(self):
-        return f"{self.user.username} session"
+
+        return (
+            f"{self.student.username} analytics"
+        )
 
 
+# =====================================================
+# CLASS ANALYTICS
+# =====================================================
 
 
+class ClassAnalytics(models.Model):
+
+    clazz = models.OneToOneField(
+        Class,
+        on_delete=models.CASCADE,
+        related_name='analytics'
+    )
+
+    total_students = models.IntegerField(
+        default=0
+    )
+
+    active_students = models.IntegerField(
+        default=0
+    )
+
+    average_xp = models.IntegerField(
+        default=0
+    )
+
+    total_resources = models.IntegerField(
+        default=0
+    )
+
+    total_discussions = models.IntegerField(
+        default=0
+    )
+
+    average_engagement = models.FloatField(
+        default=0
+    )
+
+    leaderboard_enabled = models.BooleanField(
+        default=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+
+        verbose_name_plural = (
+            'Class Analytics'
+        )
+
+    def __str__(self):
+
+        return (
+            f"{self.clazz.name} analytics"
+        )
 
 
+# =====================================================
+# RESOURCE ANALYTICS
+# =====================================================
 
 
+class ResourceAnalytics(models.Model):
+
+    resource = models.OneToOneField(
+        TeachingResource,
+        on_delete=models.CASCADE,
+        related_name='analytics'
+    )
+
+    views = models.IntegerField(
+        default=0
+    )
+
+    downloads = models.IntegerField(
+        default=0
+    )
+
+    shares = models.IntegerField(
+        default=0
+    )
+
+    comments = models.IntegerField(
+        default=0
+    )
+
+    likes = models.IntegerField(
+        default=0
+    )
+
+    bookmarks = models.IntegerField(
+        default=0
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+
+        verbose_name_plural = (
+            'Resource Analytics'
+        )
+
+    def __str__(self):
+
+        return (
+            f"{self.resource.title} analytics"
+        )
+
+
+# =====================================================
+# FORUM ANALYTICS
+# =====================================================
+
+
+class ForumAnalytics(models.Model):
+
+    post = models.OneToOneField(
+        ForumPost,
+        on_delete=models.CASCADE,
+        related_name='analytics'
+    )
+
+    views = models.IntegerField(
+        default=0
+    )
+
+    replies = models.IntegerField(
+        default=0
+    )
+
+    likes = models.IntegerField(
+        default=0
+    )
+
+    reports = models.IntegerField(
+        default=0
+    )
+
+    moderation_actions = models.IntegerField(
+        default=0
+    )
+
+    engagement_score = models.FloatField(
+        default=0
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+
+        verbose_name_plural = (
+            'Forum Analytics'
+        )
+
+    def __str__(self):
+
+        return (
+            f"{self.post.title} analytics"
+        )
+
+
+# =====================================================
+# SCHOOL ANALYTICS PROFILE
+# =====================================================
+
+
+class SchoolAnalyticsProfile(models.Model):
+
+    school = models.OneToOneField(
+        School,
+        on_delete=models.CASCADE,
+        related_name='analytics'
+    )
+
+    total_teachers = models.IntegerField(
+        default=0
+    )
+
+    total_students = models.IntegerField(
+        default=0
+    )
+
+    total_classes = models.IntegerField(
+        default=0
+    )
+
+    total_resources = models.IntegerField(
+        default=0
+    )
+
+    total_forum_posts = models.IntegerField(
+        default=0
+    )
+
+    total_game_sessions = models.IntegerField(
+        default=0
+    )
+
+    safeguarding_flags = models.IntegerField(
+        default=0
+    )
+
+    average_engagement = models.FloatField(
+        default=0
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    class Meta:
+
+        verbose_name_plural = (
+            'School Analytics Profiles'
+        )
+
+    def __str__(self):
+
+        return (
+            f"{self.school.name} analytics"
+        )

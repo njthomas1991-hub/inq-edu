@@ -39,7 +39,7 @@
                 <div class="image-flash"></div>
             </div>
             <div class="content">
-                {{ post.content|safe }}
+                {{ post.description|safe }}
             </div>
         </div>
     </div>
@@ -64,7 +64,7 @@
                             </div>
                         {% endif %}
                     </div>
-                    <div class="mt-2">{{ reply.content|safe }}</div>
+                    <div class="mt-2">{{ reply.description|safe }}</div>
                 </div>
             {% endfor %}
         </div>

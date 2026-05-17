@@ -1,120 +1,441 @@
 {% extends "core/base_teacher.html" %}
+
 {% load static %}
 {% load crispy_forms_tags %}
 
-{% block title %}Community Forum - Teacher Hub{% endblock %}
+{% block title %}
+Community Forum - Teacher Hub
+{% endblock %}
 
 {% block content %}
-<div class="container">
+
+<div class="container py-4">
+
+    <!-- HEADER -->
+
     <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+
         <div>
-            <h1 class="h3 mb-1">Community Forum</h1>
-            <p class="text-muted mb-0">Ask questions and share ideas with other teachers.</p>
+
+            <h1 class="h3 mb-1">
+
+                Community Forum
+
+            </h1>
+
+            <p class="text-muted mb-0">
+
+                Ask questions, share teaching ideas,
+                collaborate and support other educators.
+
+            </p>
+
         </div>
-        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#forumForm" aria-expanded="false">
-            <i class="fas fa-plus"></i> Start Discussion
+
+        <button
+            class="btn btn-primary"
+            data-bs-toggle="collapse"
+            data-bs-target="#forumForm"
+            aria-expanded="false"
+        >
+
+            <i class="fas fa-plus me-2"></i>
+
+            Start Discussion
+
         </button>
+
     </div>
+
+    <!-- CREATE POST -->
 
     <div class="collapse mb-4" id="forumForm">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">New Forum Post</h5>
-                <form method="post" enctype="multipart/form-data">
+
+        <div class="card shadow-sm border-0 rounded-4">
+
+            <div class="card-body p-4">
+
+                <h5 class="card-title mb-3">
+
+                    Create a Forum Post
+
+                </h5>
+
+                <form
+                    method="post"
+                    enctype="multipart/form-data"
+                >
+
                     {% csrf_token %}
+
                     {{ form|crispy }}
-                    <button class="btn btn-success" type="submit">Post</button>
+
+                    <!-- GUIDELINES -->
+
+                    <div class="alert alert-warning border-0 mt-4">
+
+                        <strong>
+
+                            Community & Professional Guidelines
+
+                        </strong>
+
+                        <p class="mb-2 mt-2">
+
+                            Forum discussions are reviewed regularly.
+
+                            Content containing offensive language,
+                            discrimination,
+                            safeguarding concerns,
+                            harassment,
+                            spam,
+                            copyright breaches
+                            or unprofessional conduct
+                            may be removed.
+
+                        </p>
+
+                        <p class="mb-0 small">
+
+                            Please communicate respectfully
+                            and professionally at all times.
+
+                        </p>
+
+                    </div>
+
+                    <!-- ACTION -->
+
+                    <div class="mt-4">
+
+                        <button
+                            class="btn btn-success"
+                            type="submit"
+                        >
+
+                            <i class="fas fa-paper-plane me-2"></i>
+
+                            Publish Post
+
+                        </button>
+
+                    </div>
+
                 </form>
-                <p class="small text-muted mt-3 mb-0">
-                    We welcome open and respectful discussion. Please note that this comments section is monitored. Any posts containing offensive language, harassment, hate speech, spam, personal attacks, or inappropriate content may be removed at our discretion.
-                </p>
+
             </div>
+
         </div>
+
     </div>
 
+    <!-- POSTS -->
+
     {% if posts %}
-        <div class="list-group shadow-sm">
+
+        <div class="d-flex flex-column gap-4">
+
             {% for post in posts %}
-                <div class="list-group-item">
-                    <div class="image-container mb-3">
-                        {% if post.image and "placeholder" in post.image.url %}
-                            <img class="card-img-top" src="{% static 'core/images/default.jpg' %}" alt="placeholder image">
-                        {% elif post.image %}
-                            <img class="card-img-top" src="{{ post.image.url }}" alt="{{ post.title }}">
-                        {% else %}
-                            <img class="card-img-top" src="{% static 'core/images/default.jpg' %}" alt="placeholder image">
-                        {% endif %}
-                        <div class="image-flash"></div>
-                    </div>
-                    <div class="d-flex w-100 justify-content-between align-items-start">
-                        <h5 class="mb-1">
-                            <a class="text-decoration-none" href="{% url 'teacher_forum_list_detail' post.id %}">
-                                {% if post.is_pinned %}<i class="fas fa-thumbtack text-warning"></i>{% endif %} {{ post.title }}
-                            </a>
-                        </h5>
-                        <div class="d-flex align-items-center gap-2">
-                            <small class="text-muted">{{ post.updated_at|date:"M d, Y" }}</small>
-                            {% if post.author == request.user or request.user.is_superuser %}
-                                <a href="{% url 'teacher_forum_list_edit' post.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <form method="post" action="{% url 'teacher_forum_list_delete' post.id %}" onsubmit="return confirm('Delete this discussion?');" style="display:inline;">
-                                    {% csrf_token %}
-                                    <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
-                                </form>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <p class="mb-1 text-muted">{{ post.content|truncatewords:24 }}</p>
-                    <small class="text-muted">By {{ post.author.get_full_name|default:post.author.username }} · {{ post.replies_count }} replies · {{ post.views }} views</small>
-                </div>
-            {% endfor %}
-        </div>
-        
-        <!-- Pagination -->
-        {% if is_paginated %}
-        <nav aria-label="Page navigation" class="mt-4">
-            <ul class="pagination justify-content-center">
-                {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page=1" aria-label="First">
-                            <span aria-hidden="true">&laquo;&laquo;</span>
-                        </a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                {% endif %}
-                
-                {% for num in page_obj.paginator.page_range %}
-                    {% if page_obj.number == num %}
-                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+
+                <div class="card shadow-sm border-0 rounded-4">
+
+                    <!-- IMAGE -->
+
+                    {% if post.image %}
+
+                        <img
+                            class="card-img-top rounded-top-4"
+                            src="{{ post.image.url }}"
+                            alt="{{ post.title }}"
+                        >
+
+                    {% else %}
+
+                        <img
+                            class="card-img-top rounded-top-4"
+                            src="{% static 'core/images/default.jpg' %}"
+                            alt="Default forum image"
+                        >
+
                     {% endif %}
-                {% endfor %}
-                
-                {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
+
+                    <!-- BODY -->
+
+                    <div class="card-body">
+
+                        <!-- TOP ROW -->
+
+                        <div class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-3">
+
+                            <div>
+
+                                <h4 class="mb-2">
+
+                                    <a
+                                        class="text-decoration-none"
+                                        href="{% url 'teacher_forum_detail' post.id %}"
+                                    >
+
+                                        {% if post.is_pinned %}
+
+                                            <i class="fas fa-thumbtack text-warning me-1"></i>
+
+                                        {% endif %}
+
+                                        {{ post.title }}
+
+                                    </a>
+
+                                </h4>
+
+                                <div class="small text-muted">
+
+                                    <strong>
+                                        Posted by:
+                                    </strong>
+
+                                    {{ post.author.get_full_name|default:post.author.username }}
+
+                                </div>
+
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2">
+
+                                {% if post.visibility == 'public' %}
+
+                                    <span class="badge bg-success">
+
+                                        Public
+
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-info">
+
+                                        School Only
+
+                                    </span>
+
+                                {% endif %}
+
+                                {% if post.is_locked %}
+
+                                    <span class="badge bg-danger">
+
+                                        Locked
+
+                                    </span>
+
+                                {% endif %}
+
+                                {% if post.is_pinned %}
+
+                                    <span class="badge bg-warning text-dark">
+
+                                        Pinned
+
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                        <!-- DESCRIPTION -->
+
+                        <p class="text-muted">
+
+                            {{ post.description|truncatewords:35 }}
+
+                        </p>
+
+                        <!-- ATTACHMENT -->
+
+                        {% if post.uploaded_file %}
+
+                            <div class="alert alert-light border small py-2">
+
+                                <i class="fas fa-paperclip text-primary me-1"></i>
+
+                                Attachment included
+
+                            </div>
+
+                        {% endif %}
+
+                        <!-- STATS -->
+
+                        <div class="small text-muted mb-3 d-flex flex-wrap gap-3">
+
+                            <span>
+
+                                <i class="fas fa-comments me-1"></i>
+
+                                {{ post.replies.count }}
+                                repl{{ post.replies.count|pluralize:"y,ies" }}
+
+                            </span>
+
+                            <span>
+
+                                <i class="fas fa-eye me-1"></i>
+
+                                {{ post.views }}
+                                view{{ post.views|pluralize }}
+
+                            </span>
+
+                            <span>
+
+                                <i class="fas fa-heart me-1"></i>
+
+                                {{ post.likes_count }}
+                                like{{ post.likes_count|pluralize }}
+
+                            </span>
+
+                            <span>
+
+                                <i class="fas fa-clock me-1"></i>
+
+                                {{ post.created_at|date:"M d, Y \\a\\t H:i" }}
+
+                            </span>
+
+                        </div>
+
+                        <!-- ACTIONS -->
+
+                        <div class="d-flex flex-wrap gap-2">
+
+                            <a
+                                href="{% url 'teacher_forum_detail' post.id %}"
+                                class="btn btn-sm btn-primary"
+                            >
+
+                                Open Discussion
+
+                            </a>
+
+                            {% if post.author == request.user or request.user.is_superuser %}
+
+                                <a
+                                    href="{% url 'teacher_forum_edit' post.id %}"
+                                    class="btn btn-sm btn-outline-primary"
+                                >
+
+                                    Edit
+
+                                </a>
+
+                                <form
+                                    method="post"
+                                    action="{% url 'teacher_forum_delete' post.id %}"
+                                    onsubmit="return confirm('Delete this discussion?');"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <button
+                                        class="btn btn-sm btn-outline-danger"
+                                        type="submit"
+                                    >
+
+                                        Delete
+
+                                    </button>
+
+                                </form>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+        <!-- PAGINATION -->
+
+        {% if is_paginated %}
+
+            <nav class="mt-5">
+
+                <ul class="pagination justify-content-center">
+
+                    {% if page_obj.has_previous %}
+
+                        <li class="page-item">
+
+                            <a
+                                class="page-link"
+                                href="?page={{ page_obj.previous_page_number }}"
+                            >
+
+                                Previous
+
+                            </a>
+
+                        </li>
+
+                    {% endif %}
+
+                    <li class="page-item active">
+
+                        <span class="page-link">
+
+                            {{ page_obj.number }}
+
+                        </span>
+
                     </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
-                            <span aria-hidden="true">&raquo;&raquo;</span>
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
+
+                    {% if page_obj.has_next %}
+
+                        <li class="page-item">
+
+                            <a
+                                class="page-link"
+                                href="?page={{ page_obj.next_page_number }}"
+                            >
+
+                                Next
+
+                            </a>
+
+                        </li>
+
+                    {% endif %}
+
+                </ul>
+
+            </nav>
+
         {% endif %}
+
     {% else %}
-        <div class="alert alert-info">No discussions yet. Start the first one!</div>
+
+        <div class="alert alert-info shadow-sm border-0">
+
+            No discussions have been posted yet.
+
+        </div>
+
     {% endif %}
+
 </div>
 
-{% block extra_js %}
-    {{ form.media }}
 {% endblock %}
+
+{% block extra_js %}
+
+    {{ form.media }}
+
 {% endblock %}

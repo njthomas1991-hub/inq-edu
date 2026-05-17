@@ -1,134 +1,420 @@
 {% extends "core/base_teacher.html" %}
+
 {% load static %}
 {% load crispy_forms_tags %}
 
-{% block title %}Teaching Resources - Teacher Hub{% endblock %}
+{% block title %}
+Teaching Resources - Teacher Hub
+{% endblock %}
 
 {% block content %}
-<div class="container">
+
+<div class="container py-4">
+
+    <!-- HEADER -->
+
     <div class="d-flex flex-wrap align-items-center justify-content-between mb-4">
+
         <div>
-            <h1 class="h3 mb-1">Teaching Resources</h1>
-            <p class="text-muted mb-0">Shared resources from teachers.</p>
+
+            <h1 class="h3 mb-1">
+
+                Teaching Resources
+
+            </h1>
+
+            <p class="text-muted mb-0">
+
+                Share worksheets, presentations,
+                lesson ideas and classroom resources
+                with other educators.
+
+            </p>
+
         </div>
-        <button class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#resourceForm" aria-expanded="false">
-            <i class="fas fa-plus"></i> Share a Resource
+
+        <button
+            class="btn btn-primary"
+            data-bs-toggle="collapse"
+            data-bs-target="#resourceForm"
+            aria-expanded="false"
+        >
+
+            <i class="fas fa-plus me-2"></i>
+
+            Share a Resource
+
         </button>
+
     </div>
+
+    <!-- RESOURCE FORM -->
 
     <div class="collapse mb-4" id="resourceForm">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h5 class="card-title">Add a Teaching Resource</h5>
-                <form method="post" enctype="multipart/form-data">
+
+        <div class="card shadow-sm border-0 rounded-4">
+
+            <div class="card-body p-4">
+
+                <h5 class="card-title mb-3">
+
+                    Add a Teaching Resource
+
+                </h5>
+
+                <form
+                    method="post"
+                    enctype="multipart/form-data"
+                >
+
                     {% csrf_token %}
+
                     {{ form|crispy }}
-                    <div class="mt-3">
-                        <button class="btn btn-success" type="submit">Save Resource</button>
+
+                    <!-- GUIDELINES -->
+
+                    <div class="alert alert-warning border-0 mt-4">
+
+                        <strong>
+
+                            Community & Professional Guidelines
+
+                        </strong>
+
+                        <p class="mb-2 mt-2">
+
+                            All uploaded resources are reviewed regularly.
+
+                            Content that breaches safeguarding,
+                            equality and diversity,
+                            copyright,
+                            or professional conduct expectations
+                            may be removed.
+
+                        </p>
+
+                        <p class="mb-0 small">
+
+                            Please ensure all uploaded files
+                            are appropriate for educational use.
+
+                        </p>
+
                     </div>
+
+                    <div class="mt-4">
+
+                        <button
+                            class="btn btn-success"
+                            type="submit"
+                        >
+
+                            <i class="fas fa-save me-2"></i>
+
+                            Save Resource
+
+                        </button>
+
+                    </div>
+
                 </form>
+
             </div>
+
         </div>
+
     </div>
 
+    <!-- RESOURCE LIST -->
+
     {% if resources %}
+
         <div class="row g-4">
+
             {% for resource in resources %}
+
                 <div class="col-md-6 col-lg-4">
-                    <div class="card h-100 shadow-sm">
+
+                    <div class="card h-100 shadow-sm border-0 rounded-4">
+
+                        <!-- IMAGE -->
+
                         <div class="image-container">
-                            {% if resource.image and "placeholder" in resource.image.url %}
-                                <img class="card-img-top" src="{% static 'core/images/default.jpg' %}" alt="placeholder image">
-                            {% elif resource.image %}
-                                <img class="card-img-top" src="{{ resource.image.url }}" alt="{{ resource.title }}">
+
+                            {% if resource.image %}
+
+                                <img
+                                    class="card-img-top rounded-top-4"
+                                    src="{{ resource.image.url }}"
+                                    alt="{{ resource.title }}"
+                                >
+
                             {% else %}
-                                <img class="card-img-top" src="{% static 'core/images/default.jpg' %}" alt="placeholder image">
+
+                                <img
+                                    class="card-img-top rounded-top-4"
+                                    src="{% static 'core/images/default.jpg' %}"
+                                    alt="Default resource image"
+                                >
+
                             {% endif %}
-                            <div class="image-flash"></div>
+
                         </div>
-                        <div class="card-body">
+
+                        <!-- BODY -->
+
+                        <div class="card-body d-flex flex-column">
+
+                            <!-- TITLE -->
+
                             <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h5 class="card-title">{{ resource.title }}</h5>
-                                <div class="d-flex gap-2">
-                                    <span class="badge bg-secondary">{{ resource.get_resource_type_display }}</span>
+
+                                <h5 class="card-title mb-0">
+
+                                    {{ resource.title }}
+
+                                </h5>
+
+                                <div class="d-flex gap-2 ms-2">
+
+                                    <span class="badge bg-secondary">
+
+                                        {{ resource.resource_type }}
+
+                                    </span>
+
                                     {% if resource.visibility == 'public' %}
-                                        <span class="badge bg-success">Public</span>
+
+                                        <span class="badge bg-success">
+
+                                            Public
+
+                                        </span>
+
                                     {% else %}
-                                        <span class="badge bg-info">School Only</span>
+
+                                        <span class="badge bg-info">
+
+                                            School Only
+
+                                        </span>
+
                                     {% endif %}
+
                                 </div>
+
                             </div>
-                            <p class="card-text text-muted">{{ resource.excerpt|default:resource.content|truncatewords:25 }}</p>
-                            <div class="small text-muted">Shared by {{ resource.author.get_full_name|default:resource.author.username }}</div>
-                            <div class="small text-muted">
-                                {% if resource.file %}<i class="fas fa-paperclip text-primary"></i> Attachment | {% endif %}
-                                {{ resource.comments.count }} comment{{ resource.comments.count|pluralize }}
+
+                            <!-- DESCRIPTION -->
+
+                            <p class="card-text text-muted small">
+
+                                {{ resource.description|truncatewords:25 }}
+
+                            </p>
+
+                            <!-- META -->
+
+                            <div class="small text-muted mb-3">
+
+                                <div>
+
+                                    <strong>
+                                        Shared by:
+                                    </strong>
+
+                                    {{ resource.author.get_full_name|default:resource.author.username }}
+
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        Subject:
+                                    </strong>
+
+                                    {{ resource.subject|default:"General" }}
+
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        Key Stage:
+                                    </strong>
+
+                                    {{ resource.year_ks|default:"-" }}
+
+                                </div>
+
+                                <div>
+
+                                    <strong>
+                                        Uploaded:
+                                    </strong>
+
+                                    {{ resource.created_at|date:"M d, Y \\a\\t H:i" }}
+
+                                </div>
+
                             </div>
-                        </div>
-                        <div class="card-footer d-flex justify-content-between align-items-center">
-                            <small class="text-muted">{{ resource.created_at|date:"M d, Y" }}</small>
-                            <div class="d-flex gap-2">
-                                <a class="btn btn-sm btn-primary" href="{% url 'teacher_resource_detail' resource.slug %}">View</a>
+
+                            <!-- FILE -->
+
+                            {% if resource.uploaded_file %}
+
+                                <div class="alert alert-light border small py-2">
+
+                                    <i class="fas fa-paperclip text-primary me-1"></i>
+
+                                    File attached
+
+                                </div>
+
+                            {% endif %}
+
+                            <!-- COMMENTS -->
+
+                            <div class="small text-muted mb-3">
+
+                                <i class="fas fa-comments me-1"></i>
+
+                                {{ resource.comments.count }}
+                                comment{{ resource.comments.count|pluralize }}
+
+                            </div>
+
+                            <!-- ACTIONS -->
+
+                            <div class="mt-auto d-flex flex-wrap gap-2">
+
+                                <a
+                                    class="btn btn-sm btn-primary"
+                                    href="{% url 'teacher_resource_detail' resource.slug %}"
+                                >
+
+                                    View
+
+                                </a>
+
                                 {% if resource.author == request.user or request.user.is_superuser %}
-                                    <a class="btn btn-sm btn-outline-primary" href="{% url 'teacher_resource_edit' resource.slug %}">Edit</a>
-                                    <form method="post" action="{% url 'teacher_resource_delete' resource.slug %}" onsubmit="return confirm('Delete this resource?');" style="display:inline;">
+
+                                    <a
+                                        class="btn btn-sm btn-outline-primary"
+                                        href="{% url 'teacher_resource_edit' resource.slug %}"
+                                    >
+
+                                        Edit
+
+                                    </a>
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'teacher_resource_delete' resource.slug %}"
+                                        onsubmit="return confirm('Delete this resource?');"
+                                    >
+
                                         {% csrf_token %}
-                                        <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
+
+                                        <button
+                                            class="btn btn-sm btn-outline-danger"
+                                            type="submit"
+                                        >
+
+                                            Delete
+
+                                        </button>
+
                                     </form>
+
                                 {% endif %}
+
                             </div>
+
                         </div>
+
                     </div>
+
                 </div>
+
             {% endfor %}
+
         </div>
-        
-        <!-- Pagination -->
+
+        <!-- PAGINATION -->
+
         {% if is_paginated %}
-        <nav aria-label="Page navigation" class="mt-4">
-            <ul class="pagination justify-content-center">
-                {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page=1" aria-label="First">
-                            <span aria-hidden="true">&laquo;&laquo;</span>
-                        </a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>
-                {% endif %}
-                
-                {% for num in page_obj.paginator.page_range %}
-                    {% if page_obj.number == num %}
-                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-                    {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-                        <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+
+            <nav class="mt-5">
+
+                <ul class="pagination justify-content-center">
+
+                    {% if page_obj.has_previous %}
+
+                        <li class="page-item">
+
+                            <a
+                                class="page-link"
+                                href="?page={{ page_obj.previous_page_number }}"
+                            >
+
+                                Previous
+
+                            </a>
+
+                        </li>
+
                     {% endif %}
-                {% endfor %}
-                
-                {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
+
+                    <li class="page-item active">
+
+                        <span class="page-link">
+
+                            {{ page_obj.number }}
+
+                        </span>
+
                     </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}" aria-label="Last">
-                            <span aria-hidden="true">&raquo;&raquo;</span>
-                        </a>
-                    </li>
-                {% endif %}
-            </ul>
-        </nav>
+
+                    {% if page_obj.has_next %}
+
+                        <li class="page-item">
+
+                            <a
+                                class="page-link"
+                                href="?page={{ page_obj.next_page_number }}"
+                            >
+
+                                Next
+
+                            </a>
+
+                        </li>
+
+                    {% endif %}
+
+                </ul>
+
+            </nav>
+
         {% endif %}
+
     {% else %}
-        <div class="alert alert-info">No resources yet. Be the first to share one.</div>
+
+        <div class="alert alert-info shadow-sm border-0">
+
+            No teaching resources have been uploaded yet.
+
+        </div>
+
     {% endif %}
+
 </div>
 
-{% block extra_js %}
-    {{ form.media }}
 {% endblock %}
+
+{% block extra_js %}
+
+    {{ form.media }}
+
 {% endblock %}
