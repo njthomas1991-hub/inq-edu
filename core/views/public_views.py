@@ -10,9 +10,16 @@ def about_page_view(request):
     return render(request, "core/public/about.html")
 
 
-def kindlewick_page_view(request):
-    return render(request, "core/public/kindlewick.html")
+from django.contrib.auth.decorators import login_required
 
+
+@login_required
+def kindlewick_page_view(request):
+
+    return render(
+        request,
+        "core/public/kindlewick.html"
+    )
 
 def questopia_page_view(request):
     return render(request, "core/public/questopia.html")
