@@ -1,50 +1,140 @@
 {% extends "core/base.html" %}
 
+{% block title %}
+My Classes
+{% endblock %}
+
 {% block content %}
 
-<div class="container">
+<div class="container py-4">
 
-    <h1>My Classes</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-    <a href="{% url 'create_class' %}">
-        Create Class
-    </a>
+        <div>
 
-    <hr>
+            <h1 class="mb-1">
+                My Classes
+            </h1>
 
-    {% for class_obj in classes %}
-
-        <div class="card">
-
-            <h3>{{ class_obj.name }}</h3>
-
-            <p>
-                Subject: {{ class_obj.subject }}
+            <p class="text-muted mb-0">
+                Manage your classes and students.
             </p>
-
-            <p>
-                Key Stage: {{ class_obj.year_ks }}
-            </p>
-
-            <a href="{% url 'edit_class' class_obj.id %}">
-                Edit
-            </a>
-
-            <a href="{% url 'delete_class' class_obj.id %}">
-                Delete
-            </a>
-
-            <a href="{% url 'add_student_to_class' class_obj.id %}">
-                Add Student
-            </a>
 
         </div>
 
-    {% empty %}
+        <a
+            href="{% url 'create_class' %}"
+            class="btn btn-primary"
+        >
+            Create Class
+        </a>
 
-        <p>No classes created yet.</p>
+    </div>
 
-    {% endfor %}
+    {% if classes %}
+
+        <div class="row g-4">
+
+            {% for class_obj in classes %}
+
+                <div class="col-lg-6">
+
+                    <div class="card shadow-sm border-0 h-100">
+
+                        <div class="card-body">
+
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+
+                                <div>
+
+                                    <h3 class="h5 mb-1">
+                                        {{ class_obj.name }}
+                                    </h3>
+
+                                    <p class="text-muted mb-0">
+                                        {{ class_obj.subject|title }}
+                                    </p>
+
+                                </div>
+
+                                <span class="badge bg-secondary">
+                                    {{ class_obj.year_ks }}
+                                </span>
+
+                            </div>
+
+                            <div class="mb-4">
+
+                                <a
+                                    href="{% url 'class_detail' class_obj.id %}"
+                                    class="btn btn-sm btn-outline-primary"
+                                >
+                                    View Class
+                                </a>
+
+                                <a
+                                    href="{% url 'add_student_to_class' class_obj.id %}"
+                                    class="btn btn-sm btn-success"
+                                >
+                                    Add Student
+                                </a>
+
+                            </div>
+
+                            <div class="border-top pt-3 d-flex gap-3">
+
+                                <a
+                                    href="{% url 'edit_class' class_obj.id %}"
+                                    class="text-decoration-none"
+                                >
+                                    Edit
+                                </a>
+
+                                <a
+                                    href="{% url 'delete_class' class_obj.id %}"
+                                    class="text-danger text-decoration-none"
+                                >
+                                    Delete
+                                </a>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="card border-0 shadow-sm">
+
+            <div class="card-body py-5 text-center">
+
+                <h3 class="h5 mb-3">
+                    No classes created yet
+                </h3>
+
+                <p class="text-muted mb-4">
+                    Create your first class to begin adding students and resources.
+                </p>
+
+                <a
+                    href="{% url 'create_class' %}"
+                    class="btn btn-primary"
+                >
+                    Create Your First Class
+                </a>
+
+            </div>
+
+        </div>
+
+    {% endif %}
 
 </div>
 

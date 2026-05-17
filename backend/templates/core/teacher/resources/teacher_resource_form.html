@@ -1,176 +1,599 @@
 {% extends "core/base_teacher.html" %}
+
 {% load crispy_forms_tags %}
 
-{% block title %}Edit Resource - Teaching Resources{% endblock %}
+{% block title %}
+Edit Resource - Teaching Resources
+{% endblock %}
 
 {% block content %}
 
-<div class="teacher-resource-main d-flex justify-content-center">
-    <div class="summernote-wrapper">
-        <a class="btn btn-link px-0 mb-3" href="{% url 'teacher_resource_detail' resource.slug %}">
-            <i class="fas fa-arrow-left"></i> Back to Resource
-        </a>
+<div class="container py-4">
 
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h1 class="h4 mb-4">Edit Teaching Resource</h1>
+    <div class="teacher-resource-main d-flex justify-content-center">
 
-                <form method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
+        <div class="summernote-wrapper w-100">
 
-                    <!-- Description Field -->
-                    <div class="mb-3">
-                        <label for="summernote-description" class="form-label">Description</label>
-                        {% if form.description %}
-                            <textarea id="summernote-description" name="description" class="summernote-editor form-control" rows="8">{{ form.description.value }}</textarea>
-                        {% else %}
-                            <div class="alert alert-warning">Description field missing from form.</div>
-                        {% endif %}
+            <!-- BACK -->
+
+            <a
+                class="btn btn-link px-0 mb-3 text-decoration-none"
+                href="{% url 'teacher_resource_detail' resource.slug %}"
+            >
+
+                <i class="fas fa-arrow-left"></i>
+
+                Back to Resource
+
+            </a>
+
+            <!-- CARD -->
+
+            <div class="card shadow-sm border-0 rounded-4">
+
+                <div class="card-body p-4 p-lg-5">
+
+                    <!-- HEADING -->
+
+                    <div class="mb-4">
+
+                        <h1 class="h3 mb-2">
+
+                            Edit Teaching Resource
+
+                        </h1>
+
+                        <p class="text-muted mb-0">
+
+                            Update your teaching resource,
+                            supporting files and discussion content.
+
+                        </p>
+
                     </div>
 
-                    <!-- Notes Field -->
-                    <div class="mb-3">
-                        <label for="summernote-notes" class="form-label">Notes</label>
-                        {% if form.notes %}
-                            <textarea id="summernote-notes" name="notes" class="summernote-editor form-control" rows="8">{% if form.notes.value %}{{ form.notes.value }}{% endif %}</textarea>
-                        {% else %}
-                            <div class="alert alert-warning">Notes field missing from form.</div>
-                        {% endif %}
-                    </div>
+                    <!-- FORM -->
 
-                    <!-- Multi-file Upload Field -->
-                    <div class="mb-3">
-                        <label for="resource-files" class="form-label">Upload Files</label>
-                        <input type="file" name="files" id="resource-files" class="form-control" multiple>
-                        <small class="text-muted d-block mt-1">
-                            {% if resource.files.exists %}
-                                Current files:
-                                <ul>
-                                    {% for f in resource.files.all %}
-                                        <li><a href="{{ f.file.url }}" target="_blank">{{ f.file.name }}</a></li>
-                                    {% endfor %}
-                                </ul>
+                    <form
+                        method="post"
+                        enctype="multipart/form-data"
+                    >
+
+                        {% csrf_token %}
+
+                        <!-- TITLE -->
+
+                        <div class="mb-4">
+
+                            {{ form.title|as_crispy_field }}
+
+                        </div>
+
+                        <!-- DESCRIPTION -->
+
+                        <div class="mb-4">
+
+                            <label
+                                for="summernote-description"
+                                class="form-label fw-semibold"
+                            >
+
+                                Description
+
+                            </label>
+
+                            {% if form.description %}
+
+                                <textarea
+                                    id="summernote-description"
+                                    name="description"
+                                    class="summernote-editor form-control"
+                                    rows="8"
+                                >{{ form.description.value|default_if_none:"" }}</textarea>
+
+                            {% else %}
+
+                                <div class="alert alert-warning">
+
+                                    Description field missing from form.
+
+                                </div>
+
                             {% endif %}
-                        </small>
-                        <div id="file-previews" class="mt-2"></div>
-                    </div>
 
-                    <!-- Submit Buttons -->
-                    <div class="mt-4 d-flex gap-2">
-                        <button class="btn btn-primary" type="submit">Save Changes</button>
-                        <a href="{% url 'teacher_resource_detail' resource.slug %}" class="btn btn-secondary">Cancel</a>
-                    </div>
-                </form>
+                        </div>
+
+                        <!-- NOTES -->
+
+                        {% if form.notes %}
+
+                            <div class="mb-4">
+
+                                <label
+                                    for="summernote-notes"
+                                    class="form-label fw-semibold"
+                                >
+
+                                    Notes
+
+                                </label>
+
+                                <textarea
+                                    id="summernote-notes"
+                                    name="notes"
+                                    class="summernote-editor form-control"
+                                    rows="8"
+                                >{{ form.notes.value|default_if_none:"" }}</textarea>
+
+                            </div>
+
+                        {% endif %}
+
+                        <!-- FORM FIELDS -->
+
+                        <div class="row g-3 mb-4">
+
+                            <div class="col-md-6">
+
+                                {{ form.resource_type|as_crispy_field }}
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                {{ form.year_ks|as_crispy_field }}
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                {{ form.subject|as_crispy_field }}
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                {{ form.status|as_crispy_field }}
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                {{ form.visibility|as_crispy_field }}
+
+                            </div>
+
+                            <div class="col-md-6 d-flex align-items-center pt-4">
+
+                                <div class="form-check">
+
+                                    {{ form.featured }}
+
+                                    <label
+                                        class="form-check-label ms-2"
+                                    >
+
+                                        Featured Resource
+
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- FILES -->
+
+                        <div class="mb-4">
+
+                            <label
+                                for="resource-files"
+                                class="form-label fw-semibold"
+                            >
+
+                                Upload Files
+
+                            </label>
+
+                            <input
+                                type="file"
+                                name="files"
+                                id="resource-files"
+                                class="form-control"
+                                multiple
+                            >
+
+                            <div class="form-text mt-2">
+
+                                Upload worksheets, PDFs,
+                                PowerPoints, ZIP files,
+                                images or supporting materials.
+
+                            </div>
+
+                        </div>
+
+                        <!-- EXISTING FILES -->
+
+                        {% if resource.files.exists %}
+
+                            <div class="mb-4">
+
+                                <h6 class="mb-3">
+
+                                    Existing Files
+
+                                </h6>
+
+                                <ul class="list-group">
+
+                                    {% for f in resource.files.all %}
+
+                                        <li class="list-group-item">
+
+                                            <a
+                                                href="{{ f.file.url }}"
+                                                target="_blank"
+                                            >
+
+                                                {{ f.file.name }}
+
+                                            </a>
+
+                                        </li>
+
+                                    {% endfor %}
+
+                                </ul>
+
+                            </div>
+
+                        {% endif %}
+
+                        <!-- FILE PREVIEWS -->
+
+                        <div
+                            id="file-previews"
+                            class="mb-4"
+                        ></div>
+
+                        <!-- MODERATION NOTICE -->
+
+                        <div class="alert alert-warning border-0 shadow-sm mb-4">
+
+                            <div class="d-flex gap-3">
+
+                                <div class="fs-3">
+
+                                    ⚠️
+
+                                </div>
+
+                                <div>
+
+                                    <h5 class="mb-2">
+
+                                        Community Guidelines
+
+                                    </h5>
+
+                                    <p class="mb-2">
+
+                                        All uploaded resources and
+                                        discussion posts are reviewed
+                                        regularly by moderators.
+
+                                    </p>
+
+                                    <ul class="mb-2">
+
+                                        <li>
+                                            Follow safeguarding policies
+                                        </li>
+
+                                        <li>
+                                            Respect equality and diversity
+                                            guidance
+                                        </li>
+
+                                        <li>
+                                            Avoid copyrighted content
+                                        </li>
+
+                                        <li>
+                                            Maintain professional conduct
+                                        </li>
+
+                                    </ul>
+
+                                    <p class="small text-muted mb-0">
+
+                                        Content may be edited,
+                                        removed or restricted if it
+                                        breaches platform policy.
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- ACTIONS -->
+
+                        <div class="d-flex flex-wrap gap-2">
+
+                            <button
+                                class="btn btn-primary px-4"
+                                type="submit"
+                            >
+
+                                <i class="fas fa-save me-2"></i>
+
+                                Save Changes
+
+                            </button>
+
+                            <a
+                                href="{% url 'teacher_resource_detail' resource.slug %}"
+                                class="btn btn-outline-secondary px-4"
+                            >
+
+                                Cancel
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
 
+{% endblock %}
+
 {% block extra_js %}
-    {{ form.media }}
 
-    <style>
-        /* Responsive Summernote setup */
-        .summernote-wrapper {
-            width: 100%;
-            max-width: 662.67px;
-            margin: 0 auto;
-        }
+{{ form.media }}
 
-        .summernote-wrapper .note-editor,
-        .summernote-wrapper .note-toolbar,
-        .summernote-wrapper .note-editable {
-            width: 100% !important;
-            max-width: 100% !important;
-            box-sizing: border-box;
-        }
+<style>
 
-        .summernote-wrapper .note-editor {
-            display: flex;
-            flex-direction: column;
-        }
+.summernote-wrapper {
 
-        .summernote-wrapper .note-editable {
-            height: 300px !important;
-            overflow-y: auto !important;
-        }
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+}
 
-        .summernote-wrapper .note-editable img,
-        .summernote-wrapper .note-editable table {
-            max-width: 100% !important;
-            height: auto !important;
-            display: block !important;
-        }
+.note-editor,
+.note-toolbar,
+.note-editable {
 
-        @media (max-width: 576px) {
-            .summernote-wrapper .note-editable {
-                height: 250px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+}
+
+.note-editor {
+
+    display: flex;
+    flex-direction: column;
+}
+
+.note-editable {
+
+    height: 300px !important;
+    overflow-y: auto !important;
+}
+
+.note-editable img,
+.note-editable table {
+
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+#file-previews img {
+
+    max-width: 120px;
+    border-radius: 8px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 576px) {
+
+    .note-editable {
+
+        height: 220px !important;
+    }
+}
+
+</style>
+
+<script>
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function () {
+
+        // SUMMERNOTE
+
+        $('.summernote-editor').each(
+            function () {
+
+                try {
+
+                    $(this).summernote({
+
+                        height: 300,
+
+                        minHeight: 300,
+
+                        maxHeight: 400,
+
+                        disableResizeEditor: true,
+
+                        toolbar: [
+
+                            ['style', ['style']],
+
+                            [
+                                'font',
+                                [
+                                    'bold',
+                                    'italic',
+                                    'underline',
+                                    'clear'
+                                ]
+                            ],
+
+                            [
+                                'fontname',
+                                ['fontname']
+                            ],
+
+                            [
+                                'fontsize',
+                                ['fontsize']
+                            ],
+
+                            [
+                                'color',
+                                ['color']
+                            ],
+
+                            [
+                                'para',
+                                [
+                                    'ul',
+                                    'ol',
+                                    'paragraph',
+                                    'height'
+                                ]
+                            ],
+
+                            [
+                                'table',
+                                ['table']
+                            ],
+
+                            [
+                                'insert',
+                                [
+                                    'link',
+                                    'picture',
+                                    'video'
+                                ]
+                            ],
+
+                            [
+                                'view',
+                                [
+                                    'fullscreen',
+                                    'codeview',
+                                    'help'
+                                ]
+                            ],
+                        ],
+                    });
+
+                } catch (e) {
+
+                    console.error(
+                        'Summernote error:',
+                        e
+                    );
+                }
             }
-        }
+        );
 
-        /* Preview thumbnails */
-        #file-previews img {
-            max-width: 100px;
-            margin-right: 10px;
-            margin-bottom: 10px;
-            display: inline-block;
-        }
-    </style>
+        // FILE PREVIEWS
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize Summernote editors
-        $('.summernote-editor').each(function() {
-            try {
-                $(this).summernote('destroy');
-                $(this).summernote({
-                    height: 300,
-                    minHeight: 300,
-                    maxHeight: 300,
-                    disableResizeEditor: true,
-                    toolbar: [
-                        ['style', ['style']],
-                        ['font', ['bold','italic','underline','clear']],
-                        ['fontname', ['fontname']],
-                        ['fontsize', ['fontsize']],
-                        ['color', ['color']],
-                        ['para', ['ul','ol','paragraph','height']],
-                        ['table', ['table']],
-                        ['insert', ['link','picture','video']],
-                        ['view', ['fullscreen','codeview','help']]
-                    ]
-                });
-            } catch (e) {
-                console.error('[DEBUG] Summernote editor initialization error:', e);
-            }
-        });
+        const fileInput =
+            document.getElementById(
+                'resource-files'
+            );
 
-        // Multi-file preview
-        const fileInput = document.getElementById('resource-files');
-        const previews = document.getElementById('file-previews');
+        const previews =
+            document.getElementById(
+                'file-previews'
+            );
 
         if (fileInput) {
-            fileInput.addEventListener('change', function() {
-                previews.innerHTML = '';
-                Array.from(this.files).forEach(file => {
-                    if (file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            const img = document.createElement('img');
-                            img.src = e.target.result;
-                            previews.appendChild(img);
+
+            fileInput.addEventListener(
+                'change',
+                function () {
+
+                    previews.innerHTML = '';
+
+                    Array.from(this.files).forEach(
+                        file => {
+
+                            if (
+                                file.type.startsWith(
+                                    'image/'
+                                )
+                            ) {
+
+                                const reader =
+                                    new FileReader();
+
+                                reader.onload =
+                                    function (e) {
+
+                                        const img =
+                                            document.createElement(
+                                                'img'
+                                            );
+
+                                        img.src =
+                                            e.target.result;
+
+                                        previews.appendChild(
+                                            img
+                                        );
+                                    };
+
+                                reader.readAsDataURL(
+                                    file
+                                );
+
+                            } else {
+
+                                const item =
+                                    document.createElement(
+                                        'div'
+                                    );
+
+                                item.className =
+                                    'small text-muted mb-1';
+
+                                item.textContent =
+                                    file.name;
+
+                                previews.appendChild(
+                                    item
+                                );
+                            }
                         }
-                        reader.readAsDataURL(file);
-                    } else {
-                        const p = document.createElement('p');
-                        p.textContent = file.name;
-                        previews.appendChild(p);
-                    }
-                });
-            });
+                    );
+                }
+            );
         }
-    });
-    </script>
-{% endblock %}
+    }
+);
+
+</script>
 
 {% endblock %}

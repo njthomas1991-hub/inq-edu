@@ -7,8 +7,10 @@
     <div class="mb-4">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">
             <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-secondary btn-sm">← Back to Dashboard</a>
-            <a href="{% url 'class_analytics' class_obj.id %}" class="btn btn-outline-primary btn-sm">
-                <i class="fas fa-chart-bar"></i> Class Analytics
+            <a href="#"
+                class="btn btn-outline-secondary btn-sm disabled"
+            >
+                Analytics Coming Soon
             </a>
         </div>
         <h2 class="mb-1">{{ class_obj.name }}</h2>
@@ -23,7 +25,11 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-white d-flex justify-content-between align-items-center">
                     <strong>Students ({{ students.count }})</strong>
-                    <a href="{% url 'student_signup_guided' %}?class_id={{ class_obj.id }}" class="btn btn-primary btn-sm">+ Add Student</a>
+                    <a href="{% url 'add_student_to_class' class_obj.id %}"
+                        class="btn btn-primary btn-sm"
+                    >
+                        + Add Student
+                    </a>
                 </div>
                 <div class="card-body">
                     {% if students %}
@@ -35,6 +41,7 @@
                                         <th>Username</th>
                                         <th>Password</th>
                                         <th>Date Joined</th>
+                                        <th>Game Stats</th> 
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -59,6 +66,28 @@
                                                 {% endif %}
                                             </td>
                                             <td>{{ enrollment.date_joined|date:"M d, Y" }}</td>
+                                            <td>
+
+                                                <div class="small">
+
+                                                    <div>
+                                                        XP:
+                                                        {{ enrollment.student.total_xp|default:"0" }}
+                                                    </div>
+
+                                                    <div>
+                                                        Level:
+                                                        {{ enrollment.student.level|default:"1" }}
+                                                    </div>
+
+                                                    <div>
+                                                        Streak:
+                                                        {{ enrollment.student.streak|default:"0" }}
+                                                    </div>
+
+                                                </div>
+
+                                                >
                                             <td>
                                                 <div class="d-flex gap-1">
                                                     <a class="btn btn-sm btn-outline-success" title="View student analytics" href="{% url 'student_analytics' class_obj.id enrollment.student.id %}">
@@ -119,7 +148,20 @@
                             </table>
                         </div>
                     {% else %}
-                        <p class="text-muted mb-0">No students enrolled in this class yet.</p>
+                        <div class="text-center py-4">
+
+    <p class="text-muted mb-3">
+        No students enrolled in this class yet.
+    </p>
+
+    <a
+        href="{% url 'add_student_to_class' class_obj.id %}"
+        class="btn btn-primary btn-sm"
+    >
+        Add First Student
+    </a>
+
+</div>
                     {% endif %}
                 </div>
             </div>

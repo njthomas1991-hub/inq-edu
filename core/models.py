@@ -177,22 +177,153 @@ class User(AbstractUser):
         related_name='users'
     )
 
+    # =====================================================
+    # PROFILE
+    # =====================================================
+
     display_name = models.CharField(
         max_length=255,
         blank=True
     )
 
-    bio = models.TextField(blank=True, null=True)
+    bio = models.TextField(
+        blank=True,
+        null=True
+    )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    profile_image = models.ImageField(
+        upload_to='profile_images/',
+        blank=True,
+        null=True
+    )
+
+    # =====================================================
+    # STUDENT LOGIN SUPPORT
+    # =====================================================
+
+    plain_password = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Temporary readable classroom password."
+    )
+
+    # =====================================================
+    # GAMIFICATION
+    # =====================================================
+
+    total_xp = models.IntegerField(
+        default=0
+    )
+
+    level = models.IntegerField(
+        default=1
+    )
+
+    streak = models.IntegerField(
+        default=0
+    )
+
+    tokens = models.IntegerField(
+        default=0
+    )
+
+    achievements = models.JSONField(
+        default=list,
+        blank=True
+    )
+
+    # =====================================================
+    # ACTIVITY
+    # =====================================================
+
+    last_active = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    # =====================================================
+    # META
+    # =====================================================
 
     class Meta:
+
         ordering = ['username']
 
+    # =====================================================
+    # METHODS
+    # =====================================================
+
     def __str__(self):
+
         return f"{self.username} ({self.role})"
 
+    @property
+    def full_name(self):
 
+        full = (
+            f"{self.first_name} "
+            f"{self.last_name}"
+        ).strip()
+
+        return (
+            full
+            if full
+            else self.username
+        )
+
+    @property
+    def initials(self):
+
+        first = (
+            self.first_name[:1]
+            if self.first_name
+            else ""
+        )
+
+        last = (
+            self.last_name[:1]
+            if self.last_name
+            else ""
+        )
+
+        return (
+            f"{first}{last}"
+        ).upper()
+
+    def add_xp(self, amount):
+
+        self.total_xp += amount
+
+        self.level = max(
+            1,
+            (self.total_xp // 100) + 1
+        )
+
+        self.save()
+
+    def add_tokens(self, amount):
+
+        self.tokens += amount
+        self.save()
+
+    def increment_streak(self):
+
+        self.streak += 1
+        self.save()
+
+    def reset_streak(self):
+
+        self.streak = 0
+        self.save()
 # =====================================================
 # AVATAR MODEL
 # =====================================================
@@ -446,6 +577,40 @@ class TeachingResource(models.Model):
 
         super().save(*args, **kwargs)
 
+        description = models.TextField(
+    blank=True
+)
+
+uploaded_file = models.FileField(
+    upload_to='resources/uploads/',
+    blank=True,
+    null=True
+)
+
+allow_comments = models.BooleanField(
+    default=True
+)
+
+likes_count = models.IntegerField(
+    default=0
+)
+
+updated_by = models.ForeignKey(
+    User,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name='updated_resources'
+)
+
+moderation_notes = models.TextField(
+    blank=True
+)
+
+is_flagged = models.BooleanField(
+    default=False
+)
+
 
 # =====================================================
 # RESOURCE COMMENTS
@@ -473,7 +638,37 @@ class ResourceComment(models.Model):
     def __str__(self):
         return f"Comment by {self.author.username}"
 
+    class ResourceLike(models.Model):
 
+        resource = models.ForeignKey(
+        TeachingResource,
+        on_delete=models.CASCADE,
+        related_name='resource_likes'
+    )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+
+        unique_together = (
+            'resource',
+            'user',
+        )
+
+    def __str__(self):
+
+        return (
+            f"{self.user.username} "
+            f"liked {self.resource.title}"
+        )
+    
 # =====================================================
 # FORUM POSTS
 # =====================================================
@@ -510,6 +705,32 @@ class ForumPost(models.Model):
 
     def __str__(self):
         return self.title
+    
+    description = models.TextField(
+    blank=True
+)
+
+uploaded_file = models.FileField(
+    upload_to='forum/uploads/',
+    blank=True,
+    null=True
+)
+
+likes_count = models.IntegerField(
+    default=0
+)
+
+allow_replies = models.BooleanField(
+    default=True
+)
+
+is_flagged = models.BooleanField(
+    default=False
+)
+
+moderation_notes = models.TextField(
+    blank=True
+)
 
 
 # =====================================================
@@ -538,6 +759,36 @@ class ForumReply(models.Model):
     def __str__(self):
         return f"Reply by {self.author.username}"
 
+    class ForumPostLike(models.Model):
+
+        post = models.ForeignKey(
+            ForumPost,
+            on_delete=models.CASCADE,
+            related_name='post_likes'
+        )
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    class Meta:
+
+        unique_together = (
+            'post',
+            'user',
+        )
+
+    def __str__(self):
+
+        return (
+            f"{self.user.username} "
+            f"liked {self.post.title}"
+        )
 
 # =====================================================
 # NEWS ANNOUNCEMENTS

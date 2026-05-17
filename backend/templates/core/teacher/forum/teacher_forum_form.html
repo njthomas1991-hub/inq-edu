@@ -1,61 +1,265 @@
 {% extends "core/base_teacher.html" %}
+
 {% load crispy_forms_tags %}
 
-{% block title %}{{ page_title }}{% endblock %}
+{% block title %}
+{{ page_title }}
+{% endblock %}
 
 {% block content %}
-<div class="container">
 
-    <a class="btn btn-link px-0 mb-3"
-       href="{{ cancel_url }}">
+<div class="container py-4">
+
+    <!-- BACK BUTTON -->
+
+    <a
+        class="btn btn-link px-0 mb-3 text-decoration-none"
+        href="{{ cancel_url }}"
+    >
+
         <i class="fas fa-arrow-left"></i>
+
         {{ back_text }}
+
     </a>
 
-    <div class="card shadow-sm">
-        <div class="card-body">
+    <!-- FORM CARD -->
 
-            <h1 class="h4 mb-4">
-                {{ heading }}
-            </h1>
+    <div class="card shadow-sm border-0 rounded-4">
 
-            {% if discussion_title %}
-                <div class="bg-light p-3 rounded mb-4">
-                    <p class="mb-0">
-                        <strong>Discussion:</strong>
-                        {{ discussion_title }}
-                    </p>
+        <div class="card-body p-4 p-lg-5">
+
+            <!-- HEADING -->
+
+            <div class="mb-4">
+
+                <h1 class="h3 mb-2">
+
+                    {{ heading }}
+
+                </h1>
+
+                <p class="text-muted mb-0">
+
+                    Share resources, ideas and discussions
+                    with other educators safely and professionally.
+
+                </p>
+
+            </div>
+
+            <!-- TIMESTAMPS -->
+
+            {% if object %}
+
+                <div class="bg-light rounded p-3 mb-4">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <div class="small text-muted">
+
+                                Created
+
+                            </div>
+
+                            <div>
+
+                                {{ object.created_at|date:"M d, Y \\a\\t H:i" }}
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="small text-muted">
+
+                                Last Updated
+
+                            </div>
+
+                            <div>
+
+                                {{ object.updated_at|date:"M d, Y \\a\\t H:i" }}
+
+                                {% if object.updated_at != object.created_at %}
+
+                                    <span class="badge bg-warning text-dark ms-2">
+
+                                        Edited
+
+                                    </span>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
             {% endif %}
 
-            <form method="post"
-                  {% if multipart %}
-                  enctype="multipart/form-data"
-                  {% endif %}>
+            <!-- DISCUSSION INFO -->
+
+            {% if discussion_title %}
+
+                <div class="alert alert-light border mb-4">
+
+                    <strong>
+
+                        Discussion:
+
+                    </strong>
+
+                    {{ discussion_title }}
+
+                </div>
+
+            {% endif %}
+
+            <!-- FORM -->
+
+            <form
+                method="post"
+
+                {% if multipart %}
+                    enctype="multipart/form-data"
+                {% endif %}
+            >
 
                 {% csrf_token %}
 
-                {{ form|crispy }}
+                <!-- FORM CONTENT -->
 
-                <div class="d-flex gap-2">
-                    <button class="btn btn-primary"
-                            type="submit">
+                <div class="mb-4">
+
+                    {{ form|crispy }}
+
+                </div>
+
+                <!-- MODERATION NOTICE -->
+
+                <div class="alert alert-warning border-0 shadow-sm mb-4">
+
+                    <div class="d-flex align-items-start gap-3">
+
+                        <div class="fs-4">
+
+                            ⚠️
+
+                        </div>
+
+                        <div>
+
+                            <h5 class="mb-2">
+
+                                Community & Professional Guidelines
+
+                            </h5>
+
+                            <p class="mb-2">
+
+                                All uploaded resources, files,
+                                images and discussion posts are
+                                reviewed regularly by moderators.
+
+                            </p>
+
+                            <ul class="mb-2">
+
+                                <li>
+                                    Follow safeguarding expectations
+                                </li>
+
+                                <li>
+                                    Respect equality and diversity
+                                    guidelines
+                                </li>
+
+                                <li>
+                                    Do not upload copyrighted
+                                    materials without permission
+                                </li>
+
+                                <li>
+                                    Maintain professional conduct
+                                    at all times
+                                </li>
+
+                            </ul>
+
+                            <p class="mb-0 small text-muted">
+
+                                Content that breaches platform
+                                policies may be edited, removed,
+                                restricted or escalated.
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- FILE GUIDANCE -->
+
+                <div class="alert alert-info border-0 mb-4">
+
+                    <strong>
+
+                        Supported Uploads:
+
+                    </strong>
+
+                    PDF, PowerPoint, Word documents,
+                    worksheets, ZIP files and images.
+
+                </div>
+
+                <!-- ACTIONS -->
+
+                <div class="d-flex flex-wrap gap-2">
+
+                    <button
+                        class="btn btn-primary px-4"
+                        type="submit"
+                    >
+
+                        <i class="fas fa-save me-2"></i>
+
                         Save Changes
+
                     </button>
 
-                    <a href="{{ cancel_url }}"
-                       class="btn btn-secondary">
+                    <a
+                        href="{{ cancel_url }}"
+                        class="btn btn-outline-secondary px-4"
+                    >
+
                         Cancel
+
                     </a>
+
                 </div>
 
             </form>
 
         </div>
+
     </div>
+
 </div>
+
 {% endblock %}
 
 {% block extra_js %}
+
     {{ form.media }}
+
 {% endblock %}

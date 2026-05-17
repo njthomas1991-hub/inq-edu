@@ -7,10 +7,15 @@ from core.views.teacher_views import (
 
     # CLASSES
     teacher_classes_view,
+    class_detail_view,
+    class_analytics_view,
+    student_analytics_view,
     create_class_view,
     edit_class_view,
     delete_class_view,
     add_student_to_class_view,
+    remove_student_view,
+    transfer_student_view,
 
     # RESOURCES
     teacher_resources_list_view,
@@ -59,6 +64,24 @@ urlpatterns = [
     ),
 
     path(
+        "teacher/classes/<int:pk>/",
+        class_detail_view,
+        name="class_detail",
+    ),
+
+    path(
+        "teacher/classes/<int:pk>/analytics/",
+        class_analytics_view,
+        name="class_analytics",
+    ),
+
+    path(
+    "teacher/classes/<int:class_pk>/students/<int:student_pk>/analytics/",
+    student_analytics_view,
+    name="student_analytics",
+    ),
+   
+    path(
         "teacher/classes/<int:pk>/edit/",
         edit_class_view,
         name="edit_class",
@@ -74,6 +97,18 @@ urlpatterns = [
         "teacher/classes/<int:pk>/students/add/",
         add_student_to_class_view,
         name="add_student_to_class",
+    ),
+
+    path(
+        "teacher/classes/<int:class_pk>/students/<int:student_pk>/remove/",
+        remove_student_view,
+        name="remove_student",
+    ),
+
+    path(
+        "teacher/classes/<int:class_pk>/students/<int:student_pk>/transfer/",
+        transfer_student_view,
+        name="transfer_student",
     ),
 
     # =====================================================
@@ -145,7 +180,7 @@ urlpatterns = [
     ),
 
     # =====================================================
-    # ANALYTICS
+    # TEACHER ANALYTICS
     # =====================================================
 
     path(
