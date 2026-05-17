@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-4">
+
+    <h1 class="mb-4">Avatar Builder</h1>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <div class="mb-3">
+                    <label class="form-label">Avatar Style</label>
+
+                    <select
+                        name="avatar_style"
+                        class="form-select"
+                    >
+                        {% for value, label in avatar_styles %}
+                            <option
+                                value="{{ value }}"
+                                {% if config.avatar_style == value %}selected{% endif %}
+                            >
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Body Type</label>
+
+                    <select
+                        name="body_type"
+                        class="form-select"
+                    >
+                        {% for value, label in body_types %}
+                            <option
+                                value="{{ value }}"
+                                {% if config.body_type == value %}selected{% endif %}
+                            >
+                                {{ label }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Eyes</label>
+
+                    <select
+                        name="eye_type"
+                        class="form-select"
+                    >
+                        {% for value, label in eye_types %}
+                            <option
+                                value="{{ value }}"
+                                {% if config.eye_type == value %}selected{% endif %}
+                            >
+                                {{ label }}
+{% endblock %}

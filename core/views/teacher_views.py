@@ -1,334 +1,340 @@
-import csv
+import random
 
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_protect
+from django.contrib import messages
+from django.shortcuts import (
+    render,
+    redirect,
+    get_object_or_404,
+)
 
-from core.forms.class_forms import CreateStudentForm
-from core.models import Class, ForumPost, ForumReply, ResourceComment, TeachingResource, User
+from core.models import (
+    User,
+    Class,
+    ClassStudent,
+    TeachingResource,
+    ForumPost,
+)
 
+from core.forms.class_forms import (
+    ClassForm,
+)
+
+from core.forms.resource_forms import (
+    TeachingResourceForm,
+)
+
+from core.forms.forum_forms import (
+    ForumPostForm,
+)
+
+
+# =====================================================
+# HELPERS
+# =====================================================
+
+def teacher_required(user):
+
+    return (
+        user.is_authenticated
+        and user.role in ["teacher", "school_admin"]
+    )
+
+WORD_LIST = [
+    "Blue",
+    "Tiger",
+    "Rocket",
+    "Apple",
+    "Magic",
+    "Sunny",
+    "Forest",
+    "Dragon",
+    "River",
+    "Star",
+    "Cloud",
+    "Ocean",
+]
+
+
+def generate_username(first_name, last_name):
+
+    base = (
+        first_name.lower() +
+        last_name[0].lower()
+        if last_name else ""
+    )
+
+    username = base
+
+    counter = 1
+
+    while User.objects.filter(username=username).exists():
+
+        counter += 1
+
+        username = f"{base}{counter}"
+
+    return username
+
+
+def generate_password():
+
+    return (
+        random.choice(WORD_LIST) +
+        random.choice(WORD_LIST)
+    )
+
+
+# =====================================================
+# DASHBOARD
+# =====================================================
 
 @login_required
-@require_http_methods(["GET", "POST"])
-@csrf_protect
-def add_student_view(request):
-    """
-    Teacher-created student accounts.
-    Creates real User records with role='student', generated password, saved to DB.
-    """
-    if request.method == 'GET':
-        form = CreateStudentForm()
-        return render(request, "core/teacher/add_student.html", {'form': form})
+def teacher_dashboard_view(request):
 
-    if request.method == 'POST':
-        form = CreateStudentForm(request.POST)
+    classes = Class.objects.filter(
+        teacher=request.user
+    )
+
+    resources = TeachingResource.objects.filter(
+        author=request.user
+    )[:5]
+
+    forum_posts = ForumPost.objects.filter(
+        author=request.user
+    )[:5]
+
+    context = {
+        "classes": classes,
+        "resources": resources,
+        "forum_posts": forum_posts,
+    }
+
+    return render(
+        request,
+        "core/teacher/teacher_dashboard.html",
+        context,
+    )
+
+
+# =====================================================
+# CLASSES
+# =====================================================
+
+@login_required
+def teacher_classes_view(request):
+
+    classes = Class.objects.filter(
+        teacher=request.user
+    )
+
+    context = {
+        "classes": classes,
+    }
+
+    return render(
+        request,
+        "core/teacher/classes/class_list.html",
+        context,
+    )
+
+@login_required
+def class_detail_view(request, pk):
+
+    classroom = get_object_or_404(
+        Class,
+        pk=pk,
+        teacher=request.user,
+    )
+
+    students = ClassStudent.objects.filter(
+        clazz=classroom
+    ).select_related("student")
+
+    new_student = request.session.pop(
+        "new_student",
+        None,
+    )
+
+    context = {
+        "classroom": classroom,
+        "students": students,
+        "new_student": new_student,
+    }
+
+    return render(
+        request,
+        "core/teacher/classes/class_detail.html",
+        context,
+    )
+
+@login_required
+def create_class_view(request):
+
+    if request.method == "POST":
+
+        form = ClassForm(request.POST)
 
         if form.is_valid():
-            student = form.save()
 
-            recent_ids = request.session.get('recent_student_ids', [])
-            recent_ids.append(int(student.pk))
-            request.session['recent_student_ids'] = recent_ids[-100:]
+            classroom = form.save(commit=False)
+            classroom.teacher = request.user
+            classroom.save()
 
-            return render(request, "core/teacher/add_student.html", {
-                'form': CreateStudentForm(),
-                'created_student': student,
-            })
+            messages.success(
+                request,
+                "Class created successfully."
+            )
 
-        return render(request, "core/teacher/add_student.html", {
-            'form': form,
-        })
+            return redirect("teacher_classes")
 
-    return render(request, "core/teacher/add_student.html", {
-        'form': CreateStudentForm(),
-    })
+    else:
 
+        form = ClassForm()
 
-@login_required
-@require_http_methods(["GET"])
-def download_student_login_card_view(request, student_id):
-    """Download a plain-text login card for a student account."""
-    student = get_object_or_404(
-        User,
-        id=student_id,
-        role='student',
-        school=request.user.school
+    context = {
+        "form": form,
+    }
+
+    return render(
+        request,
+        "core/teacher/classes/class_form.html",
+        context,
     )
 
-    card_lines = [
-        "Inq-Ed Student Login Card",
-        "=========================",
-        f"Student Name: {(student.get_full_name() or student.username).strip()}",
-        f"Username: {student.username}",
-        f"Password: {student.plain_password or '[Password not available]'}",
-        "Login URL: /login/",
-    ]
-
-    response = HttpResponse("\n".join(card_lines), content_type="text/plain; charset=utf-8")
-    response["Content-Disposition"] = f'attachment; filename="student-login-card-{student.username}.txt"'
-    return response
-
 
 @login_required
-@require_http_methods(["GET"])
-def download_recent_student_login_cards_csv_view(request):
-    """Download CSV login cards for recently created student accounts."""
-    if getattr(request.user, 'role', None) not in ['teacher', 'school_admin']:
-        return HttpResponseForbidden("You do not have permission to download student login cards.")
+def edit_class_view(request, pk):
 
-    recent_ids = request.session.get('recent_student_ids', [])
-    students = User.objects.filter(id__in=recent_ids, role='student').order_by('id')
-
-    response = HttpResponse(content_type="text/csv; charset=utf-8")
-    response["Content-Disposition"] = 'attachment; filename="recent-student-login-cards.csv"'
-
-    writer = csv.writer(response)
-    writer.writerow(["first_name", "last_name", "username", "password", "login_url"])
-
-    for student in students:
-        writer.writerow([
-            student.first_name,
-            student.last_name,
-            student.username,
-            student.plain_password or "",
-            "/login/",
-        ])
-
-    return response
-
-
-def teacher_dashboard_view(request):
-    return render(request, "core/teacher/teacher_dashboard.html")
-
-
-def teacher_analytics_view(request):
-    return render(request, "core/teacher/analytics/teacher_analytics.html")
-
-
-@login_required
-def class_analytics_view(request, class_id=None):
-    if class_id:
-        clazz = get_object_or_404(
-            Class,
-            id=class_id,
-            teacher__school=request.user.school
-        )
-        return render(request, "core/teacher/classes/class_analytics.html", {"class": clazz})
-    return render(request, "core/teacher/classes/class_analytics.html")
-
-
-@login_required
-def student_analytics_view(request, class_id=None, student_id=None):
-    if class_id and student_id:
-        clazz = get_object_or_404(
-            Class,
-            id=class_id,
-            teacher__school=request.user.school
-        )
-        student = get_object_or_404(
-            User,
-            id=student_id,
-            role='student',
-            enrolled_classes__clazz=clazz
-        )
-        return render(request, "core/student/student_analytics.html", {"class": clazz, "student": student})
-    return render(request, "core/student/student_analytics.html")
-
-
-def add_class_view(request):
-    return render(request, "core/teacher/classes/add.html")
-
-
-@login_required
-def class_detail_view(request, class_id):
-    clazz = get_object_or_404(
+    classroom = get_object_or_404(
         Class,
-        id=class_id,
-        teacher__school=request.user.school
+        pk=pk,
+        teacher=request.user,
     )
-    return render(request, "core/teacher/classes/class_detail.html", {"class": clazz})
+
+    if request.method == "POST":
+
+        form = ClassForm(
+            request.POST,
+            instance=classroom,
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+                request,
+                "Class updated successfully."
+            )
+
+            return redirect("teacher_classes")
+
+    else:
+
+        form = ClassForm(instance=classroom)
+
+    context = {
+        "form": form,
+        "classroom": classroom,
+    }
+
+    return render(
+        request,
+        "core/teacher/classes/class_form.html",
+        context,
+    )
 
 
 @login_required
-def remove_student_view(request, class_id, student_id):
-    clazz = get_object_or_404(
+def delete_class_view(request, pk):
+
+    classroom = get_object_or_404(
         Class,
-        id=class_id,
-        teacher__school=request.user.school
+        pk=pk,
+        teacher=request.user,
     )
-    student = get_object_or_404(
-        User,
-        id=student_id,
-        role='student',
-        enrolled_classes__clazz=clazz
-    )
-    return render(request, "core/teacher/classes/remove_student.html", {"class": clazz, "student": student})
 
+    if request.method == "POST":
+
+        classroom.delete()
+
+        messages.success(
+            request,
+            "Class deleted successfully."
+        )
+
+        return redirect("teacher_classes")
+
+    context = {
+        "classroom": classroom,
+    }
+
+    return render(
+        request,
+        "core/teacher/classes/class_delete.html",
+        context,
+    )
 
 @login_required
-def transfer_student_view(request, class_id, student_id):
-    clazz = get_object_or_404(
+def add_student_to_class_view(request, pk):
+
+    teacher_class = get_object_or_404(
         Class,
-        id=class_id,
-        teacher__school=request.user.school
+        pk=pk,
+        teacher=request.user,
     )
-    student = get_object_or_404(
-        User,
-        id=student_id,
-        role='student',
-        enrolled_classes__clazz=clazz
+
+    generated_credentials = None
+
+    if request.method == "POST":
+
+        first_name = request.POST.get("first_name")
+        last_name = request.POST.get("last_name")
+
+        username = generate_username(
+            first_name,
+            last_name,
+        )
+
+        password = generate_password()
+
+        student = User.objects.create_user(
+            username=username,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+            role="student",
+            school=request.user.school,
+        )
+
+        ClassStudent.objects.create(
+            student=student,
+            clazz=teacher_class,
+        )
+
+        request.session["new_student"] = {
+            "full_name": f"{first_name} {last_name}",
+            "username": username,
+            "password": password,
+        }
+
+        messages.success(
+            request,
+            "Student created successfully."
+        )
+
+        return redirect(
+            "class_detail",
+            pk=teacher_class.pk,
+        )
+
+    context = {
+        "teacher_class": teacher_class,
+    }
+
+    return render(
+        request,
+        "core/teacher/classes/add_student.html",
+        context,
     )
-    return render(request, "core/teacher/classes/transfer_student.html", {"class": clazz, "student": student})
-
-
-def teacher_news_list_view(request):
-    return render(request, "core/teacher/news/teacher_news_list.html")
-
-
-def teacher_news_detail_view(request, slug):
-    return render(request, "core/teacher/news/teacher_news_detail.html")
-
-
-def teacher_help_list_view(request):
-    return render(request, "core/teacher/guides/teacher_help_list.html")
-
-
-def teacher_help_detail_view(request, slug):
-    return render(request, "core/teacher/guides/teacher_help_detail.html")
-
-
-@login_required
-def teacher_resources_list_view(request):
-    """List teaching resources visible to the current user based on visibility and school."""
-    from django.db.models import Q
-    
-    # Show all own resources + school resources + public resources
-    resources = TeachingResource.objects.filter(
-        Q(author=request.user) |  # Own resources
-        Q(visibility='public') |  # Public resources from anyone
-        Q(visibility='school', author__school=request.user.school)  # School resources from same school
-    ).select_related('author').filter(status='published').order_by('-published_at')
-    
-    return render(request, "core/teacher/resources/teacher_resources_list.html", {"resources": resources})
-
-
-@login_required
-def teacher_resource_detail_view(request, slug):
-    """Display a resource if user has permission based on visibility and school."""
-    from django.db.models import Q
-    
-    resource = get_object_or_404(
-        TeachingResource,
-        slug=slug,
-        status='published'
-    )
-    
-    # Check permissions: own resource, public resource, or school-only from same school
-    if resource.author != request.user:
-        if resource.visibility == 'school' and resource.author.school != request.user.school:
-            raise Http404("You don't have permission to view this resource.")
-        elif resource.visibility != 'public' and resource.visibility != 'school':
-            raise Http404("You don't have permission to view this resource.")
-    
-    return render(request, "core/teacher/resources/teacher_resource_detail.html", {"resource": resource})
-
-
-@login_required
-def teacher_resource_edit_view(request, slug):
-    resource = get_object_or_404(
-        TeachingResource,
-        slug=slug,
-        author__school=request.user.school
-    )
-    return render(request, "core/teacher/resources/teacher_resource_form.html", {"resource": resource})
-
-
-@login_required
-def teacher_resource_delete_view(request, slug):
-    resource = get_object_or_404(
-        TeachingResource,
-        slug=slug,
-        author__school=request.user.school
-    )
-    return render(request, "core/teacher/resources/teacher_resource_delete.html", {"resource": resource})
-
-
-@login_required
-def teacher_resource_comment_delete_view(request, slug, comment_id):
-    resource = get_object_or_404(
-        TeachingResource,
-        slug=slug,
-        author__school=request.user.school
-    )
-    comment = get_object_or_404(
-        ResourceComment,
-        id=comment_id,
-        resource=resource
-    )
-    return render(request, "core/teacher/resources/teacher_resource_comment_delete.html", {"resource": resource, "comment": comment})
-
-
-def teacher_forum_list_view(request):
-    return render(request, "core/teacher/forum/teacher_forum_list.html")
-
-
-@login_required
-def teacher_forum_detail_view(request, post_id):
-    post = get_object_or_404(
-        ForumPost,
-        id=post_id,
-        author__school=request.user.school
-    )
-    return render(request, "core/teacher/forum/teacher_forum_detail.html", {"post": post})
-
-
-@login_required
-def teacher_forum_edit_view(request, post_id):
-    post = get_object_or_404(
-        ForumPost,
-        id=post_id,
-        author__school=request.user.school
-    )
-    return render(request, "core/teacher/forum/teacher_forum_form.html", {"post": post})
-
-
-@login_required
-def teacher_forum_delete_view(request, post_id):
-    post = get_object_or_404(
-        ForumPost,
-        id=post_id,
-        author__school=request.user.school
-    )
-    return render(request, "core/teacher/forum/teacher_forum_delete.html", {"post": post})
-
-
-@login_required
-def teacher_forum_reply_edit_view(request, post_id, reply_id):
-    post = get_object_or_404(
-        ForumPost,
-        id=post_id,
-        author__school=request.user.school
-    )
-    reply = get_object_or_404(
-        ForumReply,
-        id=reply_id,
-        post=post
-    )
-    return render(request, "core/teacher/forum/teacher_forum_reply_edit.html", {"post": post, "reply": reply})
-
-
-@login_required
-def teacher_forum_reply_delete_view(request, post_id, reply_id):
-    post = get_object_or_404(
-        ForumPost,
-        id=post_id,
-        author__school=request.user.school
-    )
-    reply = get_object_or_404(
-        ForumReply,
-        id=reply_id,
-        post=post
-    )
-    return render(request, "core/teacher/forum/teacher_forum_reply_delete.html", {"post": post, "reply": reply})

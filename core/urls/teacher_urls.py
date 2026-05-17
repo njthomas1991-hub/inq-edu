@@ -1,186 +1,157 @@
 from django.urls import path
 
 from core.views.teacher_views import (
+
+    # DASHBOARD
     teacher_dashboard_view,
-    teacher_analytics_view,
-    add_class_view,
-    add_student_view,
-    download_student_login_card_view,
-    download_recent_student_login_cards_csv_view,
-    class_detail_view,
-    class_analytics_view,
-    student_analytics_view,
-    remove_student_view,
-    transfer_student_view,
-    teacher_news_list_view,
-    teacher_news_detail_view,
-    teacher_help_list_view,
-    teacher_help_detail_view,
+
+    # CLASSES
+    teacher_classes_view,
+    create_class_view,
+    edit_class_view,
+    delete_class_view,
+    add_student_to_class_view,
+
+    # RESOURCES
     teacher_resources_list_view,
+    teacher_resource_create_view,
     teacher_resource_detail_view,
     teacher_resource_edit_view,
     teacher_resource_delete_view,
-    teacher_resource_comment_delete_view,
+
+    # FORUM
     teacher_forum_list_view,
+    teacher_forum_create_view,
     teacher_forum_detail_view,
     teacher_forum_edit_view,
     teacher_forum_delete_view,
-    teacher_forum_reply_edit_view,
-    teacher_forum_reply_delete_view,
+
+    # ANALYTICS
+    teacher_analytics_view,
 )
 
 urlpatterns = [
 
-    path("teacher/", teacher_dashboard_view, name="teacher_dashboard"),
+    # =====================================================
+    # DASHBOARD
+    # =====================================================
 
     path(
-        "teacher/analytics/",
-        teacher_analytics_view,
-        name="teacher_analytics"
+        "teacher/",
+        teacher_dashboard_view,
+        name="teacher_dashboard",
+    ),
+
+    # =====================================================
+    # CLASSES
+    # =====================================================
+
+    path(
+        "teacher/classes/",
+        teacher_classes_view,
+        name="teacher_classes",
     ),
 
     path(
-        "teacher/class/add/",
-        add_class_view,
-        name="add_class"
+        "teacher/classes/create/",
+        create_class_view,
+        name="create_class",
     ),
 
     path(
-        "teacher/student/add/",
-        add_student_view,
-        name="add_student"
+        "teacher/classes/<int:pk>/edit/",
+        edit_class_view,
+        name="edit_class",
     ),
 
     path(
-        "teacher/student/<int:student_id>/login-card/",
-        download_student_login_card_view,
-        name="download_student_login_card"
+        "teacher/classes/<int:pk>/delete/",
+        delete_class_view,
+        name="delete_class",
     ),
 
     path(
-        "teacher/students/login-cards/download/",
-        download_recent_student_login_cards_csv_view,
-        name="download_recent_student_login_cards"
+        "teacher/classes/<int:pk>/students/add/",
+        add_student_to_class_view,
+        name="add_student_to_class",
     ),
 
-    path(
-        "teacher/class/<int:class_id>/",
-        class_detail_view,
-        name="class_detail"
-    ),
-
-    path(
-        "teacher/class/<int:class_id>/analytics/",
-        class_analytics_view,
-        name="class_analytics"
-    ),
-
-    path(
-        "teacher/class/<int:class_id>/student/<int:student_id>/analytics/",
-        student_analytics_view,
-        name="student_analytics"
-    ),
-
-    path(
-        "teacher/class/<int:class_id>/remove/<int:student_id>/",
-        remove_student_view,
-        name="remove_student"
-    ),
-
-    path(
-        "teacher/class/<int:class_id>/transfer/<int:student_id>/",
-        transfer_student_view,
-        name="transfer_student"
-    ),
-
-    path(
-        "teacher/news/",
-        teacher_news_list_view,
-        name="teacher_news"
-    ),
-
-    path(
-        "teacher/news/<slug:slug>/",
-        teacher_news_detail_view,
-        name="teacher_news_detail"
-    ),
-
-    path(
-        "teacher/help/",
-        teacher_help_list_view,
-        name="teacher_help"
-    ),
-
-    path(
-        "teacher/help/<slug:slug>/",
-        teacher_help_detail_view,
-        name="teacher_help_detail"
-    ),
+    # =====================================================
+    # RESOURCES CRUD
+    # =====================================================
 
     path(
         "teacher/resources/",
         teacher_resources_list_view,
-        name="teacher_resources"
+        name="teacher_resources_list",
     ),
 
     path(
-        "teacher/resources/<slug:slug>/",
+        "teacher/resources/create/",
+        teacher_resource_create_view,
+        name="teacher_resource_create",
+    ),
+
+    path(
+        "teacher/resources/<int:pk>/",
         teacher_resource_detail_view,
-        name="teacher_resource_detail"
+        name="teacher_resource_detail",
     ),
 
     path(
-        "teacher/resources/<slug:slug>/edit/",
+        "teacher/resources/<int:pk>/edit/",
         teacher_resource_edit_view,
-        name="teacher_resource_edit"
+        name="teacher_resource_edit",
     ),
 
     path(
-        "teacher/resources/<slug:slug>/delete/",
+        "teacher/resources/<int:pk>/delete/",
         teacher_resource_delete_view,
-        name="teacher_resource_delete"
+        name="teacher_resource_delete",
     ),
 
-    path(
-        "teacher/resources/<slug:slug>/comment/<int:comment_id>/delete/",
-        teacher_resource_comment_delete_view,
-        name="teacher_resource_comment_delete"
-    ),
+    # =====================================================
+    # FORUM CRUD
+    # =====================================================
 
     path(
         "teacher/forum/",
         teacher_forum_list_view,
-        name="teacher_forum"
+        name="teacher_forum_list",
     ),
 
     path(
-        "teacher/forum/<int:post_id>/",
+        "teacher/forum/create/",
+        teacher_forum_create_view,
+        name="teacher_forum_create",
+    ),
+
+    path(
+        "teacher/forum/<int:pk>/",
         teacher_forum_detail_view,
-        name="teacher_forum_detail"
+        name="teacher_forum_detail",
     ),
 
     path(
-        "teacher/forum/<int:post_id>/edit/",
+        "teacher/forum/<int:pk>/edit/",
         teacher_forum_edit_view,
-        name="teacher_forum_edit"
+        name="teacher_forum_edit",
     ),
 
     path(
-        "teacher/forum/<int:post_id>/delete/",
+        "teacher/forum/<int:pk>/delete/",
         teacher_forum_delete_view,
-        name="teacher_forum_delete"
+        name="teacher_forum_delete",
     ),
 
-    path(
-        "teacher/forum/<int:post_id>/reply/<int:reply_id>/edit/",
-        teacher_forum_reply_edit_view,
-        name="teacher_forum_reply_edit"
-    ),
+    # =====================================================
+    # ANALYTICS
+    # =====================================================
 
     path(
-        "teacher/forum/<int:post_id>/reply/<int:reply_id>/delete/",
-        teacher_forum_reply_delete_view,
-        name="teacher_forum_reply_delete"
+        "teacher/analytics/",
+        teacher_analytics_view,
+        name="teacher_analytics",
     ),
 
 ]

@@ -134,6 +134,11 @@ class CustomSignupForm(SignupForm):
         )
     )
 
+    username = forms.CharField(
+        required=False,
+         widget=forms.HiddenInput()
+    )
+
     school = forms.CharField(
         max_length=255,
         required=False,
@@ -147,23 +152,24 @@ class CustomSignupForm(SignupForm):
 
 def save(self, request):
 
+    email = self.cleaned_data.get("email", "").strip()
+
+    base_username = email.split("@")[0]
+    username = base_username
+    counter = 1
+
+    while User.objects.filter(username=username).exists():
+        username = f"{base_username}{counter}"
+        counter += 1
+
+    self.cleaned_data["username"] = username
+
     user = super().save(request)
 
-    if not user.username:
-        base_username = user.email.split('@')[0]
-        username = base_username
-        counter = 1
-
-        while User.objects.filter(username=username).exists():
-            username = f"{base_username}{counter}"
-            counter += 1
-
-        user.username = username
+    user.username = username
 
     role = self.cleaned_data.get('role', 'teacher')
-
-    if hasattr(user, 'role'):
-        user.role = role
+    user.role = role
 
     user.first_name = self.cleaned_data.get('first_name', '')
     user.last_name = self.cleaned_data.get('last_name', '')
@@ -177,12 +183,6 @@ def save(self, request):
             name=school_name
         )
 
-        school_name = self.cleaned_data.get('school', '').strip()
-
-        if school_name:
-            school, _ = School.objects.get_or_create(
-            name=school_name
-        )
         user.school = school
 
     user.is_staff = role in ['teacher', 'school_admin']
@@ -274,7 +274,6 @@ class CustomPasswordChangeForm(PasswordChangeForm):
                 }
             )
 
-
 class CustomSignupForm(SignupForm):
 
     ROLE_DESCRIPTIONS = {
@@ -298,51 +297,51 @@ class CustomSignupForm(SignupForm):
     first_name = forms.CharField(
         max_length=150,
         required=False,
-        widget=forms.TextInput(
-            attrs={
-                'class': 'form-control',
-                'placeholder': 'First name'
-            }
-        )
     )
 
     last_name = forms.CharField(
         max_length=150,
         required=False,
-        widget=forms.TextInput(
-            attrs={
-                'class': 'form-control',
-                'placeholder': 'Last name'
-            }
-        )
     )
 
     school = forms.CharField(
         max_length=255,
         required=False,
-        widget=forms.TextInput(
-            attrs={
-                'class': 'form-control',
-                'placeholder': 'School name'
-            }
-        )
     )
 
     def save(self, request):
 
+        email = self.cleaned_data.get("email")
+
+        base_username = email.split("@")[0]
+        username = base_username
+        counter = 1
+
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+
+        self.cleaned_data["username"] = username
+
         user = super().save(request)
 
-        role = self.cleaned_data.get('role', 'teacher')
+        user.username = username
 
-        if hasattr(user, 'role'):
-            user.role = role
+        role = self.cleaned_data.get('role', 'teacher')
+        user.role = role
 
         user.first_name = self.cleaned_data.get('first_name', '')
         user.last_name = self.cleaned_data.get('last_name', '')
 
-        school = self.cleaned_data.get('school', '')
+        school_name = self.cleaned_data.get('school', '').strip()
 
-        if hasattr(user, 'school'):
+        if school_name:
+            from core.models import School
+
+            school, _ = School.objects.get_or_create(
+                name=school_name
+            )
+
             user.school = school
 
         user.is_staff = role in ['teacher', 'school_admin']
@@ -350,3 +349,18 @@ class CustomSignupForm(SignupForm):
         user.save()
 
         return user
+
+    def get_success_url(self, request):
+
+        user = request.user
+
+        if user.role == 'teacher':
+            return '/teacher/'
+
+        if user.role == 'student':
+            return '/student/'
+
+        if user.role == 'school_admin':
+            return '/school-admin/'
+
+        return '/'

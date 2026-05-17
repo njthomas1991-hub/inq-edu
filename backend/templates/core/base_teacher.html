@@ -299,7 +299,7 @@
 
                         <a
                             class="nav-link"
-                            href="{% url 'add_class' %}"
+                            href="{% url 'create_class' %}"
                         >
 
                             <i class="fas fa-plus"></i>
@@ -313,7 +313,7 @@
 
                         <a
                             class="nav-link"
-                            href="{% url 'teacher_resources' %}"
+                            href="{% url 'teacher_resources_list' %}"
                         >
 
                             <i class="fas fa-book"></i>
@@ -327,7 +327,7 @@
 
                         <a
                             class="nav-link"
-                            href="{% url 'teacher_forum' %}"
+                            href="{% url 'teacher_forum_list' %}"
                         >
 
                             <i class="fas fa-comments"></i>
@@ -356,7 +356,7 @@
 
                             {% if user.is_authenticated %}
 
-                                {% include "core/avatar_icon.html" %}
+                                {% include "core/components/avatar/avatar_icon.html" %}
 
                                 <span>
                                     {{ user.get_full_name|default:user.username }}

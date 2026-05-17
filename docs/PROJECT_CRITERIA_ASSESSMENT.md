@@ -150,28 +150,28 @@
 **Evidence:**
 
 **CREATE:**
-- ✅ Classes: `add_class_view` (views.py line 395+)
+- ✅ Classes: `create_class_view` (views.py line 395+)
 - ✅ Students: `create_student_account_view` (views.py line 273+)
 - ✅ Forum Posts: `teacher_forum_list_view` with POST handling
-- ✅ Resources: `teacher_resources_list_view` with form submission
+- ✅ Resources: `teacher_resources_list_list_view` with form submission
 - ✅ Avatars: `save_user_avatar` API endpoint
 
 **READ:**
 - ✅ Class details: `class_detail_view` (views.py line 441+)
 - ✅ Student list: displayed in class_detail.html
 - ✅ Analytics: `teacher_analytics_view`, `class_analytics_view`, `student_analytics_view`
-- ✅ Forum posts: `teacher_forum_list_view`, `teacher_forum_detail_view`
-- ✅ Resources: `teacher_resources_list_view`, `teacher_resource_detail_view`
+- ✅ Forum posts: `teacher_forum_list_view`, `teacher_forum_list_detail_view`
+- ✅ Resources: `teacher_resources_list_list_view`, `teacher_resource_detail_view`
 
 **UPDATE:**
-- ✅ Forum posts: `teacher_forum_edit_view` (views.py)
+- ✅ Forum posts: `teacher_forum_list_edit_view` (views.py)
 - ✅ Resources: `teacher_resource_edit_view` (views.py)
 - ✅ Avatars: `save_user_avatar` updates existing avatar
 
 **DELETE:**
 - ✅ Students from class: `remove_student_view` (views.py line 498+)
-- ✅ Forum posts: `teacher_forum_delete_view` (views.py)
-- ✅ Forum replies: `teacher_forum_reply_delete_view` (views.py)
+- ✅ Forum posts: `teacher_forum_list_delete_view` (views.py)
+- ✅ Forum replies: `teacher_forum_list_reply_delete_view` (views.py)
 - ✅ Resource comments: `teacher_resource_comment_delete_view` (views.py)
 
 **Access Control:**
@@ -259,7 +259,7 @@
 **Evidence:**
 - ✅ **Login State Display:** 
   - Username/full name shown in navbar: `{{ user.get_full_name|default:user.username }}`
-  - Avatar icon included: `{% include "core/avatar_icon.html" %}`
+  - Avatar icon included: `{% include "core/components/avatar/avatar_icon.html" %}`
 - ✅ **Logout Button:** Dropdown menu with "Logout" option
   - File: base_teacher.html lines 234-250
 - ✅ **Conditional Content:** 

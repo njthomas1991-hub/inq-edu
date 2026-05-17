@@ -318,7 +318,7 @@ class ClassCRUDTestCase(TestCase):
             'year_ks': 3,
             'description': 'A new math class'
         }
-        response = self.client.post(reverse('add_class'), data)
+        response = self.client.post(reverse('create_class'), data)
         # Should redirect after successful creation
         self.assertEqual(response.status_code, 302)
         # Verify class was created
@@ -527,7 +527,7 @@ class FormValidationTestCase(TestCase):
             'subject': 'maths',
             'year_ks': 2
         }
-        response = self.client.post(reverse('add_class'), data)
+        response = self.client.post(reverse('create_class'), data)
         # Should not redirect (form has errors)
         self.assertEqual(response.status_code, 200)
         # Should not create class
@@ -540,7 +540,7 @@ class FormValidationTestCase(TestCase):
             'subject': 'invalid_subject',
             'year_ks': 2
         }
-        response = self.client.post(reverse('add_class'), data)
+        response = self.client.post(reverse('create_class'), data)
         # Should have validation errors
         self.assertFalse(Class.objects.filter(name='Test Class').exists())
 
@@ -572,7 +572,7 @@ class TeacherWorkflowIntegrationTestCase(TestCase):
             'year_ks': 2,
             'description': 'Test description'
         }
-        response = self.client.post(reverse('add_class'), class_data)
+        response = self.client.post(reverse('create_class'), class_data)
         self.assertEqual(response.status_code, 302)
         
         # Verify class exists

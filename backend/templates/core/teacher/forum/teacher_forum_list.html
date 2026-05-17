@@ -48,15 +48,15 @@
                     </div>
                     <div class="d-flex w-100 justify-content-between align-items-start">
                         <h5 class="mb-1">
-                            <a class="text-decoration-none" href="{% url 'teacher_forum_detail' post.id %}">
+                            <a class="text-decoration-none" href="{% url 'teacher_forum_list_detail' post.id %}">
                                 {% if post.is_pinned %}<i class="fas fa-thumbtack text-warning"></i>{% endif %} {{ post.title }}
                             </a>
                         </h5>
                         <div class="d-flex align-items-center gap-2">
                             <small class="text-muted">{{ post.updated_at|date:"M d, Y" }}</small>
                             {% if post.author == request.user or request.user.is_superuser %}
-                                <a href="{% url 'teacher_forum_edit' post.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <form method="post" action="{% url 'teacher_forum_delete' post.id %}" onsubmit="return confirm('Delete this discussion?');" style="display:inline;">
+                                <a href="{% url 'teacher_forum_list_edit' post.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <form method="post" action="{% url 'teacher_forum_list_delete' post.id %}" onsubmit="return confirm('Delete this discussion?');" style="display:inline;">
                                     {% csrf_token %}
                                     <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
                                 </form>

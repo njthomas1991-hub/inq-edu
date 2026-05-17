@@ -1,0 +1,51 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <h1>My Classes</h1>
+
+    <a href="{% url 'create_class' %}">
+        Create Class
+    </a>
+
+    <hr>
+
+    {% for class_obj in classes %}
+
+        <div class="card">
+
+            <h3>{{ class_obj.name }}</h3>
+
+            <p>
+                Subject: {{ class_obj.subject }}
+            </p>
+
+            <p>
+                Key Stage: {{ class_obj.year_ks }}
+            </p>
+
+            <a href="{% url 'edit_class' class_obj.id %}">
+                Edit
+            </a>
+
+            <a href="{% url 'delete_class' class_obj.id %}">
+                Delete
+            </a>
+
+            <a href="{% url 'add_student_to_class' class_obj.id %}">
+                Add Student
+            </a>
+
+        </div>
+
+    {% empty %}
+
+        <p>No classes created yet.</p>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

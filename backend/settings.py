@@ -97,13 +97,9 @@ AUTHENTICATION_BACKENDS = [
 
 ACCOUNT_LOGIN_METHODS = {"email"}
 
-ACCOUNT_SIGNUP_FIELDS = [
-    "email*",
-    "password1*",
-    "password2*",
-]
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 
-ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
 
 ACCOUNT_EMAIL_VERIFICATION = "none"
 
@@ -168,9 +164,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
 
-        'DIRS': [
-            BASE_DIR / 'templates',
-            BASE_DIR / 'backend' / 'templates',
+       'DIRS': [
+            BASE_DIR / "backend" / "templates",
         ],
 
         'APP_DIRS': True,

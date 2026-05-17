@@ -347,7 +347,7 @@
 
                             {% if user.is_authenticated %}
 
-                                {% include "core/avatar_icon.html" %}
+                                {% include "core/components/avatar/avatar_icon.html" %}
 
                                 <span>
                                     {{ user.get_full_name|default:user.username }}

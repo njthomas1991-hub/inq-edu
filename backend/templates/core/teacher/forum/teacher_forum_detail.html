@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class="container">
-    <a class="btn btn-link px-0 mb-3" href="{% url 'teacher_forum' %}"><i class="fas fa-arrow-left"></i> Back to Forum</a>
+    <a class="btn btn-link px-0 mb-3" href="{% url 'teacher_forum_list' %}"><i class="fas fa-arrow-left"></i> Back to Forum</a>
 
     <div class="card shadow-sm mb-4">
         <div class="card-body">
@@ -19,8 +19,8 @@
                     {% if post.is_pinned %}<span class="badge bg-warning text-dark">Pinned</span>{% endif %}
                     {% if post.is_locked %}<span class="badge bg-danger">Locked</span>{% endif %}
                     {% if post.author == request.user or request.user.is_superuser %}
-                        <a href="{% url 'teacher_forum_edit' post.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
-                        <form method="post" action="{% url 'teacher_forum_delete' post.id %}" onsubmit="return confirm('Delete this discussion?');" style="display:inline;">
+                        <a href="{% url 'teacher_forum_list_edit' post.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <form method="post" action="{% url 'teacher_forum_list_delete' post.id %}" onsubmit="return confirm('Delete this discussion?');" style="display:inline;">
                             {% csrf_token %}
                             <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
                         </form>
@@ -56,8 +56,8 @@
                         </div>
                         {% if reply.author == request.user or request.user.is_superuser %}
                             <div class="d-flex align-items-center gap-2">
-                                <a href="{% url 'teacher_forum_reply_edit' post.id reply.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <form method="post" action="{% url 'teacher_forum_reply_delete' post.id reply.id %}" onsubmit="return confirm('Delete this reply?');" style="display:inline;">
+                                <a href="{% url 'teacher_forum_list_reply_edit' post.id reply.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <form method="post" action="{% url 'teacher_forum_list_reply_delete' post.id reply.id %}" onsubmit="return confirm('Delete this reply?');" style="display:inline;">
                                     {% csrf_token %}
                                     <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
                                 </form>

@@ -1,3 +1,4 @@
+import random
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
@@ -7,9 +8,8 @@ from django.utils.text import slugify
 # =====================================================
 # HELPERS
 # =====================================================
-
-
 def default_avatar_config():
+
     return {
         "avatar_style": "monster",
         "body_type": "blob",
@@ -22,6 +22,80 @@ def default_avatar_config():
         "pattern_color": "#FF1493",
     }
 
+AVATAR_STYLES = [
+        ("monster", "Monster"),
+        ("human", "Human"),
+        ("robot", "Robot"),
+        ("animal", "Animal"),
+    ]
+
+BODY_TYPES = [
+        ("blob", "Blob"),
+        ("round", "Round"),
+        ("square", "Square"),
+        ("slim", "Slim"),
+    ]
+
+EYE_TYPES = [
+        ("big_round", "Big Round"),
+        ("sleepy", "Sleepy"),
+        ("angry", "Angry"),
+        ("star", "Star"),
+        ("pixel", "Pixel"),
+    ]
+
+MOUTH_TYPES = [
+        ("happy", "Happy"),
+        ("sad", "Sad"),
+        ("smile", "Smile"),
+        ("open", "Open"),
+        ("fangs", "Fangs"),
+    ]
+
+HEAD_DECORATIONS = [
+        ("none", "None"),
+        ("horns", "Horns"),
+        ("hat", "Hat"),
+        ("crown", "Crown"),
+        ("antenna", "Antenna"),
+    ]
+
+PATTERNS = [
+        ("solid", "Solid"),
+        ("spots", "Spots"),
+        ("stripes", "Stripes"),
+        ("zigzag", "Zigzag"),
+    ]
+
+def randomize(self):
+
+        self.avatar_config = {
+            "avatar_style": random.choice(self.AVATAR_STYLES)[0],
+            "body_type": random.choice(self.BODY_TYPES)[0],
+            "body_color": random.choice([
+                "#FF6B9D",
+                "#6BCBFF",
+                "#6BFF95",
+                "#FFD93D",
+                "#B28DFF",
+            ]),
+            "eye_type": random.choice(self.EYE_TYPES)[0],
+            "mouth_type": random.choice(self.MOUTH_TYPES)[0],
+            "head_decoration": random.choice(self.HEAD_DECORATIONS)[0],
+            "decoration_color": random.choice([
+                "#FFB347",
+                "#FF6B6B",
+                "#4D96FF",
+                "#9D4EDD",
+            ]),
+            "pattern": random.choice(self.PATTERNS)[0],
+            "pattern_color": random.choice([
+                "#FFFFFF",
+                "#222222",
+                "#FFD93D",
+                "#00C2A8",
+            ]),
+        }
 
 # =====================================================
 # SCHOOL MODEL
