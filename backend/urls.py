@@ -13,18 +13,6 @@ from core.views.public_views import (
     home_page_view,
 )
 
-from core.views.teacher_views import (
-    teacher_dashboard_view,
-)
-
-from core.views.student_views import (
-    student_dashboard_view,
-)
-
-from core.views.school_admin_views import (
-    school_admin_dashboard_view,
-)
-
 urlpatterns = [
 
     # Admin
@@ -35,25 +23,6 @@ urlpatterns = [
 
     # Home
     path("", home_page_view, name="home"),
-
-    # Dashboards
-    path(
-        "teacher/",
-        teacher_dashboard_view,
-        name="teacher_dashboard",
-    ),
-
-    path(
-        "student/",
-        student_dashboard_view,
-        name="student_dashboard",
-    ),
-
-    path(
-        "school-admin/",
-        school_admin_dashboard_view,
-        name="school_admin_dashboard",
-    ),
 
     # Auth
     path(
