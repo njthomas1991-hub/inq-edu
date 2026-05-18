@@ -1,8 +1,7 @@
 from django import forms
-from django_summernote.widgets import SummernoteWidget
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Row, Column
-from ..models import TeachingResource, User, Class
+from ..models import TeachingResource, Class
 
 
 class TeachingResourceForm(forms.ModelForm):

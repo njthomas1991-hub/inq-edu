@@ -6,8 +6,6 @@ from .models import (
     ClassStudent,
     Avatar,
     SchoolAnalyticsProfile,
-    TeachingResource,
-    ForumPost,
 )
 
 User = get_user_model()
@@ -118,9 +116,7 @@ class ClassStudentModelTestCase(TestCase):
         self.class_obj = Class.objects.create(
             name="Test Class", teacher=self.teacher, subject="maths", year_ks=2
         )
-        self.enrollment = ClassStudent.objects.create(
-            student=self.student, clazz=self.class_obj
-        )
+        ClassStudent.objects.create(student=self.student, clazz=self.class1)
 
     def test_enrollment_creation(self):
         """Test student enrollment in class"""
@@ -331,7 +327,7 @@ class ClassCRUDTestCase(TestCase):
         class_obj = Class.objects.create(
             name="Test Class", teacher=self.teacher, subject="maths", year_ks=2
         )
-        enrollment = ClassStudent.objects.create(student=student, clazz=class_obj)
+        ClassStudent.objects.create(student=student, clazz=class_obj)
 
         # Remove student
         response = self.client.post(
@@ -362,7 +358,7 @@ class StudentCreationTestCase(TestCase):
     def test_create_student_account(self):
         """Test that teachers can create student accounts"""
         data = {"username": "newstudent1", "full_name": "New Student", "year_ks": 2}
-        response = self.client.post(reverse("create_student_account"), data)
+        self.client.post(reverse("create_student_account"), data)
         # Should create student and redirect
         self.assertTrue(User.objects.filter(username="newstudent1").exists())
         student = User.objects.get(username="newstudent1")
@@ -480,7 +476,7 @@ class FormValidationTestCase(TestCase):
     def test_class_form_validation_invalid_subject(self):
         """Test that class form validates subject choices"""
         data = {"name": "Test Class", "subject": "invalid_subject", "year_ks": 2}
-        response = self.client.post(reverse("create_class"), data)
+        self.client.post(reverse("create_class"), data)
         # Should have validation errors
         self.assertFalse(Class.objects.filter(name="Test Class").exists())
 
@@ -526,8 +522,7 @@ class TeacherWorkflowIntegrationTestCase(TestCase):
             "full_name": "Test Student",
             "year_ks": 2,
         }
-        response = self.client.post(reverse("create_student_account"), student_data)
-        student = User.objects.get(username="teststudent1")
+        self.client.post(reverse("create_student_account"), student_data)
 
         # Step 3: View class detail (should show student)
         response = self.client.get(reverse("class_detail", args=[class_obj.pk]))

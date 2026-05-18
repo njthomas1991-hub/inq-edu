@@ -2,7 +2,6 @@ from django.urls import path
 
 from core.views.student_views import (
     student_signup_with_details_view,
-    create_student_account_view,
     student_dashboard_view,
 )
 

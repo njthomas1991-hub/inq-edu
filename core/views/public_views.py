@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 
 
@@ -7,9 +8,6 @@ def home_page_view(request):
 
 def about_page_view(request):
     return render(request, "core/public/about.html")
-
-
-from django.contrib.auth.decorators import login_required
 
 
 @login_required
