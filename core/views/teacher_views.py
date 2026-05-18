@@ -625,7 +625,8 @@ def teacher_resource_create_view(request):
             )
 
             return redirect(
-                "teacher_resources_list"
+                "teacher_resource_detail",
+                pk=resource.pk,
             )
 
     else:
@@ -793,7 +794,8 @@ def teacher_forum_create_view(request):
             )
 
             return redirect(
-                "teacher_forum_list"
+                "teacher_forum_detail",
+                pk=post.pk,
             )
 
     else:
