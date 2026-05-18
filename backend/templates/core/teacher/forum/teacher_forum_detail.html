@@ -2,7 +2,7 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
-{% block title %}{{ post.title }} - Community Forum{% endblock %}
+{% block title %}{{ forum_post.title }} - Community Forum{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -12,15 +12,15 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
-                    <h1 class="h4">{{ post.title }}</h1>
-                    <div class="text-muted small">By {{ post.author.get_full_name|default:post.author.username }} · {{ post.created_at|date:"M d, Y" }}</div>
+                    <h1 class="h4">{{ forum_post.title }}</h1>
+                    <div class="text-muted small">By {{ forum_post.author.get_full_name|default:forum_post.author.username }} · {{ forum_post.created_at|date:"M d, Y" }}</div>
                 </div>
                 <div class="d-flex align-items-center gap-2">
-                    {% if post.is_pinned %}<span class="badge bg-warning text-dark">Pinned</span>{% endif %}
-                    {% if post.is_locked %}<span class="badge bg-danger">Locked</span>{% endif %}
-                    {% if post.author == request.user or request.user.is_superuser %}
-                        <a href="{% url 'teacher_forum_list_edit' post.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
-                        <form method="post" action="{% url 'teacher_forum_list_delete' post.id %}" onsubmit="return confirm('Delete this discussion?');" style="display:inline;">
+                    {% if forum_post.is_pinned %}<span class="badge bg-warning text-dark">Pinned</span>{% endif %}
+                    {% if forum_post.is_locked %}<span class="badge bg-danger">Locked</span>{% endif %}
+                    {% if forum_post.author == request.user or request.user.is_superuser %}
+                        <a href="{% url 'teacher_forum_edit' forum_post.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <form method="post" action="{% url 'teacher_forum_delete' forum_post.id %}" onsubmit="return confirm('Delete this discussion?');" style="display:inline;">
                             {% csrf_token %}
                             <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
                         </form>
@@ -29,25 +29,25 @@
             </div>
             <hr>
             <div class="image-container mb-3">
-                {% if post.image and "placeholder" in post.image.url %}
+                {% if forum_post.image and "placeholder" in forum_post.image.url %}
                     <img class="card-img-top" src="{% static 'core/images/default.jpg' %}" alt="placeholder image">
-                {% elif post.image %}
-                    <img class="card-img-top" src="{{ post.image.url }}" alt="{{ post.title }}">
+                {% elif forum_post.image %}
+                    <img class="card-img-top" src="{{ forum_post.image.url }}" alt="{{ forum_post.title }}">
                 {% else %}
                     <img class="card-img-top" src="{% static 'core/images/default.jpg' %}" alt="placeholder image">
                 {% endif %}
                 <div class="image-flash"></div>
             </div>
             <div class="content">
-                {{ post.description|safe }}
+                {{ forum_post.description|safe }}
             </div>
         </div>
     </div>
 
-    <h5 class="mb-3">Replies ({{ post.replies_count }})</h5>
-    {% if post.replies.count %}
+    <h5 class="mb-3">Replies ({{ forum_post.replies_count }})</h5>
+    {% if forum_post.replies.count %}
         <div class="list-group mb-4">
-            {% for reply in post.replies.all %}
+            {% for reply in forum_post.replies.all %}
                 <div class="list-group-item">
                     <div class="d-flex justify-content-between align-items-start mb-2">
                         <div>
@@ -56,8 +56,8 @@
                         </div>
                         {% if reply.author == request.user or request.user.is_superuser %}
                             <div class="d-flex align-items-center gap-2">
-                                <a href="{% url 'teacher_forum_list_reply_edit' post.id reply.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
-                                <form method="post" action="{% url 'teacher_forum_list_reply_delete' post.id reply.id %}" onsubmit="return confirm('Delete this reply?');" style="display:inline;">
+                                <a href="{% url 'teacher_forum_reply_edit' forum_post.id reply.id %}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <form method="post" action="{% url 'teacher_forum_reply_delete' forum_post.id reply.id %}" onsubmit="return confirm('Delete this reply?');" style="display:inline;">
                                     {% csrf_token %}
                                     <button class="btn btn-sm btn-outline-danger" type="submit">Delete</button>
                                 </form>
@@ -72,7 +72,7 @@
         <div class="alert alert-info">No replies yet.</div>
     {% endif %}
 
-    {% if post.is_locked %}
+    {% if forum_post.is_locked %}
         <div class="alert alert-warning">This thread is locked. Replies are disabled.</div>
     {% else %}
         <div class="card shadow-sm">

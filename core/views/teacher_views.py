@@ -27,6 +27,7 @@ from core.forms.resource_forms import (
 
 from core.forms.forum_forms import (
     ForumPostForm,
+    ForumReplyForm,
 )
 
 
@@ -794,8 +795,7 @@ def teacher_forum_create_view(request):
             )
 
             return redirect(
-                "teacher_forum_detail",
-                pk=post.pk,
+                "teacher_forum_list",
             )
 
     else:
@@ -822,8 +822,52 @@ def teacher_forum_detail_view(request, pk):
         author=request.user,
     )
 
+    if request.method == "POST":
+
+        if forum_post.is_locked:
+
+            messages.warning(
+                request,
+                "This thread is locked and cannot accept replies.",
+            )
+
+            return redirect(
+                "teacher_forum_detail",
+                pk=forum_post.pk,
+            )
+
+        reply_form = ForumReplyForm(
+            request.POST,
+        )
+
+        if reply_form.is_valid():
+
+            reply = reply_form.save(
+                commit=False
+            )
+
+            reply.post = forum_post
+            reply.author = request.user
+            reply.save()
+
+            messages.success(
+                request,
+                "Reply posted successfully.",
+            )
+
+            return redirect(
+                "teacher_forum_detail",
+                pk=forum_post.pk,
+            )
+
+    else:
+
+        reply_form = ForumReplyForm()
+
     context = {
         "forum_post": forum_post,
+        "post": forum_post,
+        "reply_form": reply_form,
     }
 
     return render(
