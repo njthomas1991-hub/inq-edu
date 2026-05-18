@@ -408,7 +408,6 @@ def add_student_to_class_view(request, pk):
     teacher_class = get_object_or_404(
         Class,
         pk=pk,
-        teacher=request.user,
     )
 
     if request.method == "POST":
