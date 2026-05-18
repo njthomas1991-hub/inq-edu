@@ -36,6 +36,7 @@ class CustomAccountAdapter(DefaultAccountAdapter):
 
         return reverse("teacher_dashboard")
 
+
 def custom_login_view(request):
 
     def get_role(user):
@@ -51,10 +52,7 @@ def custom_login_view(request):
 
         return redirect("teacher_dashboard")
 
-    form = AuthenticationForm(
-        request,
-        data=request.POST or None
-    )
+    form = AuthenticationForm(request, data=request.POST or None)
 
     if request.method == "POST":
 
@@ -63,11 +61,7 @@ def custom_login_view(request):
             username = form.cleaned_data.get("username")
             password = form.cleaned_data.get("password")
 
-            user = authenticate(
-                request,
-                username=username,
-                password=password
-            )
+            user = authenticate(request, username=username, password=password)
 
             if user:
 
@@ -81,18 +75,9 @@ def custom_login_view(request):
 
                 return redirect("teacher_dashboard")
 
-        messages.error(
-            request,
-            "Invalid username or password."
-        )
+        messages.error(request, "Invalid username or password.")
 
-    return render(
-        request,
-        "account/login.html",
-        {
-            "form": form
-        }
-    )
+    return render(request, "account/login.html", {"form": form})
 
 
 def custom_logout_view(request):

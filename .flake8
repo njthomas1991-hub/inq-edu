@@ -1,0 +1,2 @@
+[flake8]
+exclude = .venv,venv,env,__pycache__,.git,staticfiles,media,db.sqlite3

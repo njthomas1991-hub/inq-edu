@@ -15,68 +15,52 @@ from allauth.account.views import (
 from core.views.auth_views import custom_logout_view
 from core.forms.auth_forms import CustomPasswordChangeForm
 
-
 urlpatterns = [
-
     # -------------------------
     # SIGNUP
     # -------------------------
-
     path(
         "signup/",
-        SignupView.as_view(
-            template_name="core/account/signup.html"
-        ),
+        SignupView.as_view(template_name="core/account/signup.html"),
         name="account_signup",
     ),
-
     # -------------------------
     # LOGIN
     # -------------------------
-
     path(
         "login/",
-        LoginView.as_view(
-            template_name="core/account/login.html"
-        ),
+        LoginView.as_view(template_name="core/account/login.html"),
         name="account_login",
     ),
-
     # -------------------------
     # LOGOUT
     # -------------------------
-
     path(
         "logout/",
         custom_logout_view,
         name="account_logout",
     ),
-
     # -------------------------
     # PASSWORD CHANGE
     # -------------------------
-
     path(
         "password/change/",
         PasswordChangeView.as_view(
             form_class=CustomPasswordChangeForm,
-            template_name="core/account/password_change.html"
+            template_name="core/account/password_change.html",
         ),
-        name="password_change"
+        name="password_change",
     ),
-
     path(
         "password/change/done/",
         PasswordChangeDoneView.as_view(
             template_name="core/account/password_change_done.html"
         ),
-        name="password_change_done"
+        name="password_change_done",
     ),
-
     # -------------------------
     # PASSWORD RESET
     # -------------------------
-
     path(
         "password-reset/",
         auth_views.PasswordResetView.as_view(
@@ -86,7 +70,6 @@ urlpatterns = [
         ),
         name="password_reset",
     ),
-
     path(
         "password-reset/done/",
         auth_views.PasswordResetDoneView.as_view(
@@ -94,7 +77,6 @@ urlpatterns = [
         ),
         name="password_reset_done",
     ),
-
     path(
         "reset/<uidb64>/<token>/",
         auth_views.PasswordResetConfirmView.as_view(
@@ -102,7 +84,6 @@ urlpatterns = [
         ),
         name="password_reset_confirm",
     ),
-
     path(
         "reset/done/",
         auth_views.PasswordResetCompleteView.as_view(

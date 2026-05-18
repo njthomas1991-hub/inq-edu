@@ -30,20 +30,17 @@ from core.forms.forum_forms import (
     ForumReplyForm,
 )
 
-
 # =====================================================
 # HELPERS
 # =====================================================
 
+
 def teacher_required(user):
 
-    return (
-        user.is_authenticated
-        and user.role in [
-            "teacher",
-            "school_admin",
-        ]
-    )
+    return user.is_authenticated and user.role in [
+        "teacher",
+        "school_admin",
+    ]
 
 
 WORD_LIST = [
@@ -64,20 +61,12 @@ WORD_LIST = [
 
 def generate_username(first_name, last_name):
 
-    base = (
-        first_name.lower() +
-        (
-            last_name[0].lower()
-            if last_name else ""
-        )
-    )
+    base = first_name.lower() + (last_name[0].lower() if last_name else "")
 
     username = base
     counter = 1
 
-    while User.objects.filter(
-        username=username
-    ).exists():
+    while User.objects.filter(username=username).exists():
 
         counter += 1
         username = f"{base}{counter}"
@@ -87,30 +76,22 @@ def generate_username(first_name, last_name):
 
 def generate_password():
 
-    return (
-        random.choice(WORD_LIST) +
-        random.choice(WORD_LIST)
-    )
+    return random.choice(WORD_LIST) + random.choice(WORD_LIST)
 
 
 # =====================================================
 # DASHBOARD
 # =====================================================
 
+
 @login_required
 def teacher_dashboard_view(request):
 
-    classes = Class.objects.filter(
-        teacher=request.user
-    )
+    classes = Class.objects.filter(teacher=request.user)
 
-    resources = TeachingResource.objects.filter(
-        author=request.user
-    )[:5]
+    resources = TeachingResource.objects.filter(author=request.user)[:5]
 
-    forum_posts = ForumPost.objects.filter(
-        author=request.user
-    )[:5]
+    forum_posts = ForumPost.objects.filter(author=request.user)[:5]
 
     context = {
         "classes": classes,
@@ -129,12 +110,11 @@ def teacher_dashboard_view(request):
 # CLASSES
 # =====================================================
 
+
 @login_required
 def teacher_classes_view(request):
 
-    classes = Class.objects.filter(
-        teacher=request.user
-    )
+    classes = Class.objects.filter(teacher=request.user)
 
     context = {
         "classes": classes,
@@ -156,13 +136,9 @@ def class_detail_view(request, pk):
         teacher=request.user,
     )
 
-    students = ClassStudent.objects.filter(
-        clazz=class_obj
-    ).select_related("student")
+    students = ClassStudent.objects.filter(clazz=class_obj).select_related("student")
 
-    teacher_classes = Class.objects.filter(
-        teacher=request.user
-    )
+    teacher_classes = Class.objects.filter(teacher=request.user)
 
     new_student = request.session.pop(
         "new_student",
@@ -192,9 +168,7 @@ def create_class_view(request):
 
         if form.is_valid():
 
-            classroom = form.save(
-                commit=False
-            )
+            classroom = form.save(commit=False)
 
             classroom.teacher = request.user
             classroom.save()
@@ -204,9 +178,7 @@ def create_class_view(request):
                 "Class created successfully.",
             )
 
-            return redirect(
-                "teacher_classes"
-            )
+            return redirect("teacher_classes")
 
     else:
 
@@ -255,9 +227,7 @@ def edit_class_view(request, pk):
 
     else:
 
-        form = ClassForm(
-            instance=classroom
-        )
+        form = ClassForm(instance=classroom)
 
     context = {
         "form": form,
@@ -289,9 +259,7 @@ def delete_class_view(request, pk):
             "Class deleted successfully.",
         )
 
-        return redirect(
-            "teacher_classes"
-        )
+        return redirect("teacher_classes")
 
     context = {
         "classroom": classroom,
@@ -305,26 +273,18 @@ def delete_class_view(request, pk):
 
 
 @login_required
-def teacher_class_edit_view(
-    request,
-    slug
-):
+def teacher_class_edit_view(request, slug):
 
     class_group = get_object_or_404(
-
         Class,
-
         slug=slug,
     )
 
     if request.method == "POST":
 
         form = ClassGroupEditForm(
-
             request.POST,
-
             instance=class_group,
-
             school=request.user.school,
         )
 
@@ -333,31 +293,22 @@ def teacher_class_edit_view(
             form.save()
 
             messages.success(
-
                 request,
-
                 "Class updated successfully.",
             )
 
-            return redirect(
-                "teacher_classes"
-            )
+            return redirect("teacher_classes")
 
     else:
 
         form = ClassGroupEditForm(
-
             instance=class_group,
-
             school=request.user.school,
         )
 
     return render(
-
         request,
-
         "core/teacher/classes/class_edit.html",
-
         {
             "form": form,
             "class_group": class_group,
@@ -366,15 +317,10 @@ def teacher_class_edit_view(
 
 
 @login_required
-def teacher_class_delete_view(
-    request,
-    slug
-):
+def teacher_class_delete_view(request, slug):
 
     class_group = get_object_or_404(
-
         Class,
-
         slug=slug,
     )
 
@@ -383,24 +329,19 @@ def teacher_class_delete_view(
         class_group.delete()
 
         messages.success(
-
             request,
-
             "Class deleted successfully.",
         )
 
-        return redirect(
-            "teacher_classes"
-        )
+        return redirect("teacher_classes")
 
-    return redirect(
-        "teacher_classes"
-    )
+    return redirect("teacher_classes")
 
 
 # =====================================================
 # STUDENTS
 # =====================================================
+
 
 @login_required
 def add_student_to_class_view(request, pk):
@@ -412,13 +353,9 @@ def add_student_to_class_view(request, pk):
 
     if request.method == "POST":
 
-        first_name = request.POST.get(
-            "first_name"
-        )
+        first_name = request.POST.get("first_name")
 
-        last_name = request.POST.get(
-            "last_name"
-        )
+        last_name = request.POST.get("last_name")
 
         username = generate_username(
             first_name,
@@ -469,12 +406,13 @@ def add_student_to_class_view(request, pk):
         context,
     )
 
+
 @login_required
 def remove_student_view(
     request,
     class_pk,
     student_pk,
-    ):
+):
 
     classroom = get_object_or_404(
         Class,
@@ -513,12 +451,13 @@ def remove_student_view(
         context,
     )
 
+
 @login_required
 def transfer_student_view(
     request,
     class_pk,
     student_pk,
-    ):
+):
 
     current_class = get_object_or_404(
         Class,
@@ -534,9 +473,7 @@ def transfer_student_view(
 
     if request.method == "POST":
 
-        target_class_id = request.POST.get(
-            "target_class_id"
-        )
+        target_class_id = request.POST.get("target_class_id")
 
         target_class = get_object_or_404(
             Class,
@@ -557,9 +494,7 @@ def transfer_student_view(
             pk=target_class.pk,
         )
 
-    teacher_classes = Class.objects.filter(
-        teacher=request.user
-    ).exclude(
+    teacher_classes = Class.objects.filter(teacher=request.user).exclude(
         pk=current_class.pk
     )
 
@@ -580,12 +515,11 @@ def transfer_student_view(
 # RESOURCES CRUD
 # =====================================================
 
+
 @login_required
 def teacher_resources_list_view(request):
 
-    resources = TeachingResource.objects.filter(
-        author=request.user
-    )
+    resources = TeachingResource.objects.filter(author=request.user)
 
     form = TeachingResourceForm()
 
@@ -600,6 +534,7 @@ def teacher_resources_list_view(request):
         context,
     )
 
+
 @login_required
 def teacher_resource_create_view(request):
 
@@ -612,9 +547,7 @@ def teacher_resource_create_view(request):
 
         if form.is_valid():
 
-            resource = form.save(
-                commit=False
-            )
+            resource = form.save(commit=False)
 
             resource.author = request.user
             resource.save()
@@ -697,9 +630,7 @@ def teacher_resource_edit_view(request, pk):
 
     else:
 
-        form = TeachingResourceForm(
-            instance=resource
-        )
+        form = TeachingResourceForm(instance=resource)
 
     context = {
         "form": form,
@@ -731,9 +662,7 @@ def teacher_resource_delete_view(request, pk):
             "Resource deleted successfully.",
         )
 
-        return redirect(
-            "teacher_resources_list"
-        )
+        return redirect("teacher_resources_list")
 
     context = {
         "resource": resource,
@@ -750,16 +679,15 @@ def teacher_resource_delete_view(request, pk):
 # FORUM CRUD
 # =====================================================
 
+
 @login_required
 def teacher_forum_list_view(request):
 
-    forum_posts = ForumPost.objects.filter(
-        author=request.user
-    )
+    forum_posts = ForumPost.objects.filter(author=request.user)
 
     context = {
-    "posts": forum_posts,
-    "form": ForumPostForm(),
+        "posts": forum_posts,
+        "form": ForumPostForm(),
     }
 
     return render(
@@ -781,9 +709,7 @@ def teacher_forum_create_view(request):
 
         if form.is_valid():
 
-            post = form.save(
-                commit=False
-            )
+            post = form.save(commit=False)
 
             post.author = request.user
             post.save()
@@ -841,9 +767,7 @@ def teacher_forum_detail_view(request, pk):
 
         if reply_form.is_valid():
 
-            reply = reply_form.save(
-                commit=False
-            )
+            reply = reply_form.save(commit=False)
 
             reply.post = forum_post
             reply.author = request.user
@@ -874,6 +798,7 @@ def teacher_forum_detail_view(request, pk):
         "core/teacher/forum/teacher_forum_detail.html",
         context,
     )
+
 
 @login_required
 def teacher_forum_edit_view(request, pk):
@@ -923,6 +848,7 @@ def teacher_forum_edit_view(request, pk):
         context,
     )
 
+
 @login_required
 def teacher_forum_delete_view(request, pk):
 
@@ -941,9 +867,7 @@ def teacher_forum_delete_view(request, pk):
             "Forum post deleted successfully.",
         )
 
-        return redirect(
-            "teacher_forum_list"
-        )
+        return redirect("teacher_forum_list")
 
     context = {
         "forum_post": forum_post,
@@ -955,6 +879,7 @@ def teacher_forum_delete_view(request, pk):
         context,
     )
 
+
 @login_required
 def class_analytics_view(request, pk):
 
@@ -964,26 +889,15 @@ def class_analytics_view(request, pk):
         teacher=request.user,
     )
 
-    students = ClassStudent.objects.filter(
-        clazz=class_obj
-    ).select_related("student")
+    students = ClassStudent.objects.filter(clazz=class_obj).select_related("student")
 
     total_students = students.count()
 
     total_xp = sum(
-        getattr(
-            enrollment.student,
-            "total_xp",
-            0
-        )
-        for enrollment in students
+        getattr(enrollment.student, "total_xp", 0) for enrollment in students
     )
 
-    average_xp = (
-        total_xp / total_students
-        if total_students > 0
-        else 0
-    )
+    average_xp = total_xp / total_students if total_students > 0 else 0
 
     context = {
         "class_obj": class_obj,
@@ -998,6 +912,7 @@ def class_analytics_view(request, pk):
         "core/teacher/classes/class_analytics.html",
         context,
     )
+
 
 @login_required
 def student_analytics_view(
@@ -1034,16 +949,17 @@ def student_analytics_view(
         "core/student/student_analytics.html",
         context,
     )
+
+
 # =====================================================
 # ANALYTICS
 # =====================================================
 
+
 @login_required
 def teacher_analytics_view(request):
 
-    classes = Class.objects.filter(
-        teacher=request.user
-    )
+    classes = Class.objects.filter(teacher=request.user)
 
     context = {
         "classes": classes,

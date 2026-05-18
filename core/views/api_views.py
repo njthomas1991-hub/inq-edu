@@ -24,18 +24,15 @@ from core.serializers import (
 )
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def current_user_api(request):
-    user_data = dict(
-        UserSerializer(request.user).data
-    )
+    user_data = dict(UserSerializer(request.user).data)
 
     monster_avatar = Avatar.objects.filter(user=request.user).first()
 
-    user_data['monster_avatar'] = (
-        AvatarSerializer(monster_avatar).data
-        if monster_avatar else None
+    user_data["monster_avatar"] = (
+        AvatarSerializer(monster_avatar).data if monster_avatar else None
     )
 
     return Response(user_data)
@@ -43,80 +40,59 @@ def current_user_api(request):
 
 def custom_404_view(request, exception=None):
 
-    if request.headers.get('accept', '').startswith('application/json'):
+    if request.headers.get("accept", "").startswith("application/json"):
 
-        return JsonResponse(
-            {'error': 'Not found'},
-            status=404
-        )
+        return JsonResponse({"error": "Not found"}, status=404)
 
-    return JsonResponse(
-        {'error': 'Page not found'},
-        status=404
-    )
+    return JsonResponse({"error": "Page not found"}, status=404)
 
 
-@api_view(['GET', 'POST'])
+@api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def kindlewick_progress_list(request):
 
-    return Response(
-        {"message": "kindlewick_progress_list working"}
-    )
+    return Response({"message": "kindlewick_progress_list working"})
 
 
-@api_view(['GET', 'POST'])
+@api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated])
 def kindlewick_sessions(request):
 
-    return Response(
-        {"message": "kindlewick_sessions working"}
-    )
+    return Response({"message": "kindlewick_sessions working"})
 
 
-@api_view(['GET', 'PUT', 'DELETE'])
+@api_view(["GET", "PUT", "DELETE"])
 @permission_classes([IsAuthenticated])
 def kindlewick_session_detail(request, session_id):
 
     return Response(
-        {
-            "message": "kindlewick_session_detail working",
-            "session_id": session_id
-        }
+        {"message": "kindlewick_session_detail working", "session_id": session_id}
     )
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def kindlewick_teacher_progress(request):
 
-    return Response(
-        {"message": "kindlewick_teacher_progress working"}
-    )
+    return Response({"message": "kindlewick_teacher_progress working"})
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def kindlewick_teacher_sessions(request):
 
-    return Response(
-        {"message": "kindlewick_teacher_sessions working"}
-    )
+    return Response({"message": "kindlewick_teacher_sessions working"})
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def kindlewick_school_admin_progress(request):
 
-    return Response(
-        {"message": "kindlewick_school_admin_progress working"}
-    )
+    return Response({"message": "kindlewick_school_admin_progress working"})
 
 
-@api_view(['GET'])
+@api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def kindlewick_school_admin_sessions(request):
 
-    return Response(
-        {"message": "kindlewick_school_admin_sessions working"}
-    )
+    return Response({"message": "kindlewick_school_admin_sessions working"})

@@ -1,4 +1,3 @@
-
 from django import forms
 from django_summernote.widgets import SummernoteWidget
 from crispy_forms.helper import FormHelper
@@ -12,43 +11,79 @@ class TeachingResourceForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_tag = False
         self.helper.layout = Layout(
+            Row(Column("title", css_class="col-12"), css_class="g-3"),
             Row(
-                Column('title', css_class='col-12'),
-                css_class='g-3'
-            ),
-            Row(
-                Column('resource_type', css_class='col-md-3'),
-                Column('year_ks', css_class='col-md-3'),
-                Column('subject', css_class='col-md-3'),
-                Column('status', css_class='col-md-3'),
-                css_class='g-3'
+                Column("resource_type", css_class="col-md-3"),
+                Column("year_ks", css_class="col-md-3"),
+                Column("subject", css_class="col-md-3"),
+                Column("status", css_class="col-md-3"),
+                css_class="g-3",
             ),
         )
 
     class Meta:
         model = TeachingResource
-        fields = ('title', 'resource_type', 'year_ks', 'subject', 'status')
+        fields = ("title", "resource_type", "year_ks", "subject", "status")
         widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Resource title'}),
-            'resource_type': forms.Select(attrs={'class': 'form-select'}),
-            'year_ks': forms.Select(attrs={'class': 'form-select'}),
-            'subject': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Subject (optional)'}),
-            'status': forms.Select(attrs={'class': 'form-select'}),
+            "title": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Resource title"}
+            ),
+            "resource_type": forms.Select(attrs={"class": "form-select"}),
+            "year_ks": forms.Select(attrs={"class": "form-select"}),
+            "subject": forms.TextInput(
+                attrs={"class": "form-control", "placeholder": "Subject (optional)"}
+            ),
+            "status": forms.Select(attrs={"class": "form-select"}),
         }
 
 
 class ClassForm(forms.ModelForm):
     class Meta:
         model = Class
-        fields = ['name', 'year_ks', 'subject', 'description']
+        fields = ["name", "year_ks", "subject", "description"]
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter class name', 'required': True}),
-            'year_ks': forms.Select(choices=Class.year_ks_CHOICES, attrs={'class': 'form-select', 'required': True}),
-            'subject': forms.Select(attrs={'class': 'form-select', 'required': True}),
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Optional description'}),
+            "name": forms.TextInput(
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Enter class name",
+                    "required": True,
+                }
+            ),
+            "year_ks": forms.Select(
+                choices=Class.year_ks_CHOICES,
+                attrs={"class": "form-select", "required": True},
+            ),
+            "subject": forms.Select(attrs={"class": "form-select", "required": True}),
+            "description": forms.Textarea(
+                attrs={
+                    "class": "form-control",
+                    "rows": 3,
+                    "placeholder": "Optional description",
+                }
+            ),
         }
 
 
 class StudentSignupForm(forms.Form):
-    fname = forms.CharField(label='First Name', max_length=150, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First name', 'required': True}))
-    linitial = forms.CharField(label='Last Initial', max_length=1, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last initial', 'required': True}))
+    fname = forms.CharField(
+        label="First Name",
+        max_length=150,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "First name",
+                "required": True,
+            }
+        ),
+    )
+    linitial = forms.CharField(
+        label="Last Initial",
+        max_length=1,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "Last initial",
+                "required": True,
+            }
+        ),
+    )

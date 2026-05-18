@@ -1,6 +1,5 @@
 from django import forms
 
-
 SKIN_CHOICES = (
     ("light_1", "Light 1"),
     ("light_2", "Light 2"),
@@ -77,15 +76,33 @@ EXPRESSION_CHOICES = (
 
 
 class AvatarBuilderForm(forms.Form):
-    skin = forms.ChoiceField(choices=SKIN_CHOICES, widget=forms.Select(attrs={"class": "form-select"}))
-    hair = forms.ChoiceField(choices=HAIR_CHOICES, widget=forms.Select(attrs={"class": "form-select"}))
-    hair_color = forms.ChoiceField(choices=HAIR_COLOR_CHOICES, widget=forms.Select(attrs={"class": "form-select"}))
-    eyes = forms.ChoiceField(choices=EYES_CHOICES, widget=forms.Select(attrs={"class": "form-select"}))
-    mouth = forms.ChoiceField(choices=MOUTH_CHOICES, widget=forms.Select(attrs={"class": "form-select"}))
-    outfit = forms.ChoiceField(choices=OUTFIT_CHOICES, widget=forms.Select(attrs={"class": "form-select"}))
-    accessory = forms.ChoiceField(choices=ACCESSORY_CHOICES, widget=forms.Select(attrs={"class": "form-select"}))
-    background = forms.ChoiceField(choices=BACKGROUND_CHOICES, widget=forms.Select(attrs={"class": "form-select"}))
-    expression = forms.ChoiceField(choices=EXPRESSION_CHOICES, widget=forms.Select(attrs={"class": "form-select"}))
+    skin = forms.ChoiceField(
+        choices=SKIN_CHOICES, widget=forms.Select(attrs={"class": "form-select"})
+    )
+    hair = forms.ChoiceField(
+        choices=HAIR_CHOICES, widget=forms.Select(attrs={"class": "form-select"})
+    )
+    hair_color = forms.ChoiceField(
+        choices=HAIR_COLOR_CHOICES, widget=forms.Select(attrs={"class": "form-select"})
+    )
+    eyes = forms.ChoiceField(
+        choices=EYES_CHOICES, widget=forms.Select(attrs={"class": "form-select"})
+    )
+    mouth = forms.ChoiceField(
+        choices=MOUTH_CHOICES, widget=forms.Select(attrs={"class": "form-select"})
+    )
+    outfit = forms.ChoiceField(
+        choices=OUTFIT_CHOICES, widget=forms.Select(attrs={"class": "form-select"})
+    )
+    accessory = forms.ChoiceField(
+        choices=ACCESSORY_CHOICES, widget=forms.Select(attrs={"class": "form-select"})
+    )
+    background = forms.ChoiceField(
+        choices=BACKGROUND_CHOICES, widget=forms.Select(attrs={"class": "form-select"})
+    )
+    expression = forms.ChoiceField(
+        choices=EXPRESSION_CHOICES, widget=forms.Select(attrs={"class": "form-select"})
+    )
 
     def to_avatar_config(self):
         return {

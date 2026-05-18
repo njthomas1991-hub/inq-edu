@@ -20,42 +20,36 @@ class ProfileForm(forms.ModelForm):
         ]
 
         widgets = {
-
             "display_name": forms.TextInput(
                 attrs={
                     "class": "form-control",
                     "placeholder": "Display name",
                 }
             ),
-
             "first_name": forms.TextInput(
                 attrs={
                     "class": "form-control",
                     "placeholder": "First name",
                 }
             ),
-
             "last_name": forms.TextInput(
                 attrs={
                     "class": "form-control",
                     "placeholder": "Last name",
                 }
             ),
-
             "email": forms.EmailInput(
                 attrs={
                     "class": "form-control",
                     "placeholder": "Email address",
                 }
             ),
-
             "school": forms.TextInput(
                 attrs={
                     "class": "form-control",
                     "placeholder": "School",
                 }
             ),
-
             "bio": forms.Textarea(
                 attrs={
                     "class": "form-control",
@@ -71,8 +65,8 @@ class ProfileForm(forms.ModelForm):
 
         if "profile_image" in self.fields:
 
-            self.fields["profile_image"].widget.attrs.update({
-
-                "class": "form-control",
-
-            })
+            self.fields["profile_image"].widget.attrs.update(
+                {
+                    "class": "form-control",
+                }
+            )

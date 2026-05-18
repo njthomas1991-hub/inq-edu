@@ -14,9 +14,9 @@ class LoginForm(AuthenticationForm):
     username = forms.CharField(
         widget=forms.TextInput(
             attrs={
-                'class': 'form-control',
-                'placeholder': 'Username or Email',
-                'autocomplete': 'username',
+                "class": "form-control",
+                "placeholder": "Username or Email",
+                "autocomplete": "username",
             }
         )
     )
@@ -24,9 +24,9 @@ class LoginForm(AuthenticationForm):
     password = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
-                'class': 'form-control',
-                'placeholder': 'Password',
-                'autocomplete': 'current-password',
+                "class": "form-control",
+                "placeholder": "Password",
+                "autocomplete": "current-password",
             }
         )
     )
@@ -38,22 +38,22 @@ class CustomAllauthLoginForm(AllauthLoginForm):
 
         super().__init__(*args, **kwargs)
 
-        if 'login' in self.fields:
-            self.fields['login'].label = 'Email'
-            self.fields['login'].widget = forms.EmailInput(
+        if "login" in self.fields:
+            self.fields["login"].label = "Email"
+            self.fields["login"].widget = forms.EmailInput(
                 attrs={
-                    'class': 'form-control',
-                    'placeholder': 'Email',
-                    'autocomplete': 'email',
+                    "class": "form-control",
+                    "placeholder": "Email",
+                    "autocomplete": "email",
                 }
             )
 
-        if 'password' in self.fields:
-            self.fields['password'].widget = forms.PasswordInput(
+        if "password" in self.fields:
+            self.fields["password"].widget = forms.PasswordInput(
                 attrs={
-                    'class': 'form-control',
-                    'placeholder': 'Password',
-                    'autocomplete': 'current-password',
+                    "class": "form-control",
+                    "placeholder": "Password",
+                    "autocomplete": "current-password",
                 }
             )
 
@@ -64,30 +64,30 @@ class CustomPasswordChangeForm(PasswordChangeForm):
 
         super().__init__(*args, **kwargs)
 
-        if 'old_password' in self.fields:
-            self.fields['old_password'].widget = forms.PasswordInput(
+        if "old_password" in self.fields:
+            self.fields["old_password"].widget = forms.PasswordInput(
                 attrs={
-                    'class': 'form-control',
-                    'placeholder': 'Current password',
-                    'autocomplete': 'current-password',
+                    "class": "form-control",
+                    "placeholder": "Current password",
+                    "autocomplete": "current-password",
                 }
             )
 
-        if 'new_password1' in self.fields:
-            self.fields['new_password1'].widget = forms.PasswordInput(
+        if "new_password1" in self.fields:
+            self.fields["new_password1"].widget = forms.PasswordInput(
                 attrs={
-                    'class': 'form-control',
-                    'placeholder': 'New password',
-                    'autocomplete': 'new-password',
+                    "class": "form-control",
+                    "placeholder": "New password",
+                    "autocomplete": "new-password",
                 }
             )
 
-        if 'new_password2' in self.fields:
-            self.fields['new_password2'].widget = forms.PasswordInput(
+        if "new_password2" in self.fields:
+            self.fields["new_password2"].widget = forms.PasswordInput(
                 attrs={
-                    'class': 'form-control',
-                    'placeholder': 'Confirm new password',
-                    'autocomplete': 'new-password',
+                    "class": "form-control",
+                    "placeholder": "Confirm new password",
+                    "autocomplete": "new-password",
                 }
             )
 
@@ -95,60 +95,45 @@ class CustomPasswordChangeForm(PasswordChangeForm):
 class CustomSignupForm(SignupForm):
 
     ROLE_DESCRIPTIONS = {
-        'teacher': 'A teacher who creates and manages classes and students.',
-        'student': 'A student who participates in classes and activities.',
-        'school_admin': 'A school administrator with oversight access.',
+        "teacher": "A teacher who creates and manages classes and students.",
+        "student": "A student who participates in classes and activities.",
+        "school_admin": "A school administrator with oversight access.",
     }
 
     role = forms.ChoiceField(
         choices=User.ROLE_CHOICES,
-        widget=forms.RadioSelect(
-            attrs={
-                'class': 'role-radio'
-            }
-        ),
+        widget=forms.RadioSelect(attrs={"class": "role-radio"}),
         required=True,
-        label='I am a',
-        initial='teacher'
+        label="I am a",
+        initial="teacher",
     )
 
     first_name = forms.CharField(
         max_length=150,
         required=False,
         widget=forms.TextInput(
-            attrs={
-                'class': 'form-control',
-                'placeholder': 'First name'
-            }
-        )
+            attrs={"class": "form-control", "placeholder": "First name"}
+        ),
     )
 
     last_name = forms.CharField(
         max_length=150,
         required=False,
         widget=forms.TextInput(
-            attrs={
-                'class': 'form-control',
-                'placeholder': 'Last name'
-            }
-        )
+            attrs={"class": "form-control", "placeholder": "Last name"}
+        ),
     )
 
-    username = forms.CharField(
-        required=False,
-         widget=forms.HiddenInput()
-    )
+    username = forms.CharField(required=False, widget=forms.HiddenInput())
 
     school = forms.CharField(
         max_length=255,
         required=False,
         widget=forms.TextInput(
-            attrs={
-                'class': 'form-control',
-                'placeholder': 'School name'
-            }
-        )
+            attrs={"class": "form-control", "placeholder": "School name"}
+        ),
     )
+
 
 def save(self, request):
 
@@ -168,24 +153,22 @@ def save(self, request):
 
     user.username = username
 
-    role = self.cleaned_data.get('role', 'teacher')
+    role = self.cleaned_data.get("role", "teacher")
     user.role = role
 
-    user.first_name = self.cleaned_data.get('first_name', '')
-    user.last_name = self.cleaned_data.get('last_name', '')
+    user.first_name = self.cleaned_data.get("first_name", "")
+    user.last_name = self.cleaned_data.get("last_name", "")
 
-    school_name = self.cleaned_data.get('school', '').strip()
+    school_name = self.cleaned_data.get("school", "").strip()
 
     if school_name:
         from core.models import School
 
-        school, _ = School.objects.get_or_create(
-            name=school_name
-        )
+        school, _ = School.objects.get_or_create(name=school_name)
 
         user.school = school
 
-    user.is_staff = role in ['teacher', 'school_admin']
+    user.is_staff = role in ["teacher", "school_admin"]
 
     user.save()
 
@@ -197,9 +180,9 @@ class LoginForm(AuthenticationForm):
     username = forms.CharField(
         widget=forms.TextInput(
             attrs={
-                'class': 'form-control',
-                'placeholder': 'Username or Email',
-                'autocomplete': 'username',
+                "class": "form-control",
+                "placeholder": "Username or Email",
+                "autocomplete": "username",
             }
         )
     )
@@ -207,9 +190,9 @@ class LoginForm(AuthenticationForm):
     password = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
-                'class': 'form-control',
-                'placeholder': 'Password',
-                'autocomplete': 'current-password',
+                "class": "form-control",
+                "placeholder": "Password",
+                "autocomplete": "current-password",
             }
         )
     )
@@ -221,22 +204,22 @@ class CustomAllauthLoginForm(AllauthLoginForm):
 
         super().__init__(*args, **kwargs)
 
-        if 'login' in self.fields:
-            self.fields['login'].label = 'Email'
-            self.fields['login'].widget = forms.EmailInput(
+        if "login" in self.fields:
+            self.fields["login"].label = "Email"
+            self.fields["login"].widget = forms.EmailInput(
                 attrs={
-                    'class': 'form-control',
-                    'placeholder': 'Email',
-                    'autocomplete': 'email',
+                    "class": "form-control",
+                    "placeholder": "Email",
+                    "autocomplete": "email",
                 }
             )
 
-        if 'password' in self.fields:
-            self.fields['password'].widget = forms.PasswordInput(
+        if "password" in self.fields:
+            self.fields["password"].widget = forms.PasswordInput(
                 attrs={
-                    'class': 'form-control',
-                    'placeholder': 'Password',
-                    'autocomplete': 'current-password',
+                    "class": "form-control",
+                    "placeholder": "Password",
+                    "autocomplete": "current-password",
                 }
             )
 
@@ -247,51 +230,48 @@ class CustomPasswordChangeForm(PasswordChangeForm):
 
         super().__init__(*args, **kwargs)
 
-        if 'old_password' in self.fields:
-            self.fields['old_password'].widget = forms.PasswordInput(
+        if "old_password" in self.fields:
+            self.fields["old_password"].widget = forms.PasswordInput(
                 attrs={
-                    'class': 'form-control',
-                    'placeholder': 'Current password',
-                    'autocomplete': 'current-password',
+                    "class": "form-control",
+                    "placeholder": "Current password",
+                    "autocomplete": "current-password",
                 }
             )
 
-        if 'new_password1' in self.fields:
-            self.fields['new_password1'].widget = forms.PasswordInput(
+        if "new_password1" in self.fields:
+            self.fields["new_password1"].widget = forms.PasswordInput(
                 attrs={
-                    'class': 'form-control',
-                    'placeholder': 'New password',
-                    'autocomplete': 'new-password',
+                    "class": "form-control",
+                    "placeholder": "New password",
+                    "autocomplete": "new-password",
                 }
             )
 
-        if 'new_password2' in self.fields:
-            self.fields['new_password2'].widget = forms.PasswordInput(
+        if "new_password2" in self.fields:
+            self.fields["new_password2"].widget = forms.PasswordInput(
                 attrs={
-                    'class': 'form-control',
-                    'placeholder': 'Confirm new password',
-                    'autocomplete': 'new-password',
+                    "class": "form-control",
+                    "placeholder": "Confirm new password",
+                    "autocomplete": "new-password",
                 }
             )
+
 
 class CustomSignupForm(SignupForm):
 
     ROLE_DESCRIPTIONS = {
-        'teacher': 'A teacher who creates and manages classes and students.',
-        'student': 'A student who participates in classes and activities.',
-        'school_admin': 'A school administrator with oversight access.',
+        "teacher": "A teacher who creates and manages classes and students.",
+        "student": "A student who participates in classes and activities.",
+        "school_admin": "A school administrator with oversight access.",
     }
 
     role = forms.ChoiceField(
         choices=User.ROLE_CHOICES,
-        widget=forms.RadioSelect(
-            attrs={
-                'class': 'role-radio'
-            }
-        ),
+        widget=forms.RadioSelect(attrs={"class": "role-radio"}),
         required=True,
-        label='I am a',
-        initial='teacher'
+        label="I am a",
+        initial="teacher",
     )
 
     first_name = forms.CharField(
@@ -327,24 +307,22 @@ class CustomSignupForm(SignupForm):
 
         user.username = username
 
-        role = self.cleaned_data.get('role', 'teacher')
+        role = self.cleaned_data.get("role", "teacher")
         user.role = role
 
-        user.first_name = self.cleaned_data.get('first_name', '')
-        user.last_name = self.cleaned_data.get('last_name', '')
+        user.first_name = self.cleaned_data.get("first_name", "")
+        user.last_name = self.cleaned_data.get("last_name", "")
 
-        school_name = self.cleaned_data.get('school', '').strip()
+        school_name = self.cleaned_data.get("school", "").strip()
 
         if school_name:
             from core.models import School
 
-            school, _ = School.objects.get_or_create(
-                name=school_name
-            )
+            school, _ = School.objects.get_or_create(name=school_name)
 
             user.school = school
 
-        user.is_staff = role in ['teacher', 'school_admin']
+        user.is_staff = role in ["teacher", "school_admin"]
 
         user.save()
 
@@ -354,13 +332,13 @@ class CustomSignupForm(SignupForm):
 
         user = request.user
 
-        if user.role == 'teacher':
-            return '/teacher/'
+        if user.role == "teacher":
+            return "/teacher/"
 
-        if user.role == 'student':
-            return '/student/'
+        if user.role == "student":
+            return "/student/"
 
-        if user.role == 'school_admin':
-            return '/school-admin/'
+        if user.role == "school_admin":
+            return "/school-admin/"
 
-        return '/'
+        return "/"

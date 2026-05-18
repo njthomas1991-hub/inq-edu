@@ -3,7 +3,7 @@ import os
 import sys
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
 sys.path.insert(0, os.path.dirname(__file__))
 
 django.setup()
@@ -11,9 +11,9 @@ django.setup()
 from backend.core.models import User
 
 # Create a superuser with default credentials
-username = 'admin'
-email = 'admin@example.com'
-password = 'admin12345'
+username = "admin"
+email = "admin@example.com"
+password = "admin12345"
 
 # Check if admin already exists
 if User.objects.filter(username=username).exists():
@@ -28,7 +28,7 @@ else:
         username=username,
         email=email,
         password=password,
-        role='teacher'  # Grant teacher role
+        role="teacher",  # Grant teacher role
     )
     print(f"✓ Superuser created successfully!")
     print(f"  Username: {username}")

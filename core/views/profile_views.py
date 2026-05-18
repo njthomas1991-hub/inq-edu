@@ -15,39 +15,33 @@ from core.forms.profile_forms import (
     ProfileForm,
 )
 
-
 # =====================================================
 # AVATAR OPTIONS
 # =====================================================
 
 AVATAR_OPTIONS = {
-
     "avatar_style": [
         "monster",
         "human",
         "robot",
     ],
-
     "body_type": [
         "blob",
         "round",
         "square",
     ],
-
     "eye_type": [
         "big_round",
         "sleepy",
         "star",
         "laser",
     ],
-
     "mouth_type": [
         "happy",
         "sad",
         "grin",
         "surprised",
     ],
-
     "head_decoration": [
         "horns",
         "hat",
@@ -61,59 +55,45 @@ AVATAR_OPTIONS = {
 # PROFILE VIEW
 # =====================================================
 
+
 @login_required
 def profile_view(request):
 
-    avatar, _ = Avatar.objects.get_or_create(
-        user=request.user
-    )
+    avatar, _ = Avatar.objects.get_or_create(user=request.user)
 
     if request.method == "POST":
 
         form = ProfileForm(
-
             request.POST,
-
             request.FILES,
-
             instance=request.user,
         )
 
         if form.is_valid():
 
-            user = form.save(
-                commit=False
-            )
+            user = form.save(commit=False)
 
             user.last_active = timezone.now()
 
             user.save()
 
             messages.success(
-
                 request,
-
                 "Profile updated successfully.",
             )
 
-            return redirect(
-    "/profile/?updated=avatar"
-)
+            return redirect("/profile/?updated=avatar")
 
         else:
 
             messages.error(
-
                 request,
-
                 "Please correct the errors below.",
             )
 
     else:
 
-        form = ProfileForm(
-            instance=request.user
-        )
+        form = ProfileForm(instance=request.user)
 
     context = {
         "form": form,
@@ -122,11 +102,8 @@ def profile_view(request):
     }
 
     return render(
-
         request,
-
         "core/profile/profile.html",
-
         context,
     )
 
@@ -135,12 +112,11 @@ def profile_view(request):
 # AVATAR BUILDER
 # =====================================================
 
+
 @login_required
 def avatar_builder_view(request):
 
-    avatar, _ = Avatar.objects.get_or_create(
-        user=request.user
-    )
+    avatar, _ = Avatar.objects.get_or_create(user=request.user)
 
     config = avatar.avatar_config or {}
 
@@ -190,32 +166,21 @@ def avatar_builder_view(request):
         request.user.save()
 
         messages.success(
-
             request,
-
             "Avatar updated successfully.",
         )
 
-        return redirect(
-            "profile"
-        )
+        return redirect("profile")
 
     context = {
-
         "avatar": avatar,
-
         "config": config,
-
         "avatar_options": AVATAR_OPTIONS,
-
         "page_title": "Avatar Builder",
     }
 
     return render(
-
         request,
-
         "core/profile/avatar_builder.html",
-
         context,
     )

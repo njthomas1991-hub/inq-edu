@@ -9,10 +9,10 @@ from core.models import (
     ForumReply,
 )
 
-
 # =====================================================
 # FORUM POST FORM
 # =====================================================
+
 
 class ForumPostForm(forms.ModelForm):
 
@@ -21,82 +21,58 @@ class ForumPostForm(forms.ModelForm):
         model = ForumPost
 
         fields = (
-            'title',
-            'description',
-            'uploaded_file',
-            'image',
-            'allow_replies',
+            "title",
+            "description",
+            "uploaded_file",
+            "image",
+            "allow_replies",
         )
 
         widgets = {
-
             # TITLE
-
-            'title': forms.TextInput(
+            "title": forms.TextInput(
                 attrs={
-                    'class': 'form-control',
-                    'placeholder': (
-                        'Enter post title'
-                    ),
+                    "class": "form-control",
+                    "placeholder": ("Enter post title"),
                 }
             ),
-
             # DESCRIPTION
-
-            'description': SummernoteWidget(),
-
+            "description": SummernoteWidget(),
             # FILE UPLOAD
-
-            'uploaded_file': forms.ClearableFileInput(
+            "uploaded_file": forms.ClearableFileInput(
                 attrs={
-                    'class': 'form-control',
+                    "class": "form-control",
                 }
             ),
-
             # IMAGE
-
-            'image': forms.ClearableFileInput(
+            "image": forms.ClearableFileInput(
                 attrs={
-                    'class': 'form-control',
+                    "class": "form-control",
                 }
             ),
-
             # ALLOW REPLIES
-
-            'allow_replies': forms.CheckboxInput(
+            "allow_replies": forms.CheckboxInput(
                 attrs={
-                    'class': 'form-check-input',
+                    "class": "form-check-input",
                 }
             ),
         }
 
         labels = {
-
-            'uploaded_file': (
-                'Upload Supporting File'
-            ),
-
-            'image': (
-                'Upload Image'
-            ),
-
-            'allow_replies': (
-                'Allow replies and discussion'
-            ),
+            "uploaded_file": ("Upload Supporting File"),
+            "image": ("Upload Image"),
+            "allow_replies": ("Allow replies and discussion"),
         }
 
         help_texts = {
-
-            'uploaded_file': (
-                'Optional: PDFs, worksheets, '
-                'PowerPoints, documents, etc.'
+            "uploaded_file": (
+                "Optional: PDFs, worksheets, " "PowerPoints, documents, etc."
             ),
-
-            'description': (
-                'All posts are reviewed regularly '
-                'for safeguarding, equality, '
-                'diversity and professional '
-                'conduct compliance.'
+            "description": (
+                "All posts are reviewed regularly "
+                "for safeguarding, equality, "
+                "diversity and professional "
+                "conduct compliance."
             ),
         }
 
@@ -105,26 +81,23 @@ class ForumPostForm(forms.ModelForm):
 # FORUM REPLY FORM
 # =====================================================
 
+
 class ForumReplyForm(forms.ModelForm):
 
     class Meta:
 
         model = ForumReply
 
-        fields = (
-            'content',
-        )
+        fields = ("content",)
 
         widgets = {
-
-            'content': SummernoteWidget(),
+            "content": SummernoteWidget(),
         }
 
         help_texts = {
-
-            'content': (
-                'Replies must follow community '
-                'guidelines and professional '
-                'conduct expectations.'
+            "content": (
+                "Replies must follow community "
+                "guidelines and professional "
+                "conduct expectations."
             ),
         }

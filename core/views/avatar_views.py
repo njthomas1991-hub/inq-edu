@@ -58,7 +58,9 @@ def save_user_avatar(request):
 
     form = AvatarBuilderForm(payload)
     if not form.is_valid():
-        return JsonResponse({"error": "Invalid avatar data", "details": form.errors}, status=400)
+        return JsonResponse(
+            {"error": "Invalid avatar data", "details": form.errors}, status=400
+        )
 
     avatar = _get_or_create_avatar(request.user)
     avatar.avatar_config = form.to_avatar_config()
@@ -74,13 +76,19 @@ def randomize_avatar(request):
     avatar.avatar_config = {
         "skin": random.choice([choice[0] for choice in Avatar.SKIN_CHOICES]),
         "hair": random.choice([choice[0] for choice in Avatar.HAIR_CHOICES]),
-        "hair_color": random.choice([choice[0] for choice in Avatar.HAIR_COLOR_CHOICES]),
+        "hair_color": random.choice(
+            [choice[0] for choice in Avatar.HAIR_COLOR_CHOICES]
+        ),
         "eyes": random.choice([choice[0] for choice in Avatar.EYES_CHOICES]),
         "mouth": random.choice([choice[0] for choice in Avatar.MOUTH_CHOICES]),
         "outfit": random.choice([choice[0] for choice in Avatar.OUTFIT_CHOICES]),
         "accessory": random.choice([choice[0] for choice in Avatar.ACCESSORY_CHOICES]),
-        "background": random.choice([choice[0] for choice in Avatar.BACKGROUND_CHOICES]),
-        "expression": random.choice([choice[0] for choice in Avatar.EXPRESSION_CHOICES]),
+        "background": random.choice(
+            [choice[0] for choice in Avatar.BACKGROUND_CHOICES]
+        ),
+        "expression": random.choice(
+            [choice[0] for choice in Avatar.EXPRESSION_CHOICES]
+        ),
     }
     avatar.save()
 

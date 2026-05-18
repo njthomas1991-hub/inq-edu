@@ -8,8 +8,12 @@ from core.views.legal_views import (
 )
 
 urlpatterns = [
-    path('terms-of-use/', terms_of_use, name='terms_of_use'),
-    path('subscription-details/', subscription_details, name='subscription_details'),
-    path('privacy-policy/', privacy_policy, name='privacy_policy'),
-    path('accessibility-statement/', accessibility_statement, name='accessibility_statement'),
+    path("terms-of-use/", terms_of_use, name="terms_of_use"),
+    path("subscription-details/", subscription_details, name="subscription_details"),
+    path("privacy-policy/", privacy_policy, name="privacy_policy"),
+    path(
+        "accessibility-statement/",
+        accessibility_statement,
+        name="accessibility_statement",
+    ),
 ]

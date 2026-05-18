@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 """Check Avatar table structure"""
+
 import os
 import sys
 import django
 
 sys.path.insert(0, os.path.dirname(__file__))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
 
 # Load environment variables
-env_path = os.path.join(os.path.dirname(__file__), 'env.py')
+env_path = os.path.join(os.path.dirname(__file__), "env.py")
 if os.path.isfile(env_path):
     with open(env_path) as f:
         exec(f.read())
@@ -26,7 +27,7 @@ with connection.cursor() as cursor:
         );
     """)
     exists = cursor.fetchone()[0]
-    
+
     if exists:
         print("✓ Avatar table EXISTS")
         # Get columns

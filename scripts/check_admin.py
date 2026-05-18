@@ -3,8 +3,8 @@ import os
 import sys
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'backend'))
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "backend"))
 
 django.setup()
 

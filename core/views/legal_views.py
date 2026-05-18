@@ -3,31 +3,19 @@ from django.shortcuts import render
 
 def terms_of_use(request):
 
-    return render(
-        request,
-        'core/legal/terms_of_use.html'
-    )
+    return render(request, "core/legal/terms_of_use.html")
 
 
 def subscription_details(request):
 
-    return render(
-        request,
-        'core/legal/subscription_details.html'
-    )
+    return render(request, "core/legal/subscription_details.html")
 
 
 def privacy_policy(request):
 
-    return render(
-        request,
-        'core/legal/privacy_policy.html'
-    )
+    return render(request, "core/legal/privacy_policy.html")
 
 
 def accessibility_statement(request):
 
-    return render(
-        request,
-        'core/legal/accessibility_statement.html'
-    )
+    return render(request, "core/legal/accessibility_statement.html")

@@ -1,7 +1,6 @@
 from django.shortcuts import redirect, render
 
 
-
 def home_page_view(request):
     return render(request, "core/public/home.html")
 
@@ -16,10 +15,8 @@ from django.contrib.auth.decorators import login_required
 @login_required
 def kindlewick_page_view(request):
 
-    return render(
-        request,
-        "core/public/kindlewick.html"
-    )
+    return render(request, "core/public/kindlewick.html")
+
 
 def questopia_page_view(request):
     return render(request, "core/public/questopia.html")
@@ -43,6 +40,7 @@ def teacher_hub_view(request):
             return redirect("student_dashboard")
 
     return render(request, "core/public/teacher_hub.html")
+
 
 def contact_page_view(request):
     return render(request, "core/public/contact.html")

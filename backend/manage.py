@@ -5,7 +5,7 @@ import os
 import sys
 
 # Load environment variables from env.py if it exists
-env_path = os.path.join(os.path.dirname(__file__), 'env.py')
+env_path = os.path.join(os.path.dirname(__file__), "env.py")
 if os.path.isfile(env_path):
     with open(env_path) as f:
         exec(f.read())
@@ -13,7 +13,7 @@ if os.path.isfile(env_path):
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
@@ -25,5 +25,5 @@ def main():
     execute_from_command_line(sys.argv)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

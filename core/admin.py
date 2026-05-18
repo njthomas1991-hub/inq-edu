@@ -38,17 +38,16 @@ admin.site.unregister(Group)
 # HELPERS
 # =====================================================
 
+
 def _is_teacher(user):
 
-    return (
-        user.is_authenticated
-        and getattr(user, "role", None) == "teacher"
-    )
+    return user.is_authenticated and getattr(user, "role", None) == "teacher"
 
 
 # =====================================================
 # USER ADMIN
 # =====================================================
+
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
@@ -56,109 +55,104 @@ class UserAdmin(BaseUserAdmin):
     model = User
 
     list_display = (
-        'username',
-        'first_name',
-        'last_name',
-        'role',
-        'school',
-        'level',
-        'tokens',
-        'is_staff',
-        'is_active',
+        "username",
+        "first_name",
+        "last_name",
+        "role",
+        "school",
+        "level",
+        "tokens",
+        "is_staff",
+        "is_active",
     )
 
     list_filter = (
-        'role',
-        'school',
-        'is_staff',
-        'is_active',
+        "role",
+        "school",
+        "is_staff",
+        "is_active",
     )
 
     search_fields = (
-        'username',
-        'email',
-        'first_name',
-        'last_name',
+        "username",
+        "email",
+        "first_name",
+        "last_name",
     )
 
-    ordering = ('username',)
+    ordering = ("username",)
 
     fieldsets = (
         (
             None,
             {
-                'fields': (
-                    'username',
-                    'password',
+                "fields": (
+                    "username",
+                    "password",
                 )
-            }
+            },
         ),
-
         (
-            'Personal Information',
+            "Personal Information",
             {
-                'fields': (
-                    'first_name',
-                    'last_name',
-                    'email',
-                    'display_name',
-                    'bio',
-                    'profile_image',
+                "fields": (
+                    "first_name",
+                    "last_name",
+                    "email",
+                    "display_name",
+                    "bio",
+                    "profile_image",
                 )
-            }
+            },
         ),
-
         (
-            'School Information',
+            "School Information",
             {
-                'fields': (
-                    'role',
-                    'school',
+                "fields": (
+                    "role",
+                    "school",
                 )
-            }
+            },
         ),
-
         (
-            'Gamification',
+            "Gamification",
             {
-                'fields': (
-                    'total_xp',
-                    'level',
-                    'streak',
-                    'tokens',
+                "fields": (
+                    "total_xp",
+                    "level",
+                    "streak",
+                    "tokens",
                 )
-            }
+            },
         ),
-
         (
-            'Permissions',
+            "Permissions",
             {
-                'fields': (
-                    'is_active',
-                    'is_staff',
-                    'is_superuser',
-                    'groups',
-                    'user_permissions',
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
                 )
-            }
+            },
         ),
-
         (
-            'Important Dates',
+            "Important Dates",
             {
-                'fields': (
-                    'last_login',
-                    'date_joined',
-                    'created_at',
-                    'updated_at',
+                "fields": (
+                    "last_login",
+                    "date_joined",
+                    "created_at",
+                    "updated_at",
                 )
-            }
+            },
         ),
     )
 
     readonly_fields = (
-        'created_at',
-        'updated_at',
+        "created_at",
+        "updated_at",
     )
 
 
@@ -166,51 +160,51 @@ class UserAdmin(BaseUserAdmin):
 # SCHOOL ADMIN
 # =====================================================
 
+
 @admin.register(School)
 class SchoolAdmin(admin.ModelAdmin):
 
     list_display = (
-        'name',
-        'subscription_tier',
-        'subscription_active',
-        'created_at',
+        "name",
+        "subscription_tier",
+        "subscription_active",
+        "created_at",
     )
 
     search_fields = (
-        'name',
-        'billing_email',
+        "name",
+        "billing_email",
     )
 
     list_filter = (
-        'subscription_tier',
-        'subscription_active',
+        "subscription_tier",
+        "subscription_active",
     )
 
     readonly_fields = (
-        'created_at',
-        'updated_at',
+        "created_at",
+        "updated_at",
     )
 
-    prepopulated_fields = {
-        'slug': ('name',)
-    }
+    prepopulated_fields = {"slug": ("name",)}
 
 
 # =====================================================
 # AVATAR ADMIN
 # =====================================================
 
+
 @admin.register(Avatar)
 class AvatarAdmin(admin.ModelAdmin):
 
     list_display = (
-        'user',
-        'updated_at',
+        "user",
+        "updated_at",
     )
 
     readonly_fields = (
-        'created_at',
-        'updated_at',
+        "created_at",
+        "updated_at",
     )
 
 
@@ -218,45 +212,43 @@ class AvatarAdmin(admin.ModelAdmin):
 # CLASS INLINE
 # =====================================================
 
+
 class ClassStudentInline(admin.TabularInline):
 
     model = ClassStudent
 
     extra = 1
 
-    readonly_fields = (
-        'date_joined',
-    )
+    readonly_fields = ("date_joined",)
 
 
 # =====================================================
 # CLASS ADMIN
 # =====================================================
 
+
 @admin.register(Class)
 class ClassAdmin(admin.ModelAdmin):
 
     list_display = (
-        'name',
-        'teacher',
-        'subject',
-        'year_ks',
-        'created_at',
+        "name",
+        "teacher",
+        "subject",
+        "year_ks",
+        "created_at",
     )
 
     list_filter = (
-        'subject',
-        'year_ks',
+        "subject",
+        "year_ks",
     )
 
     search_fields = (
-        'name',
-        'teacher__username',
+        "name",
+        "teacher__username",
     )
 
-    readonly_fields = (
-        'created_at',
-    )
+    readonly_fields = ("created_at",)
 
     inlines = [ClassStudentInline]
 
@@ -265,18 +257,19 @@ class ClassAdmin(admin.ModelAdmin):
 # CLASS STUDENT ADMIN
 # =====================================================
 
+
 @admin.register(ClassStudent)
 class ClassStudentAdmin(admin.ModelAdmin):
 
     list_display = (
-        'student',
-        'clazz',
-        'date_joined',
+        "student",
+        "clazz",
+        "date_joined",
     )
 
     search_fields = (
-        'student__username',
-        'clazz__name',
+        "student__username",
+        "clazz__name",
     )
 
 
@@ -284,113 +277,105 @@ class ClassStudentAdmin(admin.ModelAdmin):
 # RESOURCE ADMIN
 # =====================================================
 
+
 @admin.register(TeachingResource)
 class TeachingResourceAdmin(SummernoteModelAdmin):
 
-    summernote_fields = (
-        'description',
-    )
+    summernote_fields = ("description",)
 
     list_display = (
-        'title',
-        'author',
-        'resource_type',
-        'subject',
-        'year_ks',
-        'visibility',
-        'status',
-        'featured',
-        'created_at',
+        "title",
+        "author",
+        "resource_type",
+        "subject",
+        "year_ks",
+        "visibility",
+        "status",
+        "featured",
+        "created_at",
     )
 
     list_filter = (
-        'resource_type',
-        'visibility',
-        'status',
-        'featured',
+        "resource_type",
+        "visibility",
+        "status",
+        "featured",
     )
 
     search_fields = (
-        'title',
-        'description',
-        'subject',
+        "title",
+        "description",
+        "subject",
     )
 
     readonly_fields = (
-        'created_at',
-        'updated_at',
-        'published_at',
+        "created_at",
+        "updated_at",
+        "published_at",
     )
 
-    prepopulated_fields = {
-        'slug': ('title',)
-    }
+    prepopulated_fields = {"slug": ("title",)}
 
     fieldsets = (
         (
-            'Content',
+            "Content",
             {
-                'fields': (
-                    'title',
-                    'slug',
-                    'description',
+                "fields": (
+                    "title",
+                    "slug",
+                    "description",
                 )
-            }
+            },
         ),
-
         (
-            'Media',
+            "Media",
             {
-                'fields': (
-                    'image',
-                    'uploaded_file',
+                "fields": (
+                    "image",
+                    "uploaded_file",
                 )
-            }
+            },
         ),
-
         (
-            'Classification',
+            "Classification",
             {
-                'fields': (
-                    'resource_type',
-                    'subject',
-                    'year_ks',
-                    'visibility',
+                "fields": (
+                    "resource_type",
+                    "subject",
+                    "year_ks",
+                    "visibility",
                 )
-            }
+            },
         ),
-
         (
-            'Publishing',
+            "Publishing",
             {
-                'fields': (
-                    'status',
-                    'featured',
-                    'allow_comments',
-                    'published_at',
+                "fields": (
+                    "status",
+                    "featured",
+                    "allow_comments",
+                    "published_at",
                 )
-            }
+            },
         ),
-
         (
-            'Moderation',
+            "Moderation",
             {
-                'fields': (
-                    'is_flagged',
-                    'moderation_notes',
+                "fields": (
+                    "is_flagged",
+                    "moderation_notes",
                 )
-            }
+            },
         ),
-
         (
-            'Metadata',
+            "Metadata",
             {
-                'fields': (
-                    'author',
-                    'created_at',
-                    'updated_at',
+                "fields": (
+                    "author",
+                    "created_at",
+                    "updated_at",
                 )
-            }
+            },
         ),
     )
 
@@ -399,37 +384,38 @@ class TeachingResourceAdmin(SummernoteModelAdmin):
 # RESOURCE COMMENT ADMIN
 # =====================================================
 
+
 @admin.register(ResourceComment)
 class ResourceCommentAdmin(admin.ModelAdmin):
 
     list_display = (
-        'resource',
-        'author',
-        'created_at',
+        "resource",
+        "author",
+        "created_at",
     )
 
-    search_fields = (
-        'content',
-    )
+    search_fields = ("content",)
 
 
 # =====================================================
 # RESOURCE LIKE ADMIN
 # =====================================================
 
+
 @admin.register(ResourceLike)
 class ResourceLikeAdmin(admin.ModelAdmin):
 
     list_display = (
-        'resource',
-        'user',
-        'created_at',
+        "resource",
+        "user",
+        "created_at",
     )
 
 
 # =====================================================
 # FORUM REPLY INLINE
 # =====================================================
+
 
 class ForumReplyInline(admin.TabularInline):
 
@@ -438,8 +424,8 @@ class ForumReplyInline(admin.TabularInline):
     extra = 0
 
     readonly_fields = (
-        'author',
-        'created_at',
+        "author",
+        "created_at",
     )
 
 
@@ -447,96 +433,91 @@ class ForumReplyInline(admin.TabularInline):
 # FORUM POST ADMIN
 # =====================================================
 
+
 @admin.register(ForumPost)
 class ForumPostAdmin(SummernoteModelAdmin):
 
-    summernote_fields = (
-        'description',
-    )
+    summernote_fields = ("description",)
 
     list_display = (
-        'title',
-        'author',
-        'visibility',
-        'is_pinned',
-        'is_locked',
-        'views',
-        'created_at',
+        "title",
+        "author",
+        "visibility",
+        "is_pinned",
+        "is_locked",
+        "views",
+        "created_at",
     )
 
     list_filter = (
-        'visibility',
-        'is_pinned',
-        'is_locked',
+        "visibility",
+        "is_pinned",
+        "is_locked",
     )
 
     search_fields = (
-        'title',
-        'description',
+        "title",
+        "description",
     )
 
     readonly_fields = (
-        'views',
-        'created_at',
-        'updated_at',
+        "views",
+        "created_at",
+        "updated_at",
     )
 
     inlines = [ForumReplyInline]
 
     fieldsets = (
         (
-            'Post',
+            "Post",
             {
-                'fields': (
-                    'title',
-                    'description',
-                    'image',
-                    'uploaded_file',
+                "fields": (
+                    "title",
+                    "description",
+                    "image",
+                    "uploaded_file",
                 )
-            }
+            },
         ),
-
         (
-            'Settings',
+            "Settings",
             {
-                'fields': (
-                    'visibility',
-                    'allow_replies',
+                "fields": (
+                    "visibility",
+                    "allow_replies",
                 )
-            }
+            },
         ),
-
         (
-            'Moderation',
+            "Moderation",
             {
-                'fields': (
-                    'is_pinned',
-                    'is_locked',
-                    'is_flagged',
-                    'moderation_notes',
+                "fields": (
+                    "is_pinned",
+                    "is_locked",
+                    "is_flagged",
+                    "moderation_notes",
                 )
-            }
+            },
         ),
-
         (
-            'Statistics',
+            "Statistics",
             {
-                'fields': (
-                    'views',
-                    'likes_count',
+                "fields": (
+                    "views",
+                    "likes_count",
                 )
-            }
+            },
         ),
-
         (
-            'Metadata',
+            "Metadata",
             {
-                'fields': (
-                    'author',
-                    'created_at',
-                    'updated_at',
+                "fields": (
+                    "author",
+                    "created_at",
+                    "updated_at",
                 )
-            }
+            },
         ),
     )
 
@@ -545,31 +526,31 @@ class ForumPostAdmin(SummernoteModelAdmin):
 # FORUM REPLY ADMIN
 # =====================================================
 
+
 @admin.register(ForumReply)
 class ForumReplyAdmin(admin.ModelAdmin):
 
     list_display = (
-        'post',
-        'author',
-        'created_at',
+        "post",
+        "author",
+        "created_at",
     )
 
-    search_fields = (
-        'content',
-    )
+    search_fields = ("content",)
 
 
 # =====================================================
 # FORUM POST LIKE ADMIN
 # =====================================================
 
+
 @admin.register(ForumPostLike)
 class ForumPostLikeAdmin(admin.ModelAdmin):
 
     list_display = (
-        'post',
-        'user',
-        'created_at',
+        "post",
+        "user",
+        "created_at",
     )
 
 
@@ -577,79 +558,74 @@ class ForumPostLikeAdmin(admin.ModelAdmin):
 # NEWS ADMIN
 # =====================================================
 
+
 @admin.register(NewsAnnouncement)
 class NewsAnnouncementAdmin(SummernoteModelAdmin):
 
-    summernote_fields = (
-        'content',
-    )
+    summernote_fields = ("content",)
 
     list_display = (
-        'title',
-        'author',
-        'created_at',
+        "title",
+        "author",
+        "created_at",
     )
 
     search_fields = (
-        'title',
-        'content',
+        "title",
+        "content",
     )
 
     readonly_fields = (
-        'created_at',
-        'updated_at',
+        "created_at",
+        "updated_at",
     )
 
-    prepopulated_fields = {
-        'slug': ('title',)
-    }
+    prepopulated_fields = {"slug": ("title",)}
 
 
 # =====================================================
 # HELP ADMIN
 # =====================================================
 
+
 @admin.register(HelpTutorial)
 class HelpTutorialAdmin(SummernoteModelAdmin):
 
-    summernote_fields = (
-        'content',
-    )
+    summernote_fields = ("content",)
 
     list_display = (
-        'title',
-        'author',
-        'created_at',
+        "title",
+        "author",
+        "created_at",
     )
 
     search_fields = (
-        'title',
-        'content',
+        "title",
+        "content",
     )
 
     readonly_fields = (
-        'created_at',
-        'updated_at',
+        "created_at",
+        "updated_at",
     )
 
-    prepopulated_fields = {
-        'slug': ('title',)
-    }
+    prepopulated_fields = {"slug": ("title",)}
 
 
 # =====================================================
 # STUDENT ANALYTICS
 # =====================================================
 
+
 @admin.register(StudentAnalytics)
 class StudentAnalyticsAdmin(admin.ModelAdmin):
 
     list_display = (
-        'student',
-        'games_played',
-        'total_score',
-        'engagement_score',
-        'updated_at',
+        "student",
+        "games_played",
+        "total_score",
+        "engagement_score",
+        "updated_at",
     )
 
 
@@ -657,15 +633,16 @@ class StudentAnalyticsAdmin(admin.ModelAdmin):
 # CLASS ANALYTICS
 # =====================================================
 
+
 @admin.register(ClassAnalytics)
 class ClassAnalyticsAdmin(admin.ModelAdmin):
 
     list_display = (
-        'clazz',
-        'total_students',
-        'average_xp',
-        'average_engagement',
-        'updated_at',
+        "clazz",
+        "total_students",
+        "average_xp",
+        "average_engagement",
+        "updated_at",
     )
 
 
@@ -673,15 +650,16 @@ class ClassAnalyticsAdmin(admin.ModelAdmin):
 # RESOURCE ANALYTICS
 # =====================================================
 
+
 @admin.register(ResourceAnalytics)
 class ResourceAnalyticsAdmin(admin.ModelAdmin):
 
     list_display = (
-        'resource',
-        'views',
-        'downloads',
-        'likes',
-        'updated_at',
+        "resource",
+        "views",
+        "downloads",
+        "likes",
+        "updated_at",
     )
 
 
@@ -689,15 +667,16 @@ class ResourceAnalyticsAdmin(admin.ModelAdmin):
 # FORUM ANALYTICS
 # =====================================================
 
+
 @admin.register(ForumAnalytics)
 class ForumAnalyticsAdmin(admin.ModelAdmin):
 
     list_display = (
-        'post',
-        'views',
-        'replies',
-        'likes',
-        'updated_at',
+        "post",
+        "views",
+        "replies",
+        "likes",
+        "updated_at",
     )
 
 
@@ -705,15 +684,16 @@ class ForumAnalyticsAdmin(admin.ModelAdmin):
 # SCHOOL ANALYTICS
 # =====================================================
 
+
 @admin.register(SchoolAnalyticsProfile)
 class SchoolAnalyticsProfileAdmin(admin.ModelAdmin):
 
     list_display = (
-        'school',
-        'total_teachers',
-        'total_students',
-        'average_engagement',
-        'updated_at',
+        "school",
+        "total_teachers",
+        "total_students",
+        "average_engagement",
+        "updated_at",
     )
 
 
@@ -721,15 +701,16 @@ class SchoolAnalyticsProfileAdmin(admin.ModelAdmin):
 # GAME PROGRESS
 # =====================================================
 
+
 @admin.register(KindlewickGameProgress)
 class KindlewickGameProgressAdmin(admin.ModelAdmin):
 
     list_display = (
-        'user',
-        'game_type',
-        'current_level',
-        'score',
-        'completed',
+        "user",
+        "game_type",
+        "current_level",
+        "score",
+        "completed",
     )
 
 
@@ -737,13 +718,14 @@ class KindlewickGameProgressAdmin(admin.ModelAdmin):
 # GAME SESSION
 # =====================================================
 
+
 @admin.register(KindlewickGameSession)
 class KindlewickGameSessionAdmin(admin.ModelAdmin):
 
     list_display = (
-        'user',
-        'game_type',
-        'level',
-        'score',
-        'created_at',
+        "user",
+        "game_type",
+        "level",
+        "score",
+        "created_at",
     )

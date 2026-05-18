@@ -14,32 +14,25 @@ from core.views.public_views import (
 )
 
 urlpatterns = [
-
     # Admin
     path("admin/", admin.site.urls),
-
     # Core app URLs
     path("", include("core.urls")),
-
     # Home
     path("", home_page_view, name="home"),
-
     # Auth
     path(
         "login/",
         custom_login_view,
         name="login",
     ),
-
     path(
         "logout/",
         custom_logout_view,
         name="logout",
     ),
-
     # Account URLs
     path("", include("core.urls.auth_urls")),
-
     # Summernote
     path(
         "summernote/",

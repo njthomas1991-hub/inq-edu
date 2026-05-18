@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-
 import os
 import importlib.util
 import dj_database_url
@@ -26,9 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 
 # Load environment variables from env.py if present.
-env_path = os.path.join(BASE_DIR.parent, 'env.py')
+env_path = os.path.join(BASE_DIR.parent, "env.py")
 if os.path.isfile(env_path):
-    spec = importlib.util.spec_from_file_location('env', env_path)
+    spec = importlib.util.spec_from_file_location("env", env_path)
     # spec_from_file_location can return None according to its type hints;
     # guard against that to satisfy type checkers and avoid runtime errors.
     if spec is None or spec.loader is None:
@@ -36,68 +35,66 @@ if os.path.isfile(env_path):
     env = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(env)
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-default-change-this-in-production')
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-default-change-this-in-production"
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '.herokuapp.com'
-]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".herokuapp.com"]
 
 # CSRF Configuration
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:8000',
-    'http://127.0.0.1:8000',
-    'http://localhost:3000',
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://localhost:3000",
 ]
 CSRF_COOKIE_SECURE = False  # Set to True in production
 CSRF_COOKIE_HTTPONLY = False
 SESSION_COOKIE_SECURE = False  # Set to True in production
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-SESSION_COOKIE_AGE = 630720000 # 20 years in seconds (60 * 60 * 24 * 365 * 20)
+SESSION_COOKIE_AGE = 630720000  # 20 years in seconds (60 * 60 * 24 * 365 * 20)
 SESSION_SAVE_EVERY_REQUEST = True
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sites',
-    'django.contrib.sessions',
-    'django.contrib.messages',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sites",
+    "django.contrib.sessions",
+    "django.contrib.messages",
     # 'cloudinary_storage',  # Disabled - causes Python 3.14 compatibility issues
-    'django.contrib.staticfiles',
+    "django.contrib.staticfiles",
     # 'cloudinary',  # Disabled - not used in new PixiJS avatar system
-    'rest_framework',
-    'corsheaders',
-    'core',
-    'django_summernote',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'crispy_forms',
-    'crispy_bootstrap5',
+    "rest_framework",
+    "corsheaders",
+    "core",
+    "django_summernote",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "crispy_forms",
+    "crispy_bootstrap5",
 ]
 
-AUTH_USER_MODEL = 'core.User'
+AUTH_USER_MODEL = "core.User"
 
-LOGIN_URL = '/login/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = "/login/"
+LOGOUT_REDIRECT_URL = "/"
 
 SITE_ID = 1
 
 AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
 ACCOUNT_LOGIN_METHODS = {"email"}
 
-ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 
 ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
 
@@ -113,76 +110,73 @@ ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 
 ACCOUNT_SIGNUP_REDIRECT_URL = "/teacher/"
 
-ACCOUNT_EMAIL_VERIFICATION = 'none'  # No email verification required
+ACCOUNT_EMAIL_VERIFICATION = "none"  # No email verification required
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
-ACCOUNT_LOGOUT_REDIRECT_URL = '/'
-ACCOUNT_LOGIN_REDIRECT_URL = '/teacher/'
-ACCOUNT_SIGNUP_REDIRECT_URL = '/teacher/'  # Redirect to home page after registration
+ACCOUNT_LOGOUT_REDIRECT_URL = "/"
+ACCOUNT_LOGIN_REDIRECT_URL = "/teacher/"
+ACCOUNT_SIGNUP_REDIRECT_URL = "/teacher/"  # Redirect to home page after registration
 ACCOUNT_SESSION_REMEMBER = True  # Keep users logged in
 ACCOUNT_FORMS = {
-    'login': 'core.forms.auth_forms.CustomAllauthLoginForm',
-    'signup': 'core.forms.auth_forms.CustomSignupForm',
+    "login": "core.forms.auth_forms.CustomAllauthLoginForm",
+    "signup": "core.forms.auth_forms.CustomSignupForm",
 }
 
-ACCOUNT_ADAPTER = 'core.views.auth_views.CustomAccountAdapter'
+ACCOUNT_ADAPTER = "core.views.auth_views.CustomAccountAdapter"
 
 # Email settings
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EMAIL_FILE_PATH = BASE_DIR / "sent_emails"
-#EMAIL_HOST = "smtp.gmail.com"
-#EMAIL_PORT = 587
-#EMAIL_USE_TLS = True
-#EMAIL_HOST_USER = "your@email.com"
-#EMAIL_HOST_PASSWORD = "yzldqelqjmwmqkbj"
-#DEFAULT_FROM_EMAIL = "INQ-ED <your@email.com>"
+# EMAIL_HOST = "smtp.gmail.com"
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = "your@email.com"
+# EMAIL_HOST_PASSWORD = "yzldqelqjmwmqkbj"
+# DEFAULT_FROM_EMAIL = "INQ-ED <your@email.com>"
 
-CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
-CRISPY_TEMPLATE_PACK = 'bootstrap5'
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]
 
-ROOT_URLCONF = 'backend.urls'
+ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-
-       'DIRS': [
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [
             BASE_DIR / "backend" / "templates",
         ],
-
-        'APP_DIRS': True,
-
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-                'django.template.context_processors.csrf',
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
+                "django.template.context_processors.csrf",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'backend.wsgi.application'
+WSGI_APPLICATION = "backend.wsgi.application"
 
 
 # Database
@@ -199,10 +193,10 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 # Use DATABASE_URL environment variable for all database configuration
 DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
+    "default": dj_database_url.config(
+        default="sqlite:///" + str(BASE_DIR / "db.sqlite3"),
         conn_max_age=600,
-        ssl_require=False
+        ssl_require=False,
     )
 }
 
@@ -212,16 +206,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -229,9 +223,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -241,75 +235,162 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
-    BASE_DIR / 'static',
+    BASE_DIR / "static",
 ]
 
 # WhiteNoise configuration
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Media files (User uploads)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 # Summernote Configuration
 SUMMERNOTE_CONFIG = {
-    'default': {
-        'toolbar': [
-            ['style', ['style']],
-            ['font', ['bold', 'underline', 'italic', 'clear']],
-            ['fontname', ['fontname']],
-            ['fontsize', ['fontsize']],
-            ['color', ['color']],
-            ['para', ['ul', 'ol', 'paragraph', 'height']],
-            ['table', ['table']],
-            ['insert', ['link', 'picture', 'video']],
-            ['view', ['fullscreen', 'codeview', 'help']],
-            ['undo', ['undo', 'redo']],
+    "default": {
+        "toolbar": [
+            ["style", ["style"]],
+            ["font", ["bold", "underline", "italic", "clear"]],
+            ["fontname", ["fontname"]],
+            ["fontsize", ["fontsize"]],
+            ["color", ["color"]],
+            ["para", ["ul", "ol", "paragraph", "height"]],
+            ["table", ["table"]],
+            ["insert", ["link", "picture", "video"]],
+            ["view", ["fullscreen", "codeview", "help"]],
+            ["undo", ["undo", "redo"]],
         ],
-        'fontNames': ['Arial', 'Calibri', 'Comic Sans MS', 'Courier', 'Courier New', 'Garamond', 'Georgia', 'Helvetica', 'Times', 'Times New Roman', 'Trebuchet MS', 'Verdana'],
-        'fontSizes': ['8', '9', '10', '11', '12', '14', '16', '18', '20', '22', '24', '28', '32', '36', '40', '44', '48'],
-        'colors': [
-            ['#000000', '#424242', '#636363', '#969696', '#bdbdbd', '#d9d9d9', '#efefef', '#f3f3f3', '#ffffff'],
-            ['#980000', '#ff0000', '#ff9900', '#ffff00', '#00f225', '#00ffff', '#4a90e2', '#9900ff', '#ff00ff'],
-            ['#e6b3b3', '#f4cccc', '#fce5cd', '#fff2cc', '#d9e8d9', '#d0e8d9', '#d9d9e3', '#ece6f1', '#f3e6e6'],
-            ['#ea9999', '#f8cbad', '#e2efda', '#eaa6a6', '#b4a7d6', '#d5a6bd', '#d9cee4', '#ead1dc', '#f0e1d8'],
-            ['#dd7e6b', '#f6a192', '#c7a875', '#d1a574', '#9a8fb4', '#ab8fa3', '#b5a7c9', '#c4b5d9', '#dcc8b6'],
-            ['#cc4125', '#e06666', '#f1c232', '#6d9eeb', '#93c5fe', '#b4a7d6', '#9fc5f8', '#9fc5f8', '#cfe2f3'],
+        "fontNames": [
+            "Arial",
+            "Calibri",
+            "Comic Sans MS",
+            "Courier",
+            "Courier New",
+            "Garamond",
+            "Georgia",
+            "Helvetica",
+            "Times",
+            "Times New Roman",
+            "Trebuchet MS",
+            "Verdana",
         ],
-        'codemirror': {
-            'mode': 'htmlmixed',
-            'lineNumbers': True,
-            'indentUnit': 4,
-            'lineWrapping': True,
-        },
-        'height': 300,
-        'minHeight': 250,
-        'maxHeight': 600,
-        'callbacks': {
-            'onImageUpload': [
-                'function(files) { sendFile(files[0], this); }'
-            ]
-        },
-        'placeholder': 'Write your content here...',
-        'popover': {
-            'image': [
-                ['imagesize', ['imagesize']],
-                ['float', ['floatLeft', 'floatRight', 'floatNone']],
-                ['remove', ['removeMedia']]
+        "fontSizes": [
+            "8",
+            "9",
+            "10",
+            "11",
+            "12",
+            "14",
+            "16",
+            "18",
+            "20",
+            "22",
+            "24",
+            "28",
+            "32",
+            "36",
+            "40",
+            "44",
+            "48",
+        ],
+        "colors": [
+            [
+                "#000000",
+                "#424242",
+                "#636363",
+                "#969696",
+                "#bdbdbd",
+                "#d9d9d9",
+                "#efefef",
+                "#f3f3f3",
+                "#ffffff",
             ],
-            'link': [
-                ['link', ['linkDialogShow', 'unlink']]
+            [
+                "#980000",
+                "#ff0000",
+                "#ff9900",
+                "#ffff00",
+                "#00f225",
+                "#00ffff",
+                "#4a90e2",
+                "#9900ff",
+                "#ff00ff",
             ],
-            'air': [
-                ['color', ['color']],
-                ['font', ['bold', 'underline', 'italic']],
-                ['para', ['ul', 'ol', 'paragraph']],
-                ['table', ['table']],
-                ['insert', ['link', 'picture']]
-            ]
+            [
+                "#e6b3b3",
+                "#f4cccc",
+                "#fce5cd",
+                "#fff2cc",
+                "#d9e8d9",
+                "#d0e8d9",
+                "#d9d9e3",
+                "#ece6f1",
+                "#f3e6e6",
+            ],
+            [
+                "#ea9999",
+                "#f8cbad",
+                "#e2efda",
+                "#eaa6a6",
+                "#b4a7d6",
+                "#d5a6bd",
+                "#d9cee4",
+                "#ead1dc",
+                "#f0e1d8",
+            ],
+            [
+                "#dd7e6b",
+                "#f6a192",
+                "#c7a875",
+                "#d1a574",
+                "#9a8fb4",
+                "#ab8fa3",
+                "#b5a7c9",
+                "#c4b5d9",
+                "#dcc8b6",
+            ],
+            [
+                "#cc4125",
+                "#e06666",
+                "#f1c232",
+                "#6d9eeb",
+                "#93c5fe",
+                "#b4a7d6",
+                "#9fc5f8",
+                "#9fc5f8",
+                "#cfe2f3",
+            ],
+        ],
+        "codemirror": {
+            "mode": "htmlmixed",
+            "lineNumbers": True,
+            "indentUnit": 4,
+            "lineWrapping": True,
         },
-        'lang': 'en-US'
+        "height": 300,
+        "minHeight": 250,
+        "maxHeight": 600,
+        "callbacks": {
+            "onImageUpload": ["function(files) { sendFile(files[0], this); }"]
+        },
+        "placeholder": "Write your content here...",
+        "popover": {
+            "image": [
+                ["imagesize", ["imagesize"]],
+                ["float", ["floatLeft", "floatRight", "floatNone"]],
+                ["remove", ["removeMedia"]],
+            ],
+            "link": [["link", ["linkDialogShow", "unlink"]]],
+            "air": [
+                ["color", ["color"]],
+                ["font", ["bold", "underline", "italic"]],
+                ["para", ["ul", "ol", "paragraph"]],
+                ["table", ["table"]],
+                ["insert", ["link", "picture"]],
+            ],
+        },
+        "lang": "en-US",
     }
 }
