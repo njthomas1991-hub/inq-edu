@@ -6,15 +6,13 @@
 <section class="hero hero-text text-center" style="min-height: 100vh; display: flex; flex-direction: column; overflow: hidden; padding-top: 2rem;">
     <!-- Header -->
     <div class="py-5 hero-header" style="z-index: 3;">
-        <h2 class="display-4 fw-bold mb-0">Learning Through Play</h2>
+        <h1 class="display-4 fw-bold mb-0">Learning Through Play</h1>
     </div>
     
     <!-- Video Container (Grows to fill available space) -->
     <div class="position-relative flex-grow-1" style="overflow: hidden; z-index: 1;">
         <video 
-            width="100%" 
-            height="100%" 
-            style="object-fit: cover; display: block;"
+            style="width: 100%; height: 100%; object-fit: cover; display: block;"
             autoplay 
             muted 
             loop 
@@ -41,6 +39,7 @@
 
 <!-- Quick Access Buttons Section -->
 <section id="platforms-section" class="quick-access py-5">
+    <h2 class="visually-hidden">Platforms</h2>
     <div class="container">
         <div class="row g-4">
             <!-- WonderWorld Button -->
@@ -96,7 +95,7 @@
                 <div class="card h-100 shadow-sm border-0">
                     <img src="{% static 'core/images/wonderworld logo.png' %}" class="card-img-top" alt="WonderWorld" style="height: 296px; object-fit: cover;">
                     <div class="card-body">
-                        <h5 class="card-title">WonderWorld</h5>
+                        <h3 class="card-title">WonderWorld</h3>
                         <p class="card-text">Explore a magical world filled with puzzles, challenges, and educational quests.</p>
                         <div class="d-flex align-items-center gap-2">
                             <div class="widgit-symbol" data-symbol="explore">
@@ -113,7 +112,7 @@
                 <div class="card h-100 shadow-sm border-0">
                     <img src="{% static 'core/images/questopia badge.png' %}" class="card-img-top" alt="Questopia" style="height: 296px; object-fit: cover;">
                     <div class="card-body">
-                        <h5 class="card-title">Questopia</h5>
+                        <h3 class="card-title">Questopia</h3>
                         <p class="card-text">Embark on epic quests and adventures while mastering key learning concepts.</p>
                         <div class="d-flex align-items-center gap-2">
                             <div class="widgit-symbol" data-symbol="quest">
@@ -130,8 +129,8 @@
                 <div class="card h-100 shadow-sm border-0">
                     <img src="{% static 'core/images/kindlewick logo.png' %}" class="card-img-top" alt="Kindle Wick" style="height: 296px; object-fit: cover;">
                     <div class="card-body">
-                        <h5 class="card-title">Kindle Wick</h5>
-                        <h5 class="card-title">Ages 7-9</h5>
+                        <h3 class="card-title">Kindle Wick</h3>
+                        <h3 class="card-title">Ages 7-9</h3>
                         <p class="card-text">An exciting learning platform designed for gamified educational experiences, correlating with the nation curiculum in Maths and English.</p>
                         <div class="d-flex align-items-center gap-2">
                             <div class="widgit-symbol" data-symbol="learning">
@@ -150,7 +149,7 @@
                 <div class="card h-100 shadow-sm border-0">
                     <img src="{% static 'core/images/teacher hub logo.png' %}" class="card-img-top" alt="Teacher Hub" style="height: 296px; object-fit: cover;">
                     <div class="card-body">
-                        <h5 class="card-title">Teacher Hub</h5>
+                        <h3 class="card-title">Teacher Hub</h3>
                         <p class="card-text">create classes to monitor engagement and track progress. View individual student stats and whole class analytics.</p>
                         <div class="d-flex align-items-center gap-2">
                             <div class="widgit-symbol" data-symbol="learning">
@@ -166,7 +165,6 @@
                 </div>
             </div>
         </div>
-        </div>
     </div>
 </section>
 
@@ -178,21 +176,21 @@
             <div class="col-md-4">
                 <div class="mb-3">
                     <div class="display-4 text-primary mb-3">1</div>
-                    <h5>Sign Up</h5>
+                    <h3>Sign Up</h3>
                     <p>Create your account in minutes and choose your learning platform.</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="mb-3">
                     <div class="display-4 text-primary mb-3">2</div>
-                    <h5>Play & Learn</h5>
+                    <h3>Play & Learn</h3>
                     <p>Engage with interactive games and educational content tailored to your level.</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="mb-3">
                     <div class="display-4 text-primary mb-3">3</div>
-                    <h5>Track Progress</h5>
+                    <h3>Track Progress</h3>
                     <p>Monitor your achievements and see your improvement over time.</p>
                 </div>
             </div>
@@ -204,51 +202,69 @@
 <section class="features py-5 bg-light">
     <div class="container">
         <h2 class="text-center mb-5">Why Choose INQ-ED?</h2>
+
         <div class="row g-4">
+
             <div class="col-md-6">
                 <div class="d-flex">
                     <div class="flex-shrink-0">
                         <i class="fas fa-check-circle text-success" style="font-size: 2rem;"></i>
                     </div>
+
                     <div class="flex-grow-1 ms-3">
-                        <h5>Engaging Content</h5>
-                        <p>Our games are designed by educators to be both fun and educational.</p>
+                        <h3>Engaging Content</h3>
+                        <p>
+                            Our games are designed by educators to be both fun and educational.
+                        </p>
                     </div>
                 </div>
             </div>
+
             <div class="col-md-6">
                 <div class="d-flex">
                     <div class="flex-shrink-0">
                         <i class="fas fa-chart-line text-success" style="font-size: 2rem;"></i>
                     </div>
+
                     <div class="flex-grow-1 ms-3">
-                        <h5>Progress Tracking</h5>
-                        <p>Detailed analytics help teachers and parents monitor learning outcomes.</p>
+                        <h3>Progress Tracking</h3>
+                        <p>
+                            Detailed analytics help teachers and parents monitor learning outcomes.
+                        </p>
                     </div>
                 </div>
             </div>
+
             <div class="col-md-6">
                 <div class="d-flex">
                     <div class="flex-shrink-0">
                         <i class="fas fa-users text-success" style="font-size: 2rem;"></i>
                     </div>
+
                     <div class="flex-grow-1 ms-3">
-                        <h5>Collaborative Learning</h5>
-                        <p>Students can team up with peers to solve challenges and complete quests.</p>
+                        <h3>Collaborative Learning</h3>
+                        <p>
+                            Students can team up with peers to solve challenges and complete quests.
+                        </p>
                     </div>
                 </div>
             </div>
+
             <div class="col-md-6">
                 <div class="d-flex">
                     <div class="flex-shrink-0">
                         <i class="fas fa-shield-alt text-success" style="font-size: 2rem;"></i>
                     </div>
+
                     <div class="flex-grow-1 ms-3">
-                        <h5>Safe & Secure</h5>
-                        <p>We prioritize student safety and privacy with industry-leading security measures.</p>
+                        <h3>Safe & Secure</h3>
+                        <p>
+                            We prioritize student safety and privacy with industry-leading security measures.
+                        </p>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </section>
@@ -267,81 +283,4 @@
     </div>
 </section>
 
-<style>
-.hero {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.cta {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-}
-
-.btn-primary:hover {
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-}
-
-/* Quick Access Buttons */
-.quick-access-btn {
-    display: block;
-    position: relative;
-    overflow: hidden;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    height: 100%;
-}
-
-.quick-access-btn:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-}
-
-.quick-access-image-wrapper {
-    position: relative;
-    overflow: hidden;
-    border-radius: 12px;
-    height: auto;
-    background: #f0f0f0;
-}
-
-.quick-access-image-wrapper img {
-    width: 100%;
-    height: auto;
-    display: block;
-    transition: transform 0.3s ease;
-}
-
-.quick-access-btn:hover .quick-access-image-wrapper img {
-    transform: scale(1.1);
-}
-
-.quick-access-overlay {
-    position: static;
-    display: block;
-    padding: 12px 8px 4px;
-    text-align: center;
-}
-
-.quick-access-text {
-    color: #1f2937;
-    font-size: 0.9rem;
-    font-weight: bold;
-    text-align: center;
-    padding: 0;
-}
-</style>
 {% endblock %}

@@ -25,21 +25,42 @@
                 <div class="card-body">
                     {% if classes %}
                         <ul class="list-group list-group-flush">
-                            {% for class_obj in classes %}
-                                <a href="{% url 'class_detail' class_obj.id %}" style="text-decoration: none; color: inherit;">
-                                    <li class="list-group-item d-flex justify-content-between align-items-center hover-bg-light" style="cursor: pointer; transition: background-color 0.2s;">
-                                        <div>
-                                            <div class="fw-semibold">{{ class_obj.name }}</div>
-                                            <div class="text-muted small">{{ class_obj.subject_label }} • Key Stage {{ class_obj.year_ks_label }}</div>
-                                            {% if class_obj.description %}
-                                                <div class="text-muted small mt-1">{{ class_obj.description|truncatewords:15 }}</div>
-                                            {% endif %}
-                                        </div>
-                                        <span class="badge bg-primary rounded-pill">{{ class_obj.students.count }} students</span>
-                                    </li>
-                                </a>
-                            {% endfor %}
-                        </ul>
+    {% for class_obj in classes %}
+
+        <li class="list-group-item p-0 border-0">
+
+            <a
+                href="{% url 'class_detail' class_obj.id %}"
+                class="d-flex justify-content-between align-items-center text-decoration-none text-reset p-3 hover-bg-light"
+                style="cursor: pointer; transition: background-color 0.2s;"
+            >
+
+                <div>
+                    <div class="fw-semibold">
+                        {{ class_obj.name }}
+                    </div>
+
+                    <div class="text-muted small">
+                        {{ class_obj.subject_label }} • Key Stage {{ class_obj.year_ks_label }}
+                    </div>
+
+                    {% if class_obj.description %}
+                        <div class="text-muted small mt-1">
+                            {{ class_obj.description|truncatewords:15 }}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <span class="badge bg-primary rounded-pill">
+                    {{ class_obj.students.count }} students
+                </span>
+
+            </a>
+
+        </li>
+
+    {% endfor %}
+</ul>
                     {% else %}
                         <div class="text-center py-4">
                             <p class="text-muted mb-3">You don't have any classes yet.</p>
