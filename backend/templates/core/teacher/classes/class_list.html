@@ -81,21 +81,35 @@ My Classes
 
                             </div>
 
-                            <div class="border-top pt-3 d-flex gap-3">
+                            <div class="d-flex gap-2 mt-2">
 
                                 <a
-                                    href="{% url 'edit_class' class_obj.id %}"
-                                    class="text-decoration-none"
+                                    href="{% url 'teacher_class_edit' class_obj.slug %}"
+                                    class="btn btn-sm btn-outline-primary"
                                 >
+
                                     Edit
+
                                 </a>
 
-                                <a
-                                    href="{% url 'delete_class' class_obj.id %}"
-                                    class="text-danger text-decoration-none"
+                                <form
+                                    method="post"
+                                    action="{% url 'teacher_class_delete' class_obj.slug %}"
+                                    onsubmit="return confirm('Delete this class?');"
                                 >
-                                    Delete
-                                </a>
+
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="btn btn-sm btn-outline-danger"
+                                    >
+
+                                        Delete
+
+                                    </button>
+
+                                </form>
 
                             </div>
 

@@ -1,1 +1,90 @@
-{% include "core/components/avatar/avatar_layers.html" with config=avatar.config size="lg" %}
+{% with config=avatar.avatar_config %}
+
+<div
+    class="position-relative mx-auto"
+    style="
+        width:{% if navbar %}40px{% else %}120px{% endif %};
+height:{% if navbar %}40px{% else %}120px{% endif %};
+    "
+>
+
+    <!-- BODY -->
+
+    <div
+        style="
+            width:{% if navbar %}34px{% else %}100px{% endif %};
+height:{% if navbar %}34px{% else %}100px{% endif %};
+            background: {{ config.body_color|default:'#FF6B9D' }};
+            border-radius:50%;
+            position:absolute;
+            bottom:0;
+            left:10px;
+        "
+    ></div>
+
+    <!-- LEFT EYE -->
+
+    <div
+        class="avatar-eye-left"
+        style="
+            width:14px;
+            height:14px;
+            background:#111;
+            border-radius:50%;
+            position:absolute;
+            top:42px;
+            left:36px;
+        "
+    ></div>
+
+    <!-- RIGHT EYE -->
+
+    <div
+        class="avatar-eye-right"
+        style="
+            width:14px;
+            height:14px;
+            background:#111;
+            border-radius:50%;
+            position:absolute;
+            top:42px;
+            right:36px;
+        "
+    ></div>
+
+    <!-- MOUTH -->
+
+    <div
+        class="avatar-mouth"
+        style="
+            width:34px;
+            height:16px;
+            border-bottom:4px solid #111;
+            border-radius:0 0 40px 40px;
+            position:absolute;
+            bottom:26px;
+            left:43px;
+        "
+    ></div>
+
+    <!-- DECORATION -->
+
+    {% if config.head_decoration != "none" %}
+
+        <div
+            style="
+                width:40px;
+                height:16px;
+                background: {{ config.decoration_color|default:'#FFB347' }};
+                border-radius:20px 20px 0 0;
+                position:absolute;
+                top:5px;
+                left:40px;
+            "
+        ></div>
+
+    {% endif %}
+
+</div>
+
+{% endwith %}

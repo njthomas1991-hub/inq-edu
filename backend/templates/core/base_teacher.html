@@ -299,11 +299,11 @@
 
                         <a
                             class="nav-link"
-                            href="{% url 'create_class' %}"
+                            href="{% url 'teacher_classes' %}"
                         >
 
-                            <i class="fas fa-plus"></i>
-                            Add Class
+                            <i class="fas fa-users"></i>
+                            Classes
 
                         </a>
 
@@ -356,21 +356,44 @@
 
                             {% if user.is_authenticated %}
 
-                                {% include "core/components/avatar/avatar_icon.html" %}
+    {% if request.user.avatar %}
 
-                                <span>
-                                    {{ user.get_full_name|default:user.username }}
-                                </span>
+        <div
+            style="
+                width:42px;
+                height:42px;
+                overflow:hidden;
+                border-radius:50%;
+            "
+        >
 
-                            {% else %}
+            {% include "core/components/avatar/avatar_display.html" with avatar=request.user.avatar navbar=True %}
 
-                                <i class="fas fa-user-circle"></i>
+        </div>
 
-                                <span>
-                                    Account
-                                </span>
+    {% else %}
 
-                            {% endif %}
+        <i class="fas fa-user-circle fs-4"></i>
+
+    {% endif %}
+
+    <span>
+
+        {{ user.get_full_name|default:user.username }}
+
+    </span>
+
+{% else %}
+
+    <i class="fas fa-user-circle fs-4"></i>
+
+    <span>
+
+        Account
+
+    </span>
+
+{% endif %}
 
                         </a>
 

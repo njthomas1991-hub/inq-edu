@@ -1,16 +1,31 @@
-{% if user.avatar %}
-    <img
-        src="{{ user.avatar.url }}"
-        alt="Avatar"
-        class="rounded-circle"
-        width="40"
-        height="40"
+{% if request.user.avatar %}
+
+    <div
+        style="
+            width:40px;
+            height:40px;
+            overflow:hidden;
+            border-radius:50%;
+            flex-shrink:0;
+        "
     >
+
+        {% include "core/components/avatar/avatar_display.html" with avatar=request.user.avatar navbar=True %}
+
+    </div>
+
 {% else %}
+
     <div
         class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center"
-        style="width:40px;height:40px;"
+        style="
+            width:40px;
+            height:40px;
+        "
     >
+
         <i class="fas fa-user"></i>
+
     </div>
+
 {% endif %}

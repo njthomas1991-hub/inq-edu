@@ -1,218 +1,559 @@
 {% extends "core/base.html" %}
 
-{% block title %}Avatar Builder - INQ-ED{% endblock %}
+{% block title %}
+
+Avatar Builder - INQ-ED
+
+{% endblock %}
 
 {% block content %}
-<div class="container py-5 avatar-builder-page">
-    <div class="row g-4">
-        <div class="col-lg-5">
-            <div class="card shadow-sm h-100">
-                <div class="card-body">
-                    <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-3">
-                        <div>
-                            <h1 class="h4 mb-1">Avatar Builder</h1>
-                            <p class="text-muted mb-0">Build a layered avatar that renders everywhere without image uploads.</p>
+
+<div class="container py-5">
+
+    <div class="row justify-content-center g-4">
+
+        <!-- PREVIEW -->
+
+        <div class="col-lg-4">
+
+            <div class="card shadow-sm border-0 rounded-4 h-100">
+
+                <div class="card-body text-center p-4">
+
+                    <h1 class="h4 mb-4">
+
+                        Avatar Preview
+
+                    </h1>
+
+                    <div id="avatar-preview">
+
+                        <div
+                            id="avatar-character"
+                            class="mx-auto position-relative"
+                            style="
+                                width:220px;
+                                height:220px;
+                            "
+                        >
+
+                            <!-- BODY -->
+
+                            <div
+                                id="avatar-body"
+                                style="
+                                    width:160px;
+                                    height:160px;
+                                    background: {{ config.body_color|default:'#FF6B9D' }};
+                                    border-radius:50%;
+                                    position:absolute;
+                                    bottom:20px;
+                                    left:30px;
+                                    transition:all .2s ease;
+                                "
+                            ></div>
+
+                            <!-- LEFT EYE -->
+
+                            <div
+                                id="left-eye"
+                                style="
+                                    width:22px;
+                                    height:22px;
+                                    background:#111;
+                                    border-radius:50%;
+                                    position:absolute;
+                                    top:85px;
+                                    left:75px;
+                                    transition:all .2s ease;
+                                "
+                            ></div>
+
+                            <!-- RIGHT EYE -->
+
+                            <div
+                                id="right-eye"
+                                style="
+                                    width:22px;
+                                    height:22px;
+                                    background:#111;
+                                    border-radius:50%;
+                                    position:absolute;
+                                    top:85px;
+                                    right:75px;
+                                    transition:all .2s ease;
+                                "
+                            ></div>
+
+                            <!-- MOUTH -->
+
+                            <div
+                                id="avatar-mouth"
+                                style="
+                                    width:50px;
+                                    height:24px;
+                                    border-bottom:6px solid #111;
+                                    border-radius:0 0 50px 50px;
+                                    position:absolute;
+                                    bottom:55px;
+                                    left:85px;
+                                    transition:all .2s ease;
+                                "
+                            ></div>
+
+                            <!-- ACCESSORY -->
+
+                            <div
+                                id="avatar-decoration"
+                                style="
+                                    width:60px;
+                                    height:25px;
+                                    background:{{ config.decoration_color|default:'#FFB347' }};
+                                    border-radius:20px 20px 0 0;
+                                    position:absolute;
+                                    top:15px;
+                                    left:80px;
+                                    transition:all .2s ease;
+                                "
+                            ></div>
+
                         </div>
-                        <span class="badge bg-info-subtle text-info-emphasis rounded-pill">Live preview</span>
+
                     </div>
 
-                    <div class="avatar-builder-preview mb-3">
-                        <div class="avatar-builder-preview-shell">
-                            {% include "core/components/avatar/avatar_display.html" with avatar=avatar %}
-                        </div>
-                    </div>
+                    <p class="text-muted small mt-3">
 
-                    <div class="avatar-builder-summary card border-0 bg-body-tertiary mb-3">
-                        <div class="card-body py-3">
-                            <div class="d-flex flex-wrap gap-2" id="avatarSummary"></div>
-                        </div>
-                    </div>
+                        Changes update live and save to your profile.
 
-                    <div class="small text-muted">
-                        Rendering uses layered HTML and JSON config, so the same avatar can appear in profile cards, navbars, and dashboards.
-                    </div>
+                    </p>
+
                 </div>
+
             </div>
+
         </div>
 
-        <div class="col-lg-7">
-            <form method="post" class="card shadow-sm avatar-builder-form">
-                {% csrf_token %}
-                <div class="card-body p-4">
-                    <div class="mb-4">
-                        <h2 class="h5 mb-1">Head</h2>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Skin tone</label>
-                                {{ form.skin }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Expression</label>
-                                {{ form.expression }}
-                            </div>
-                        </div>
-                    </div>
+        <!-- BUILDER -->
+
+        <div class="col-lg-8">
+
+            <div class="card shadow-sm border-0 rounded-4">
+
+                <div class="card-body p-4 p-lg-5">
 
                     <div class="mb-4">
-                        <h2 class="h5 mb-1">Hair</h2>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Style</label>
-                                {{ form.hair }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Color</label>
-                                {{ form.hair_color }}
-                            </div>
-                        </div>
+
+                        <h1 class="h3 mb-2">
+
+                            Avatar Builder
+
+                        </h1>
+
+                        <p class="text-muted mb-0">
+
+                            Customise your avatar appearance,
+                            colours and accessories.
+
+                        </p>
+
                     </div>
 
-                    <div class="mb-4">
-                        <h2 class="h5 mb-1">Eyes</h2>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Eye style</label>
-                                {{ form.eyes }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Mouth</label>
-                                {{ form.mouth }}
-                            </div>
-                        </div>
-                    </div>
+                    <form method="post">
 
-                    <div class="mb-4">
-                        <h2 class="h5 mb-1">Clothes</h2>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Outfit</label>
-                                {{ form.outfit }}
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Background</label>
-                                {{ form.background }}
-                            </div>
-                        </div>
-                    </div>
+                        {% csrf_token %}
 
-                    <div class="mb-4">
-                        <h2 class="h5 mb-1">Accessories</h2>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Accessory</label>
-                                {{ form.accessory }}
-                            </div>
-                        </div>
-                    </div>
+                        <div class="row g-4">
 
-                    <div class="avatar-builder-actions d-flex flex-wrap gap-2">
-                        <button type="submit" class="btn btn-primary-custom">Save Avatar</button>
-                        <button type="button" class="btn btn-secondary-custom" id="randomizeAvatarBtn" data-randomize-url="{% url 'randomize_avatar' %}">Randomize</button>
-                        <a href="{% url 'profile' %}" class="btn btn-secondary-custom">Back to Profile</a>
-                    </div>
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-bold">
+
+                                    Body Colour
+
+                                </label>
+
+                                <input
+                                    id="body_color"
+                                    type="color"
+                                    name="body_color"
+                                    class="form-control form-control-color"
+                                    value="{{ config.body_color|default:'#FF6B9D' }}"
+                                >
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-bold">
+
+                                    Eye Style
+
+                                </label>
+
+                                <select
+                                    id="eye_type"
+                                    name="eye_type"
+                                    class="form-select"
+                                >
+
+                                    {% for option in avatar_options.eye_type %}
+
+                                        <option
+                                            value="{{ option }}"
+                                            {% if config.eye_type == option %}
+                                                selected
+                                            {% endif %}
+                                        >
+
+                                            {{ option|title }}
+
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-bold">
+
+                                    Mouth Style
+
+                                </label>
+
+                                <select
+                                    id="mouth_type"
+                                    name="mouth_type"
+                                    class="form-select"
+                                >
+
+                                    {% for option in avatar_options.mouth_type %}
+
+                                        <option
+                                            value="{{ option }}"
+                                            {% if config.mouth_type == option %}
+                                                selected
+                                            {% endif %}
+                                        >
+
+                                            {{ option|title }}
+
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-bold">
+
+                                    Accessory Style
+
+                                </label>
+
+                                <select
+                                    id="head_decoration"
+                                    name="head_decoration"
+                                    class="form-select"
+                                >
+
+                                    {% for option in avatar_options.head_decoration %}
+
+                                        <option
+                                            value="{{ option }}"
+                                            {% if config.head_decoration == option %}
+                                                selected
+                                            {% endif %}
+                                        >
+
+                                            {{ option|title }}
+
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-bold">
+
+                                    Accessory Colour
+
+                                </label>
+
+                                <input
+                                    id="decoration_color"
+                                    type="color"
+                                    name="decoration_color"
+                                    class="form-control form-control-color"
+                                    value="{{ config.decoration_color|default:'#FFB347' }}"
+                                >
+
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2 mt-5">
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary px-4"
+                            >
+
+                                Save Avatar
+
+                            </button>
+
+                            <a
+                                href="{% url 'profile' %}"
+                                class="btn btn-outline-secondary px-4"
+                            >
+
+                                Back to Profile
+
+                            </a>
+
+                        </div>
+
+                    </form>
+
                 </div>
-            </form>
+
+            </div>
+
         </div>
+
     </div>
+
 </div>
 
 <script>
-(function () {
-    const form = document.querySelector('.avatar-builder-form');
-    const preview = document.querySelector('.avatar-builder-preview .avatar-render');
-    const summary = document.getElementById('avatarSummary');
-    const randomizeButton = document.getElementById('randomizeAvatarBtn');
 
-    if (!form || !preview) {
-        return;
-    }
+    const body = document.getElementById(
+        "avatar-body"
+    );
 
-    const fields = ['skin', 'hair', 'hair_color', 'eyes', 'mouth', 'outfit', 'accessory', 'background', 'expression'];
+    const leftEye = document.getElementById(
+        "left-eye"
+    );
 
-    const fieldLabels = {
-        skin: 'Skin',
-        hair: 'Hair',
-        hair_color: 'Hair color',
-        eyes: 'Eyes',
-        mouth: 'Mouth',
-        outfit: 'Clothes',
-        accessory: 'Accessory',
-        background: 'Background',
-        expression: 'Expression',
-    };
+    const rightEye = document.getElementById(
+        "right-eye"
+    );
 
-    function slugifyClassName(value) {
-        return String(value || '').toLowerCase().replace(/[^a-z0-9_\-]/g, '-');
-    }
+    const mouth = document.getElementById(
+        "avatar-mouth"
+    );
 
-    function syncPreview() {
-        const baseClasses = ['avatar-render', 'avatar-render--lg'];
-        const chips = [];
+    const decoration = document.getElementById(
+        "avatar-decoration"
+    );
 
-        fields.forEach((field) => {
-            const input = form.querySelector(`[name="${field}"]`);
-            if (input) {
-                const value = slugifyClassName(input.value);
-                baseClasses.push(`avatar-${field}-${value}`);
-                chips.push(`<span class="badge text-bg-light border avatar-summary-chip">${fieldLabels[field]}: ${value.replaceAll('_', ' ')}</span>`);
-            }
-        });
+    // BODY COLOUR
 
-        preview.className = baseClasses.join(' ');
+    document.getElementById(
+        "body_color"
+    ).addEventListener("input", (e) => {
 
-        if (summary) {
-            summary.innerHTML = chips.join('');
-        }
-    }
+        body.style.background =
+            e.target.value;
 
-    function applyConfig(config) {
-        fields.forEach((field) => {
-            const input = form.querySelector(`[name="${field}"]`);
-            if (input && config[field]) {
-                input.value = config[field];
-            }
-        });
-        syncPreview();
-    }
-
-    async function randomizeAvatar() {
-        if (!randomizeButton) {
-            return;
-        }
-
-        const previousLabel = randomizeButton.textContent;
-        randomizeButton.disabled = true;
-        randomizeButton.textContent = 'Randomizing...';
-
-        try {
-            const response = await fetch(randomizeButton.dataset.randomizeUrl, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                credentials: 'same-origin',
-            });
-
-            if (!response.ok) {
-                throw new Error(`Randomize request failed with ${response.status}`);
-            }
-
-            const payload = await response.json();
-            applyConfig(payload.avatar_config || {});
-        } catch (error) {
-            console.error('Unable to randomize avatar:', error);
-        } finally {
-            randomizeButton.disabled = false;
-            randomizeButton.textContent = previousLabel;
-        }
-    }
-
-    form.querySelectorAll('select').forEach((input) => {
-        input.addEventListener('change', syncPreview);
     });
 
-    if (randomizeButton) {
-        randomizeButton.addEventListener('click', randomizeAvatar);
-    }
+    // ACCESSORY COLOUR
 
-    syncPreview();
-})();
+    document.getElementById(
+        "decoration_color"
+    ).addEventListener("input", (e) => {
+
+        decoration.style.background =
+            e.target.value;
+
+    });
+
+    // EYES
+
+    document.getElementById(
+        "eye_type"
+    ).addEventListener("change", (e) => {
+
+        const style = e.target.value;
+
+        [leftEye, rightEye].forEach((eye) => {
+
+            eye.style.width = "22px";
+            eye.style.height = "22px";
+            eye.style.background = "#111";
+            eye.style.borderRadius = "50%";
+            eye.style.transform = "none";
+            eye.style.clipPath = "none";
+            eye.style.boxShadow = "none";
+
+        });
+
+        if (style === "sleepy") {
+
+            [leftEye, rightEye].forEach((eye) => {
+
+                eye.style.height = "4px";
+                eye.style.borderRadius = "10px";
+                eye.style.top = "95px";
+
+            });
+
+        }
+
+        if (style === "star") {
+
+            [leftEye, rightEye].forEach((eye) => {
+
+                eye.style.background = "#FFD700";
+
+                eye.style.clipPath =
+                    "polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%)";
+
+            });
+
+        }
+
+        if (style === "laser") {
+
+            [leftEye, rightEye].forEach((eye) => {
+
+                eye.style.background = "red";
+                eye.style.width = "30px";
+                eye.style.height = "6px";
+                eye.style.borderRadius = "4px";
+                eye.style.boxShadow =
+                    "0 0 10px red";
+                eye.style.top = "95px";
+
+            });
+
+        }
+
+    });
+
+    // MOUTHS
+
+    document.getElementById(
+        "mouth_type"
+    ).addEventListener("change", (e) => {
+
+        const style = e.target.value;
+
+        mouth.style.border = "none";
+        mouth.style.borderBottom = "6px solid #111";
+        mouth.style.borderRadius = "0 0 50px 50px";
+        mouth.style.width = "50px";
+        mouth.style.height = "24px";
+        
+if (style === "sad") {
+
+    mouth.style.height = "24px";
+
+    mouth.style.borderBottom = "none";
+
+    mouth.style.borderTop =
+        "8px solid #111";
+
+    mouth.style.borderRadius =
+        "50px 50px 0 0";
+
+}
+
+        if (style === "grin") {
+
+            mouth.style.height = "30px";
+            mouth.style.borderBottom =
+                "10px solid #111";
+
+        }
+
+        if (style === "surprised") {
+
+            mouth.style.width = "24px";
+            mouth.style.height = "24px";
+            mouth.style.border =
+                "6px solid #111";
+            mouth.style.borderRadius = "50%";
+
+        }
+
+    });
+
+    // ACCESSORIES
+
+    document.getElementById(
+        "head_decoration"
+    ).addEventListener("change", (e) => {
+
+        const style = e.target.value;
+
+        decoration.style.clipPath = "none";
+        decoration.style.borderRadius = "20px 20px 0 0";
+        decoration.style.height = "25px";
+        decoration.style.width = "60px";
+        decoration.style.transform = "none";
+
+        if (style === "horns") {
+
+            decoration.style.clipPath =
+                "polygon(0 100%, 20% 0, 40% 100%, 60% 0, 80% 100%, 100% 0, 100% 100%)";
+
+        }
+
+        if (style === "hat") {
+
+            decoration.style.borderRadius = "10px";
+            decoration.style.height = "35px";
+
+        }
+
+        if (style === "crown") {
+
+            decoration.style.clipPath =
+                "polygon(0 100%, 15% 20%, 35% 100%, 50% 10%, 65% 100%, 85% 20%, 100% 100%)";
+
+        }
+
+        if (style === "none") {
+
+            decoration.style.background =
+                "transparent";
+
+        }
+
+    });
+
+    // INITIAL LOAD
+
+    document.getElementById(
+        "eye_type"
+    ).dispatchEvent(
+        new Event("change")
+    );
+
+    document.getElementById(
+        "mouth_type"
+    ).dispatchEvent(
+        new Event("change")
+    );
+
+    document.getElementById(
+        "head_decoration"
+    ).dispatchEvent(
+        new Event("change")
+    );
+
 </script>
+
 {% endblock %}

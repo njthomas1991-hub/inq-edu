@@ -293,8 +293,21 @@ class Class(models.Model):
         blank=True
     )
 
+    slug = models.SlugField(
+        unique=True,
+        blank=True
+    )
+
     created_at = models.DateTimeField(
         auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    is_archived = models.BooleanField(
+        default=False
     )
 
     class Meta:
@@ -304,6 +317,11 @@ class Class(models.Model):
     def __str__(self):
 
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
 
 
 # =====================================================

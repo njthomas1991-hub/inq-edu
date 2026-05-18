@@ -23,35 +23,273 @@
                         <span class="badge bg-primary text-uppercase">{{ user.role|default:"user" }}</span>
                     </div>
 
-                    <form method="post" class="row g-3">
-                        {% csrf_token %}
+                    <form
+    method="post"
+    enctype="multipart/form-data"
+    class="row g-3"
+>
 
-                        <div class="col-md-6">
-                            <label class="form-label">Name</label>
-                            {{ form.display_name }}
-                        </div>
+    {% csrf_token %}
 
-                        <div class="col-md-6">
-                            <label class="form-label">Email</label>
-                            {{ form.email }}
-                        </div>
+    <!-- PROFILE DISPLAY MODE -->
 
-                        <div class="col-md-6">
-                            <label class="form-label">School</label>
-                            {{ form.school }}
-                        </div>
+    <div id="profile-display">
 
-                        <div class="col-12">
-                            <label class="form-label">Bio</label>
-                            {{ form.bio }}
-                        </div>
+        <div class="row g-3">
 
-                        <div class="col-12 d-flex flex-wrap gap-2 mt-2">
-                            <button type="submit" class="btn btn-primary">Save Changes</button>
-                            <a href="{% url 'settings_avatar' %}" class="btn btn-outline-secondary">Open Avatar Settings</a>
-                            <a href="{% url 'password_change' %}" class="btn btn-outline-secondary">Change Password</a>
-                        </div>
-                    </form>
+            <div class="col-md-6">
+
+                <label class="form-label fw-bold">
+
+                    Display Name
+
+                </label>
+
+                <div class="form-control bg-light">
+
+                    {{ user.display_name|default:"Not provided" }}
+
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label fw-bold">
+
+                    Email
+
+                </label>
+
+                <div class="form-control bg-light">
+
+                    {{ user.email }}
+
+                </div>
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label fw-bold">
+
+                    School
+
+                </label>
+
+                <div class="form-control bg-light">
+
+                    {{ user.school|default:"Not provided" }}
+
+                </div>
+
+            </div>
+
+            <div class="col-12">
+
+                <label class="form-label fw-bold">
+
+                    Bio
+
+                </label>
+
+                <div
+                    class="form-control bg-light"
+                    style="min-height:120px;"
+                >
+
+                    {{ user.bio|default:"No bio added yet." }}
+
+                </div>
+
+            </div>
+
+            {% if user.profile_image %}
+
+                <div class="col-12">
+
+                    <label class="form-label fw-bold">
+
+                        Profile Image
+
+                    </label>
+
+                    <div>
+
+                        <img
+                            src="{{ user.profile_image.url }}"
+                            class="rounded-circle shadow-sm"
+                            width="120"
+                            height="120"
+                            style="object-fit: cover;"
+                            alt="Profile image"
+                        >
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <!-- PROFILE EDIT MODE -->
+
+    <div
+        id="profile-edit"
+        style="display:none;"
+    >
+
+        <div class="row g-3">
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+
+                    Display Name
+
+                </label>
+
+                {{ form.display_name }}
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+
+                    Email
+
+                </label>
+
+                {{ form.email }}
+
+            </div>
+
+            <div class="col-md-6">
+
+                <label class="form-label">
+
+                    School
+
+                </label>
+
+                {{ form.school }}
+
+            </div>
+
+            {% if form.profile_image %}
+
+                <div class="col-md-6">
+
+                    <label class="form-label">
+
+                        Profile Image
+
+                    </label>
+
+                    {{ form.profile_image }}
+
+                </div>
+
+            {% endif %}
+
+            <div class="col-12">
+
+                <label class="form-label">
+
+                    Bio
+
+                </label>
+
+                {{ form.bio }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ACTION BUTTONS -->
+
+    <div class="col-12 d-flex flex-wrap gap-2 mt-4">
+
+        <button
+            type="button"
+            id="edit-profile-btn"
+            class="btn btn-primary"
+        >
+
+            Edit Profile
+
+        </button>
+
+        <button
+            type="submit"
+            id="save-profile-btn"
+            class="btn btn-success"
+            style="display:none;"
+        >
+
+            Save Changes
+
+        </button>
+
+        <a
+            href="{% url 'settings_avatar' %}"
+            class="btn btn-outline-secondary"
+        >
+
+            Open Avatar Settings
+
+        </a>
+
+        <a
+            href="{% url 'password_change' %}"
+            class="btn btn-outline-secondary"
+        >
+
+            Change Password
+
+        </a>
+
+    </div>
+
+</form>
+
+<script>
+
+    const editBtn = document.getElementById(
+        "edit-profile-btn"
+    );
+
+    const saveBtn = document.getElementById(
+        "save-profile-btn"
+    );
+
+    const displaySection = document.getElementById(
+        "profile-display"
+    );
+
+    const editSection = document.getElementById(
+        "profile-edit"
+    );
+
+    editBtn.addEventListener("click", () => {
+
+        displaySection.style.display = "none";
+
+        editSection.style.display = "block";
+
+        editBtn.style.display = "none";
+
+        saveBtn.style.display = "inline-block";
+
+    });
+
+</script>
                 </div>
             </div>
         </div>

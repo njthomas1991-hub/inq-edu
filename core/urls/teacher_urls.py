@@ -13,6 +13,8 @@ from core.views.teacher_views import (
     create_class_view,
     edit_class_view,
     delete_class_view,
+    teacher_class_edit_view,
+    teacher_class_delete_view,
     add_student_to_class_view,
     remove_student_view,
     transfer_student_view,
@@ -91,6 +93,18 @@ urlpatterns = [
         "teacher/classes/<int:pk>/delete/",
         delete_class_view,
         name="delete_class",
+    ),
+
+    path(
+        "classes/<slug:slug>/edit/",
+        teacher_class_edit_view,
+        name="teacher_class_edit",
+    ),
+
+    path(
+        "classes/<slug:slug>/delete/",
+        teacher_class_delete_view,
+        name="teacher_class_delete",
     ),
 
     path(

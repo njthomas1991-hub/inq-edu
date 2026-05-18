@@ -118,6 +118,63 @@ class ClassForm(forms.ModelForm):
         }
 
 
+class ClassGroupEditForm(forms.ModelForm):
+
+    class Meta:
+
+        model = Class
+
+        fields = [
+
+            "name",
+
+            "teacher",
+
+            "is_archived",
+        ]
+
+        widgets = {
+
+            "name": forms.TextInput(
+                attrs={
+                    "class": "form-control"
+                }
+            ),
+
+            "teacher": forms.Select(
+                attrs={
+                    "class": "form-select"
+                }
+            ),
+
+            "is_archived": forms.CheckboxInput(
+                attrs={
+                    "class": "form-check-input"
+                }
+            ),
+        }
+
+    def __init__(
+        self,
+        *args,
+        school=None,
+        **kwargs
+    ):
+
+        super().__init__(*args, **kwargs)
+
+        if school:
+
+            self.fields[
+                "teacher"
+            ].queryset = User.objects.filter(
+
+                school=school,
+
+                role="teacher",
+            )
+
+
 class StudentSignupForm(forms.Form):
 
     fname = forms.CharField(

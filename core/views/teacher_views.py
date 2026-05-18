@@ -18,6 +18,7 @@ from core.models import (
 
 from core.forms.class_forms import (
     ClassForm,
+    ClassGroupEditForm,
 )
 
 from core.forms.resource_forms import (
@@ -299,6 +300,100 @@ def delete_class_view(request, pk):
         request,
         "core/teacher/classes/class_delete.html",
         context,
+    )
+
+
+@login_required
+def teacher_class_edit_view(
+    request,
+    slug
+):
+
+    class_group = get_object_or_404(
+
+        Class,
+
+        slug=slug,
+    )
+
+    if request.method == "POST":
+
+        form = ClassGroupEditForm(
+
+            request.POST,
+
+            instance=class_group,
+
+            school=request.user.school,
+        )
+
+        if form.is_valid():
+
+            form.save()
+
+            messages.success(
+
+                request,
+
+                "Class updated successfully.",
+            )
+
+            return redirect(
+                "teacher_classes"
+            )
+
+    else:
+
+        form = ClassGroupEditForm(
+
+            instance=class_group,
+
+            school=request.user.school,
+        )
+
+    return render(
+
+        request,
+
+        "core/teacher/classes/class_edit.html",
+
+        {
+            "form": form,
+            "class_group": class_group,
+        },
+    )
+
+
+@login_required
+def teacher_class_delete_view(
+    request,
+    slug
+):
+
+    class_group = get_object_or_404(
+
+        Class,
+
+        slug=slug,
+    )
+
+    if request.method == "POST":
+
+        class_group.delete()
+
+        messages.success(
+
+            request,
+
+            "Class deleted successfully.",
+        )
+
+        return redirect(
+            "teacher_classes"
+        )
+
+    return redirect(
+        "teacher_classes"
     )
 
 
