@@ -1,5 +1,71 @@
-{% extends "core/base.html" %}
-{% block title %}Delete Resource{% endblock %}
+{% extends "core/base_teacher.html" %}
+
+{% block title %}
+Delete Resource - Teaching Resources
+{% endblock %}
+
 {% block content %}
-<div class="container py-5"><div class="alert alert-danger">Resource delete confirmation placeholder.</div></div>
+
+<div class="container py-4">
+
+	<div class="row justify-content-center">
+
+		<div class="col-lg-7">
+
+			<div class="card shadow-sm border-0 rounded-4">
+
+				<div class="card-body p-4 p-lg-5">
+
+					<h1 class="h3 mb-3">
+						Delete Resource
+					</h1>
+
+					<div class="alert alert-danger border-0 mb-4">
+
+						<strong>Warning:</strong>
+						This will permanently delete
+						<strong>{{ resource.title }}</strong>.
+
+					</div>
+
+					<p class="text-muted mb-4">
+
+						This action cannot be undone.
+						If this resource has been shared with learners or colleagues,
+						it will no longer be available after deletion.
+
+					</p>
+
+					<form method="post">
+
+						{% csrf_token %}
+
+						<div class="d-flex flex-wrap gap-2">
+
+							<button type="submit" class="btn btn-danger">
+
+								Delete Resource
+
+							</button>
+
+							<a href="{% url 'teacher_resource_detail' resource.pk %}" class="btn btn-outline-secondary">
+
+								Cancel
+
+							</a>
+
+						</div>
+
+					</form>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</div>
+
 {% endblock %}

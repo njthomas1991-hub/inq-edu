@@ -83,10 +83,10 @@
 
                     {% endif %}
 
-                    {% if resource.author == request.user or request.user.is_superuser %}
+                    {% if resource.author == request.user %}
 
                         <a
-                            href="{% url 'teacher_resource_edit' resource.slug %}"
+                            href="{% url 'teacher_resource_edit' resource.pk %}"
                             class="btn btn-sm btn-outline-primary"
                         >
 
@@ -96,7 +96,7 @@
 
                         <form
                             method="post"
-                            action="{% url 'teacher_resource_delete' resource.slug %}"
+                            action="{% url 'teacher_resource_delete' resource.pk %}"
                             onsubmit="return confirm('Delete this resource?');"
                             style="display:inline;"
                         >
@@ -314,29 +314,6 @@
                             </div>
 
                         </div>
-
-                        {% if comment.author == request.user or request.user.is_superuser %}
-
-                            <form
-                                method="post"
-                                action="{% url 'teacher_resource_comment_delete' resource.slug comment.id %}"
-                                onsubmit="return confirm('Delete this comment?');"
-                            >
-
-                                {% csrf_token %}
-
-                                <button
-                                    class="btn btn-sm btn-outline-danger"
-                                    type="submit"
-                                >
-
-                                    Delete
-
-                                </button>
-
-                            </form>
-
-                        {% endif %}
 
                     </div>
 

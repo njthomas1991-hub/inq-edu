@@ -64,9 +64,9 @@ AVATAR_OPTIONS = {
 @login_required
 def profile_view(request):
 
-    avatar = Avatar.objects.filter(
-    user=request.user
-    ).first()
+    avatar, _ = Avatar.objects.get_or_create(
+        user=request.user
+    )
 
     if request.method == "POST":
 
@@ -116,11 +116,8 @@ def profile_view(request):
         )
 
     context = {
-
         "form": form,
-
-        "avatar": request.user.avatar,
-
+        "avatar": avatar,
         "page_title": "My Profile",
     }
 

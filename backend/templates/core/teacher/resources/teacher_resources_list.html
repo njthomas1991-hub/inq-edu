@@ -291,7 +291,7 @@ Teaching Resources - Teacher Hub
 
                                 <a
                                     class="btn btn-sm btn-primary"
-                                    href="{% url 'teacher_resource_detail' resource.slug %}"
+                                    href="{% url 'teacher_resource_detail' resource.pk %}"
                                 >
 
                                     View
@@ -302,7 +302,7 @@ Teaching Resources - Teacher Hub
 
                                     <a
                                         class="btn btn-sm btn-outline-primary"
-                                        href="{% url 'teacher_resource_edit' resource.slug %}"
+                                        href="{% url 'teacher_resource_edit' resource.pk %}"
                                     >
 
                                         Edit
@@ -311,7 +311,7 @@ Teaching Resources - Teacher Hub
 
                                     <form
                                         method="post"
-                                        action="{% url 'teacher_resource_delete' resource.slug %}"
+                                        action="{% url 'teacher_resource_delete' resource.pk %}"
                                         onsubmit="return confirm('Delete this resource?');"
                                     >
 

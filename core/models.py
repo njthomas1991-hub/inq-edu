@@ -363,6 +363,23 @@ class ClassStudent(models.Model):
 
 class TeachingResource(models.Model):
 
+    RESOURCE_TYPE_CHOICES = (
+        ('lesson_plan', 'Lesson Plan'),
+        ('worksheet', 'Worksheet'),
+        ('activity', 'Activity'),
+        ('presentation', 'Presentation'),
+        ('assessment', 'Assessment'),
+        ('other', 'Other'),
+    )
+
+    YEAR_KS_CHOICES = (
+        ('0', 'EYFS'),
+        ('1', 'KS1'),
+        ('2', 'KS2'),
+        ('3', 'KS3'),
+        ('4', 'KS4'),
+    )
+
     STATUS_CHOICES = (
         ('draft', 'Draft'),
         ('published', 'Published'),
@@ -406,6 +423,7 @@ class TeachingResource(models.Model):
 
     resource_type = models.CharField(
         max_length=100,
+        choices=RESOURCE_TYPE_CHOICES,
         default='other'
     )
 
@@ -416,6 +434,7 @@ class TeachingResource(models.Model):
 
     year_ks = models.CharField(
         max_length=50,
+        choices=YEAR_KS_CHOICES,
         blank=True
     )
 
@@ -475,7 +494,18 @@ class TeachingResource(models.Model):
     def save(self, *args, **kwargs):
 
         if not self.slug:
-            self.slug = slugify(self.title)
+            base_slug = slugify(self.title) or 'resource'
+            slug = base_slug
+            counter = 1
+
+            while TeachingResource.objects.filter(slug=slug).exclude(
+                pk=self.pk
+            ).exists():
+
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            self.slug = slug
 
         if self.status == 'published' and not self.published_at:
             self.published_at = timezone.now()
