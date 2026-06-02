@@ -4,11 +4,11 @@ import sys
 import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 django.setup()
 
-from backend.core.models import User
+from core.models import User
 
 # Create a superuser with default credentials
 username = "admin"

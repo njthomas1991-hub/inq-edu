@@ -39,23 +39,38 @@ SECRET_KEY = os.environ.get(
     "SECRET_KEY", "django-insecure-default-change-this-in-production"
 )
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", ".herokuapp.com"]
+def env_bool(name, default=False):
+
+    return os.environ.get(name, str(default)) == "True"
+
+
+def env_list(name, default):
+
+    value = os.environ.get(name)
+
+    if not value:
+        return default
+
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = env_bool("DEBUG", False)
+
+ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", ["localhost", "127.0.0.1", ".herokuapp.com"])
 
 # CSRF Configuration
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "http://localhost:3000",
-]
-CSRF_COOKIE_SECURE = False  # Set to True in production
+CSRF_TRUSTED_ORIGINS = env_list(
+    "CSRF_TRUSTED_ORIGINS",
+    ["http://localhost:8000", "http://127.0.0.1:8000", "http://localhost:3000"],
+)
+CSRF_COOKIE_SECURE = env_bool("CSRF_COOKIE_SECURE", not DEBUG)
 CSRF_COOKIE_HTTPONLY = False
-SESSION_COOKIE_SECURE = False  # Set to True in production
+SESSION_COOKIE_SECURE = env_bool("SESSION_COOKIE_SECURE", not DEBUG)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 SESSION_COOKIE_AGE = 630720000  # 20 years in seconds (60 * 60 * 24 * 365 * 20)
 SESSION_SAVE_EVERY_REQUEST = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Application definition
 

@@ -4,10 +4,9 @@ from django.contrib import admin
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
 
-from core.views.auth_views import (
-    custom_login_view,
-    custom_logout_view,
-)
+from allauth.account.views import LoginView
+
+from core.views.auth_views import custom_logout_view
 
 from core.views.public_views import (
     home_page_view,
@@ -23,7 +22,7 @@ urlpatterns = [
     # Auth
     path(
         "login/",
-        custom_login_view,
+        LoginView.as_view(template_name="core/account/login.html"),
         name="login",
     ),
     path(

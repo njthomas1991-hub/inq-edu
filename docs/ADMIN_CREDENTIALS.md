@@ -10,7 +10,7 @@ This file documents the admin/superuser account credentials for the project.
 
 ## Access
 
-The admin account is created automatically via Django migration (`0021_create_admin_user.py`) when you run:
+The admin account is created automatically by the `0006_create_default_admin_user` data migration when you run:
 
 ```bash
 python backend/manage.py migrate
@@ -53,7 +53,7 @@ To change the admin password, you can:
 
 ## Database Storage
 
-The admin user is stored in the PostgreSQL database (Neon) with full superuser permissions:
+The admin user is stored in the database with full superuser permissions:
 - **is_staff:** True
 - **is_superuser:** True
 - **is_active:** True
