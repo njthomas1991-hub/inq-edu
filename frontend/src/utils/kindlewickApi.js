@@ -19,7 +19,10 @@ export const fetchKindlewickJson = async (path, options = {}) => {
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(text || `${response.status} ${response.statusText}`);
+    const error = new Error(text || `${response.status} ${response.statusText}`);
+    error.status = response.status;
+    error.responseText = text;
+    throw error;
   }
 
   return response.status === 204 ? null : response.json();

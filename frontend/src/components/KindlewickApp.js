@@ -4,6 +4,8 @@ import KindlewickRuntime from './KindlewickRuntime';
 import KindlewickTeacherPanel from './KindlewickTeacherPanel';
 import { fetchKindlewickJson } from '../utils/kindlewickApi';
 
+const LOGIN_URL = 'http://127.0.0.1:8000/login/';
+
 const GAME_TYPES = [
   { value: 'map', label: 'Map Exploration' },
   { value: 'wizards_castle', label: 'Wizards Castle' },
@@ -13,6 +15,7 @@ const GAME_TYPES = [
 
 const KindlewickApp = () => {
   const [user, setUser] = useState(null);
+  const [authState, setAuthState] = useState('loading');
   const [progress, setProgress] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [status, setStatus] = useState(null);
@@ -38,18 +41,28 @@ const KindlewickApp = () => {
 
   const loadData = async () => {
     setLoading(true);
+    setAuthState('loading');
     try {
-      const [userData, progressData, sessionData] = await Promise.all([
-        fetchKindlewickJson('/user/current/'),
+      const userData = await fetchKindlewickJson('/user/current/');
+      const [progressData, sessionData] = await Promise.all([
         fetchKindlewickJson('/kindlewick/progress/'),
         fetchKindlewickJson('/kindlewick/sessions/')
       ]);
       setUser(userData);
+      setAuthState('authenticated');
       setProgress(Array.isArray(progressData) ? progressData : []);
       setSessions(Array.isArray(sessionData) ? sessionData : []);
       showStatus('Kindlewick data synced.', 'success');
     } catch (error) {
-      showStatus(`Unable to load Kindlewick data: ${error.message}`, 'error');
+      if (error.status === 401 || error.status === 403) {
+        setUser(null);
+        setAuthState('unauthenticated');
+        setProgress([]);
+        setSessions([]);
+        setStatus(null);
+      } else {
+        showStatus(`Unable to load Kindlewick data: ${error.message}`, 'error');
+      }
     } finally {
       setLoading(false);
     }
@@ -151,23 +164,41 @@ const KindlewickApp = () => {
             {user ? `${user.first_name || user.username} • ${user.role}` : 'Not signed in'}
           </p>
           <h1>Kindlewick Adventure Console</h1>
-          <p>Sync progress and session data for the logged-in student profile.</p>
+          <p>
+            {user
+              ? 'Sync progress and session data for the logged-in student profile.'
+              : 'Sign in to load the Kindlewick map, progress, and session tracking.'}
+          </p>
         </div>
         <div className="kw-react-actions">
-          <button type="button" className="kw-react-button" onClick={loadData}>
-            Refresh
-          </button>
-          <button
-            type="button"
-            className="kw-react-button outline"
-            onClick={() => {
-              if (sessions[0]) {
-                finishSession(sessions[0].id);
-              }
-            }}
-          >
-            Finish latest session
-          </button>
+          {user ? (
+            <>
+              <button type="button" className="kw-react-button" onClick={loadData}>
+                Refresh
+              </button>
+              <button
+                type="button"
+                className="kw-react-button outline"
+                onClick={() => {
+                  if (sessions[0]) {
+                    finishSession(sessions[0].id);
+                  }
+                }}
+              >
+                Finish latest session
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              className="kw-react-button"
+              onClick={() => {
+                window.location.href = LOGIN_URL;
+              }}
+            >
+              Sign in to Kindlewick
+            </button>
+          )}
         </div>
       </header>
 
@@ -175,179 +206,204 @@ const KindlewickApp = () => {
         <div className={`kw-react-alert ${status.type}`}>{status.message}</div>
       )}
 
-      <section className="kw-react-grid">
-        <article className="kw-react-card">
-          <h3>Progress Snapshot</h3>
-          <form onSubmit={submitProgress} className="kw-react-form">
-            <label>
-              Game
-              <select
-                name="game_type"
-                value={progressForm.game_type}
-                onChange={handleProgressChange}
-              >
-                {GAME_TYPES.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div className="kw-react-row">
-              <label>
-                Level
-                <input
-                  type="number"
-                  min="1"
-                  name="current_level"
-                  value={progressForm.current_level}
-                  onChange={handleProgressChange}
-                />
-              </label>
-              <label>
-                Score
-                <input
-                  type="number"
-                  min="0"
-                  name="score"
-                  value={progressForm.score}
-                  onChange={handleProgressChange}
-                />
-              </label>
-            </div>
-            <div className="kw-react-row">
-              <label>
-                Tokens
-                <input
-                  type="number"
-                  min="0"
-                  name="tokens_earned"
-                  value={progressForm.tokens_earned}
-                  onChange={handleProgressChange}
-                />
-              </label>
-              <label>
-                Playtime (sec)
-                <input
-                  type="number"
-                  min="0"
-                  name="total_playtime"
-                  value={progressForm.total_playtime}
-                  onChange={handleProgressChange}
-                />
-              </label>
-            </div>
-            <label className="kw-react-checkbox">
-              <input
-                type="checkbox"
-                name="completed"
-                checked={progressForm.completed}
-                onChange={handleProgressChange}
-              />
-              Mark complete
-            </label>
-            <button type="submit">Save progress</button>
-          </form>
-        </article>
+      {authState === 'loading' && (
+        <section className="kw-react-card">
+          <h3>Checking sign-in status</h3>
+          <p className="kw-react-muted">
+            Verifying your session before loading the Kindlewick map.
+          </p>
+        </section>
+      )}
 
-        <article className="kw-react-card">
-          <h3>Start New Session</h3>
-          <form onSubmit={submitSession} className="kw-react-form">
-            <label>
-              Game
-              <select
-                name="game_type"
-                value={sessionForm.game_type}
-                onChange={handleSessionChange}
-              >
-                {GAME_TYPES.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div className="kw-react-row">
-              <label>
-                Level
-                <input
-                  type="number"
-                  min="1"
-                  name="level"
-                  value={sessionForm.level}
-                  onChange={handleSessionChange}
-                />
-              </label>
-              <label>
-                Playtime (sec)
-                <input
-                  type="number"
-                  min="0"
-                  name="playtime"
-                  value={sessionForm.playtime}
-                  onChange={handleSessionChange}
-                />
-              </label>
-            </div>
-            <label>
-              Session data (JSON)
-              <textarea
-                name="session_data"
-                value={sessionForm.session_data}
-                onChange={handleSessionChange}
-                placeholder='{"checkpoints": 2, "hints": 1}'
-              />
-            </label>
-            <button type="submit">Create session</button>
-          </form>
-        </article>
-      </section>
+      {authState === 'unauthenticated' && (
+        <section className="kw-react-card">
+          <h3>Login Required</h3>
+          <p className="kw-react-muted">
+            Sign in to load the Kindlewick map and save progress for your profile.
+          </p>
+          <button type="button" onClick={() => { window.location.href = LOGIN_URL; }}>
+            Open Login Page
+          </button>
+        </section>
+      )}
 
-      <section className="kw-react-card">
-        <h3>Recent Progress</h3>
-        {loading ? (
-          <p className="kw-react-muted">Loading progress...</p>
-        ) : progress.length ? (
-          <div className="kw-react-list">
-            {progress.map((item) => (
-              <div key={item.id} className="kw-react-item">
-                <strong>{formatGameType(item.game_type)}</strong>
-                <span>Level {item.current_level} • Score {item.score}</span>
-                <span>Tokens {item.tokens_earned ?? 0} • {item.total_playtime ?? 0}s</span>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="kw-react-muted">No progress tracked yet.</p>
-        )}
-      </section>
-
-      <section className="kw-react-card">
-        <h3>Latest Sessions</h3>
-        {loading ? (
-          <p className="kw-react-muted">Loading sessions...</p>
-        ) : sessions.length ? (
-          <div className="kw-react-list">
-            {sessions.map((item) => (
-              <div key={item.id} className="kw-react-item">
-                <div>
-                  <strong>{formatGameType(item.game_type)}</strong> • Level {item.level}
+      {authState === 'authenticated' && (
+        <>
+          <section className="kw-react-grid">
+            <article className="kw-react-card">
+              <h3>Progress Snapshot</h3>
+              <form onSubmit={submitProgress} className="kw-react-form">
+                <label>
+                  Game
+                  <select
+                    name="game_type"
+                    value={progressForm.game_type}
+                    onChange={handleProgressChange}
+                  >
+                    {GAME_TYPES.map((type) => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="kw-react-row">
+                  <label>
+                    Level
+                    <input
+                      type="number"
+                      min="1"
+                      name="current_level"
+                      value={progressForm.current_level}
+                      onChange={handleProgressChange}
+                    />
+                  </label>
+                  <label>
+                    Score
+                    <input
+                      type="number"
+                      min="0"
+                      name="score"
+                      value={progressForm.score}
+                      onChange={handleProgressChange}
+                    />
+                  </label>
                 </div>
-                <span>Score {item.score ?? 0} • Tokens {item.tokens_earned ?? 0} • {item.playtime ?? 0}s</span>
-                <button type="button" onClick={() => finishSession(item.id)}>
-                  {item.completed ? 'View' : 'Finish session'}
-                </button>
+                <div className="kw-react-row">
+                  <label>
+                    Tokens
+                    <input
+                      type="number"
+                      min="0"
+                      name="tokens_earned"
+                      value={progressForm.tokens_earned}
+                      onChange={handleProgressChange}
+                    />
+                  </label>
+                  <label>
+                    Playtime (sec)
+                    <input
+                      type="number"
+                      min="0"
+                      name="total_playtime"
+                      value={progressForm.total_playtime}
+                      onChange={handleProgressChange}
+                    />
+                  </label>
+                </div>
+                <label className="kw-react-checkbox">
+                  <input
+                    type="checkbox"
+                    name="completed"
+                    checked={progressForm.completed}
+                    onChange={handleProgressChange}
+                  />
+                  Mark complete
+                </label>
+                <button type="submit">Save progress</button>
+              </form>
+            </article>
+
+            <article className="kw-react-card">
+              <h3>Start New Session</h3>
+              <form onSubmit={submitSession} className="kw-react-form">
+                <label>
+                  Game
+                  <select
+                    name="game_type"
+                    value={sessionForm.game_type}
+                    onChange={handleSessionChange}
+                  >
+                    {GAME_TYPES.map((type) => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="kw-react-row">
+                  <label>
+                    Level
+                    <input
+                      type="number"
+                      min="1"
+                      name="level"
+                      value={sessionForm.level}
+                      onChange={handleSessionChange}
+                    />
+                  </label>
+                  <label>
+                    Playtime (sec)
+                    <input
+                      type="number"
+                      min="0"
+                      name="playtime"
+                      value={sessionForm.playtime}
+                      onChange={handleSessionChange}
+                    />
+                  </label>
+                </div>
+                <label>
+                  Session data (JSON)
+                  <textarea
+                    name="session_data"
+                    value={sessionForm.session_data}
+                    onChange={handleSessionChange}
+                    placeholder='{"checkpoints": 2, "hints": 1}'
+                  />
+                </label>
+                <button type="submit">Create session</button>
+              </form>
+            </article>
+          </section>
+
+          <section className="kw-react-card">
+            <h3>Recent Progress</h3>
+            {loading ? (
+              <p className="kw-react-muted">Loading progress...</p>
+            ) : progress.length ? (
+              <div className="kw-react-list">
+                {progress.map((item) => (
+                  <div key={item.id} className="kw-react-item">
+                    <strong>{formatGameType(item.game_type)}</strong>
+                    <span>Level {item.current_level} • Score {item.score}</span>
+                    <span>Tokens {item.tokens_earned ?? 0} • {item.total_playtime ?? 0}s</span>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        ) : (
-          <p className="kw-react-muted">No sessions recorded yet.</p>
-        )}
-      </section>
+            ) : (
+              <p className="kw-react-muted">No progress tracked yet.</p>
+            )}
+          </section>
 
-      <KindlewickTeacherPanel user={user} />
+          <section className="kw-react-card">
+            <h3>Latest Sessions</h3>
+            {loading ? (
+              <p className="kw-react-muted">Loading sessions...</p>
+            ) : sessions.length ? (
+              <div className="kw-react-list">
+                {sessions.map((item) => (
+                  <div key={item.id} className="kw-react-item">
+                    <div>
+                      <strong>{formatGameType(item.game_type)}</strong> • Level {item.level}
+                    </div>
+                    <span>Score {item.score ?? 0} • Tokens {item.tokens_earned ?? 0} • {item.playtime ?? 0}s</span>
+                    <button type="button" onClick={() => finishSession(item.id)}>
+                      {item.completed ? 'View' : 'Finish session'}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="kw-react-muted">No sessions recorded yet.</p>
+            )}
+          </section>
 
-      <KindlewickRuntime onSessionComplete={loadData} />
+          <KindlewickTeacherPanel user={user} />
+
+          <KindlewickRuntime onSessionComplete={loadData} />
+        </>
+      )}
     </div>
   );
 };

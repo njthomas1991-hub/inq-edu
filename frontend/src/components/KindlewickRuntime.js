@@ -60,8 +60,8 @@ const KindlewickRuntime = ({ onSessionComplete }) => {
       parent: containerRef.current,
       backgroundColor: '#0f172a',
       scene: {
-        async create() {
-          await createSession();
+        create: function() {
+          void createSession();
           setStatus('Collect 6 glow orbs to finish the session.');
 
           const orbGraphics = this.add.graphics();
