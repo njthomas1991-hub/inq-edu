@@ -46,10 +46,28 @@ def repair_history(connection):
         with connection.cursor() as cursor:
             description = connection.introspection.get_table_description(cursor, "core_class")
             existing_columns = {column.name for column in description}
+            constraints = connection.introspection.get_constraints(cursor, "core_class")
+            stale_indexes = [
+                name
+                for name, info in constraints.items()
+                if info.get("index") and name.startswith("core_class_slug")
+            ]
+
+            for index_name in stale_indexes:
+                cursor.execute(f'DROP INDEX IF EXISTS "{index_name}"')
+
+        if stale_indexes:
+            print(f"Dropped stale core_class slug indexes: {', '.join(stale_indexes)}")
+
         if core_0004_columns.issubset(existing_columns):
             print("Repairing migration history: recording core.0004_class_is_archived_class_slug_class_updated_at")
             recorder.record_applied(*core_0004)
             return True
+
+        if stale_indexes:
+            return True
+
+    return False
 
 def main():
     repo_root = Path(__file__).resolve().parent.parent
