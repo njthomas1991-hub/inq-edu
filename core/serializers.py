@@ -24,7 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
     def get_school_detail(self, obj):
         if not obj.school:
             return None
-        return {"name": obj.school}
+        return {"name": obj.school.name}
 
     class Meta:
         model = User

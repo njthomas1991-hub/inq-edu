@@ -2,7 +2,7 @@ from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from core.models import Class, ClassStudent
+from core.models import Class, ClassStudent, School
 
 User = get_user_model()
 
@@ -77,3 +77,24 @@ class ClassCRUDTestCase(TestCase):
                 clazz=class_obj,
             ).exists()
         )
+
+
+class ApiCurrentUserTestCase(TestCase):
+
+    def setUp(self):
+        self.client = Client()
+        self.school = School.objects.create(name="Test School")
+        self.user = User.objects.create_user(
+            username="teacher1",
+            password="testpass123",
+            role="teacher",
+            school=self.school,
+        )
+
+    def test_current_user_api_returns_school_detail(self):
+        self.client.login(username="teacher1", password="testpass123")
+
+        response = self.client.get(reverse("api_current_user"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["school_detail"], {"name": "Test School"})
