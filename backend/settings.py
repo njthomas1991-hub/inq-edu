@@ -261,8 +261,9 @@ USE_TZ = True
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
-    BASE_DIR / "backend" / "staticfiles",
+    path
+    for path in [BASE_DIR / "static", BASE_DIR / "backend" / "staticfiles"]
+    if path.exists()
 ]
 
 # WhiteNoise configuration

@@ -1,2 +1,2 @@
-release: python manage.py migrate
+release: python scripts/heroku_migrate.py
 web: bash start.sh
