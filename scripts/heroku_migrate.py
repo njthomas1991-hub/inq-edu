@@ -57,6 +57,17 @@ def repair_history(connection):
     return False
 
 
+def cleanup_partial_core_0004(connection):
+    """Remove stale slug indexes that block reapplying core.0004."""
+    recorder = MigrationRecorder(connection)
+    applied = set(recorder.applied_migrations())
+
+    core_0004 = ("core", "0004_class_is_archived_class_slug_class_updated_at")
+    if core_0004 not in applied:
+        with connection.cursor() as cursor:
+            cursor.execute('DROP INDEX IF EXISTS "core_class_slug_e293aa55_like"')
+        print("Cleaned up stale core_class_slug_e293aa55_like index")
+
 def main():
     repo_root = Path(__file__).resolve().parent.parent
     sys.path.insert(0, str(repo_root))
@@ -65,6 +76,7 @@ def main():
 
     connection = connections["default"]
     repair_history(connection)
+    cleanup_partial_core_0004(connection)
 
     print("Running Django migrations...")
     call_command("migrate", verbosity=2)
