@@ -641,6 +641,24 @@
         aria-live="polite"
     ></div>
 
+    <!-- FLASH MESSAGES -->
+
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                {% if message.tags == "error" %}
+                    {% include "core/components/alerts/alert.html" with type="danger" message=message dismissible=True %}
+                {% elif message.tags == "success" %}
+                    {% include "core/components/alerts/alert.html" with type="success" message=message dismissible=True %}
+                {% elif message.tags == "warning" %}
+                    {% include "core/components/alerts/alert.html" with type="warning" message=message dismissible=True %}
+                {% else %}
+                    {% include "core/components/alerts/alert.html" with type="info" message=message dismissible=True %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
     <!-- MAIN CONTENT -->
 
     <main id="main-content">

@@ -17,6 +17,7 @@ class AuthenticationTestCase(TestCase):
 
         self.teacher = User.objects.create_user(
             username="teacher1",
+            email="teacher1@example.com",
             password="testpass123",
             role="teacher",
             school=self.school,
@@ -24,6 +25,7 @@ class AuthenticationTestCase(TestCase):
 
         self.student = User.objects.create_user(
             username="student1",
+            email="student1@example.com",
             password="testpass123",
             role="student",
             school=self.school,
@@ -31,6 +33,7 @@ class AuthenticationTestCase(TestCase):
 
         self.admin = User.objects.create_user(
             username="admin1",
+            email="admin1@example.com",
             password="testpass123",
             role="school_admin",
             school=self.school,
@@ -93,3 +96,49 @@ class AuthenticationTestCase(TestCase):
             response.status_code,
             302,
         )
+
+    def test_login_sets_success_message(self):
+
+        response = self.client.post(
+            reverse("account_login"),
+            {
+                "login": "teacher1@example.com",
+                "password": "testpass123",
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Logged in successfully.")
+
+    def test_logout_sets_success_message(self):
+
+        self.client.login(username="teacher1", password="testpass123")
+
+        response = self.client.post(
+            reverse("account_logout"),
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Logged out successfully.")
+
+    def test_profile_update_sets_success_message(self):
+
+        self.client.login(username="teacher1", password="testpass123")
+
+        response = self.client.post(
+            reverse("profile"),
+            {
+                "display_name": "Teacher One",
+                "first_name": "Teacher",
+                "last_name": "One",
+                "email": "teacher1@example.com",
+                "school": self.school.pk,
+                "bio": "Updated bio",
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Profile updated successfully.")

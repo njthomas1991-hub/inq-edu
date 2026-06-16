@@ -41,8 +41,8 @@ SECRET_KEY = os.environ.get(
 
 
 def env_bool(name, default=False):
-
-    return os.environ.get(name, str(default)) == "True"
+    value = os.environ.get(name, str(default))
+    return value.lower() in {"1", "true", "yes", "on"}
 
 
 def env_list(name, default):
@@ -55,9 +55,15 @@ def env_list(name, default):
     return [item.strip() for item in value.split(",") if item.strip()]
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env_bool("DEBUG", False)
+ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", ["localhost", "127.0.0.1", "[::1]"])
 
-ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", ["localhost", "127.0.0.1", ".herokuapp.com"])
+LOCAL_HOSTS = {"localhost", "127.0.0.1", "[::1]"}
+
+# Keep DEBUG opt-in and limited to local-only host lists.
+DEBUG = env_bool("DEBUG", False) and all(
+    host in LOCAL_HOSTS or host.startswith("localhost")
+    for host in ALLOWED_HOSTS
+)
 
 # CSRF Configuration
 CSRF_TRUSTED_ORIGINS = env_list(

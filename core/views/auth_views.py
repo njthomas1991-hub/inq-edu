@@ -4,38 +4,60 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib import messages
 from django.urls import reverse
 from allauth.account.adapter import DefaultAccountAdapter
+from allauth.account.views import LoginView, SignupView
+
+
+def get_dashboard_redirect_url(user):
+
+    if getattr(user, "role", None) == "student":
+        return reverse("student_dashboard")
+
+    if getattr(user, "role", None) == "school_admin":
+        return reverse("school_admin_dashboard")
+
+    return reverse("teacher_dashboard")
 
 
 class CustomAccountAdapter(DefaultAccountAdapter):
 
     def get_signup_redirect_url(self, request):
-
-        user = request.user
-
-        if user.is_authenticated:
-
-            if getattr(user, "role", None) == "student":
-                return reverse("student_dashboard")
-
-            if getattr(user, "role", None) == "school_admin":
-                return reverse("school_admin_dashboard")
+        if request.user.is_authenticated:
+            return get_dashboard_redirect_url(request.user)
 
         return reverse("teacher_dashboard")
 
     def get_login_redirect_url(self, request):
 
-        user = request.user
-
-        if user.is_authenticated:
-
-            if getattr(user, "role", None) == "student":
-                return reverse("student_dashboard")
-
-            if getattr(user, "role", None) == "school_admin":
-                return reverse("school_admin_dashboard")
+        if request.user.is_authenticated:
+            return get_dashboard_redirect_url(request.user)
 
         return reverse("teacher_dashboard")
 
+
+class FlashMessageLoginView(LoginView):
+
+    def get_success_url(self):
+
+        return get_dashboard_redirect_url(self.request.user)
+
+    def form_valid(self, form):
+
+        messages.success(self.request, "Logged in successfully.")
+
+        return super().form_valid(form)
+
+
+class FlashMessageSignupView(SignupView):
+
+    def get_success_url(self):
+
+        return get_dashboard_redirect_url(self.request.user)
+
+    def form_valid(self, form):
+
+        messages.success(self.request, "Registration completed successfully.")
+
+        return super().form_valid(form)
 
 def custom_login_view(request):
 
@@ -67,6 +89,8 @@ def custom_login_view(request):
 
                 login(request, user)
 
+                messages.success(request, "Logged in successfully.")
+
                 if get_role(user) == "student":
                     return redirect("student_dashboard")
 
@@ -83,5 +107,7 @@ def custom_login_view(request):
 def custom_logout_view(request):
 
     logout(request)
+
+    messages.success(request, "Logged out successfully.")
 
     return redirect("home")

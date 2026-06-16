@@ -7,12 +7,11 @@ from django.contrib.auth.views import (
 
 from django.contrib.auth import views as auth_views
 
-from allauth.account.views import (
-    LoginView,
-    SignupView,
+from core.views.auth_views import (
+    FlashMessageLoginView,
+    FlashMessageSignupView,
+    custom_logout_view,
 )
-
-from core.views.auth_views import custom_logout_view
 from core.forms.auth_forms import CustomPasswordChangeForm
 
 urlpatterns = [
@@ -21,7 +20,7 @@ urlpatterns = [
     # -------------------------
     path(
         "signup/",
-        SignupView.as_view(template_name="core/account/signup.html"),
+        FlashMessageSignupView.as_view(template_name="core/account/signup.html"),
         name="account_signup",
     ),
     # -------------------------
@@ -29,7 +28,7 @@ urlpatterns = [
     # -------------------------
     path(
         "login/",
-        LoginView.as_view(template_name="core/account/login.html"),
+        FlashMessageLoginView.as_view(template_name="core/account/login.html"),
         name="account_login",
     ),
     # -------------------------
