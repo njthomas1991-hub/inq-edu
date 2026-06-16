@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='class',
             name='slug',
-            field=models.SlugField(blank=True, null=True),
+            field=models.CharField(max_length=50, blank=True, null=True),
         ),
         migrations.AddField(
             model_name='class',
@@ -46,9 +46,20 @@ class Migration(migrations.Migration):
             'DROP INDEX IF EXISTS "core_class_slug_e293aa55_like"',
             reverse_sql=migrations.RunSQL.noop,
         ),
-        migrations.AlterField(
-            model_name='class',
-            name='slug',
-            field=models.SlugField(unique=True),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunSQL(
+                    'ALTER TABLE "core_class" DROP CONSTRAINT IF EXISTS "core_class_slug_key"; '
+                    'ALTER TABLE "core_class" ADD CONSTRAINT "core_class_slug_key" UNIQUE ("slug")',
+                    reverse_sql=migrations.RunSQL.noop,
+                )
+            ],
+            state_operations=[
+                migrations.AlterField(
+                    model_name='class',
+                    name='slug',
+                    field=models.SlugField(unique=True, blank=True),
+                )
+            ],
         ),
     ]
