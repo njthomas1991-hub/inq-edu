@@ -17,25 +17,26 @@ def repair_history(connection):
     """Repair a database where account was recorded before the custom user app."""
     recorder = MigrationRecorder(connection)
     applied = set(recorder.applied_migrations())
+    table_names = set(connection.introspection.table_names())
 
     account_initial = ("account", "0001_initial")
     core_initial = ("core", "0001_initial")
 
-    if account_initial in applied and core_initial not in applied:
-        table_names = set(connection.introspection.table_names())
+    if "core_user" not in table_names:
+        print("Repairing migration history: applying core.0001_initial schema")
+        loader = MigrationLoader(connection)
+        migration = loader.get_migration(*core_initial)
+        state = loader.project_state(migration.dependencies)
+        with transaction.atomic(using=connection.alias):
+            with connection.schema_editor() as schema_editor:
+                migration.apply(state, schema_editor)
+        if core_initial not in applied:
+            recorder.record_applied(*core_initial)
+        return True
 
-        if "core_user" not in table_names:
-            print("Repairing migration history: applying core.0001_initial schema")
-            loader = MigrationLoader(connection)
-            migration = loader.get_migration(*core_initial)
-            state = loader.project_state([migration.dependencies[0]])
-            with transaction.atomic(using=connection.alias):
-                with connection.schema_editor() as schema_editor:
-                    migration.apply(state, schema_editor)
-            recorder.record_applied(*core_initial)
-        else:
-            print("Repairing migration history: recording core.0001_initial")
-            recorder.record_applied(*core_initial)
+    if account_initial in applied and core_initial not in applied:
+        print("Repairing migration history: recording core.0001_initial")
+        recorder.record_applied(*core_initial)
         return True
 
     return False
