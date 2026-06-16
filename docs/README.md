@@ -10,6 +10,7 @@ This directory contains comprehensive documentation for the INQ-ED platform.
 - The environment boolean helper now accepts common truthy values such as `true`, `1`, `yes`, and `on`.
 - The Django messages framework is now wired through the shared base template, with success messages added for login, logout, registration, profile updates, and class actions.
 - Auth regression tests now cover the visible flash-message flow so the feedback remains in place.
+- The Terms of Use, Privacy Policy, and Accessibility Statement pages now render from the existing public templates instead of broken `core/legal/*` paths, which fixed the 500 errors on those routes.
 
 ---
 
