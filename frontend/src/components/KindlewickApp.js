@@ -45,8 +45,8 @@ const KindlewickApp = () => {
         fetchKindlewickJson('/kindlewick/sessions/')
       ]);
       setUser(userData);
-      setProgress(progressData);
-      setSessions(sessionData);
+      setProgress(Array.isArray(progressData) ? progressData : []);
+      setSessions(Array.isArray(sessionData) ? sessionData : []);
       showStatus('Kindlewick data synced.', 'success');
     } catch (error) {
       showStatus(`Unable to load Kindlewick data: ${error.message}`, 'error');
@@ -313,7 +313,7 @@ const KindlewickApp = () => {
               <div key={item.id} className="kw-react-item">
                 <strong>{formatGameType(item.game_type)}</strong>
                 <span>Level {item.current_level} • Score {item.score}</span>
-                <span>Tokens {item.tokens_earned} • {item.total_playtime}s</span>
+                <span>Tokens {item.tokens_earned ?? 0} • {item.total_playtime ?? 0}s</span>
               </div>
             ))}
           </div>
@@ -333,7 +333,7 @@ const KindlewickApp = () => {
                 <div>
                   <strong>{formatGameType(item.game_type)}</strong> • Level {item.level}
                 </div>
-                <span>Score {item.score} • Tokens {item.tokens_earned} • {item.playtime}s</span>
+                <span>Score {item.score ?? 0} • Tokens {item.tokens_earned ?? 0} • {item.playtime ?? 0}s</span>
                 <button type="button" onClick={() => finishSession(item.id)}>
                   {item.completed ? 'View' : 'Finish session'}
                 </button>

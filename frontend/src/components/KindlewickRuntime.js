@@ -16,16 +16,21 @@ const KindlewickRuntime = ({ onSessionComplete }) => {
     let playtime = 0;
 
     const createSession = async () => {
-      const session = await fetchKindlewickJson('/kindlewick/sessions/', {
-        method: 'POST',
-        body: JSON.stringify({
-          game_type: GAME_TYPE,
-          level: LEVEL,
-          session_data: { collected: 0 }
-        })
-      });
-      sessionIdRef.current = session.id;
-      return session.id;
+      try {
+        const session = await fetchKindlewickJson('/kindlewick/sessions/', {
+          method: 'POST',
+          body: JSON.stringify({
+            game_type: GAME_TYPE,
+            level: LEVEL,
+            session_data: { collected: 0 }
+          })
+        });
+        sessionIdRef.current = session.id;
+        return session.id;
+      } catch (error) {
+        setStatus(`Session tracking unavailable: ${error.message}`);
+        return null;
+      }
     };
 
     const finalizeSession = async (score, tokens, collected) => {
@@ -55,12 +60,17 @@ const KindlewickRuntime = ({ onSessionComplete }) => {
       parent: containerRef.current,
       backgroundColor: '#0f172a',
       scene: {
-        preload() {
-          this.load.image('orb', 'https://assets.codepen.io/1320943/orb.png');
-        },
         async create() {
           await createSession();
           setStatus('Collect 6 glow orbs to finish the session.');
+
+          const orbGraphics = this.add.graphics();
+          orbGraphics.fillStyle(0x38bdf8, 1);
+          orbGraphics.fillCircle(32, 32, 28);
+          orbGraphics.lineStyle(4, 0xf8fafc, 0.9);
+          orbGraphics.strokeCircle(32, 32, 28);
+          orbGraphics.generateTexture('orb', 64, 64);
+          orbGraphics.destroy();
 
           const target = 6;
           let collected = 0;

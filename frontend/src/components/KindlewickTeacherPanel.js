@@ -65,8 +65,8 @@ const KindlewickTeacherPanel = ({ user }) => {
         fetchKindlewickJson(`${basePath}/progress/${query}`),
         fetchKindlewickJson(`${basePath}/sessions/${query}`)
       ]);
-      setProgress(progressData);
-      setSessions(sessionData);
+      setProgress(Array.isArray(progressData) ? progressData : []);
+      setSessions(Array.isArray(sessionData) ? sessionData : []);
       setStatus({ type: 'success', message: 'Tracking data loaded.' });
     } catch (error) {
       setStatus({ type: 'error', message: `Unable to load tracking data: ${error.message}` });
@@ -156,8 +156,8 @@ const KindlewickTeacherPanel = ({ user }) => {
                   {progress.map((item) => (
                     <div key={item.id} className="kw-react-item">
                       <strong>{item.user_detail?.first_name || item.user_detail?.username}</strong>
-                      <span>{item.game_type_display} • Level {item.current_level}</span>
-                      <span>Score {item.score} • Tokens {item.tokens_earned}</span>
+                      <span>{item.game_type_display || item.game_type} • Level {item.current_level}</span>
+                      <span>Score {item.score ?? 0} • Tokens {item.tokens_earned ?? 0}</span>
                     </div>
                   ))}
                 </div>
@@ -172,8 +172,8 @@ const KindlewickTeacherPanel = ({ user }) => {
                   {sessions.map((item) => (
                     <div key={item.id} className="kw-react-item">
                       <strong>{item.user_detail?.first_name || item.user_detail?.username}</strong>
-                      <span>{item.game_type_display} • Level {item.level}</span>
-                      <span>Score {item.score} • {item.playtime}s</span>
+                      <span>{item.game_type_display || item.game_type} • Level {item.level}</span>
+                      <span>Score {item.score ?? 0} • {item.playtime ?? 0}s</span>
                     </div>
                   ))}
                 </div>

@@ -448,9 +448,13 @@
 - ✅ **Environment Variables:** All secrets use `os.environ.get()`
 - ✅ **DEBUG Mode Logic:** 
   ```python
-  DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+  ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", ["localhost", "127.0.0.1", ".herokuapp.com"])
+  DEBUG = env_bool("DEBUG", False) and any(
+      host in {"localhost", "127.0.0.1", "[::1]"} or host.startswith("localhost")
+      for host in ALLOWED_HOSTS
+  )
   ```
-  - Defaults to False (production-safe)
+  - Defaults to False and stays local-only unless localhost-style hosts are allowed
 - ✅ **CSRF Protection:** `CSRF_TRUSTED_ORIGINS` configured
 - ✅ **Secure Database:** PostgreSQL connection via environment variable
 
