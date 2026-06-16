@@ -21,7 +21,7 @@ def repair_history(connection):
 
     if account_initial in applied and core_initial not in applied:
         print("Repairing migration history: faking core.0001_initial")
-        call_command("migrate", "core", "0001_initial", fake=True, verbosity=1)
+        recorder.record_applied(*core_initial)
         return True
 
     return False
