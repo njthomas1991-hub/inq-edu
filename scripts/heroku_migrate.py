@@ -39,6 +39,21 @@ def repair_history(connection):
         recorder.record_applied(*core_initial)
         return True
 
+    core_0004 = ("core", "0004_class_is_archived_class_slug_class_updated_at")
+    core_0004_columns = {"is_archived", "slug", "updated_at"}
+    core_0004_index = "core_class_slug_e293aa55_like"
+
+    if core_0004 not in applied and "core_class" in table_names:
+        with connection.cursor() as cursor:
+            description = connection.introspection.get_table_description(cursor, "core_class")
+            existing_columns = {column.name for column in description}
+            constraints = connection.introspection.get_constraints(cursor, "core_class")
+
+        if core_0004_columns.issubset(existing_columns) and core_0004_index in constraints:
+            print("Repairing migration history: recording core.0004_class_is_archived_class_slug_class_updated_at")
+            recorder.record_applied(*core_0004)
+            return True
+
     return False
 
 
