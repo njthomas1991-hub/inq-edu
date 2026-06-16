@@ -8,11 +8,13 @@ from pathlib import Path
 import django
 from django.core.management import call_command
 from django.db import connections
+from django.db import transaction
 from django.db.migrations.recorder import MigrationRecorder
+from django.db.migrations.loader import MigrationLoader
 
 
 def repair_history(connection):
-    """Fake core initial if allauth account was recorded before the custom user app."""
+    """Repair a database where account was recorded before the custom user app."""
     recorder = MigrationRecorder(connection)
     applied = set(recorder.applied_migrations())
 
@@ -20,8 +22,20 @@ def repair_history(connection):
     core_initial = ("core", "0001_initial")
 
     if account_initial in applied and core_initial not in applied:
-        print("Repairing migration history: faking core.0001_initial")
-        recorder.record_applied(*core_initial)
+        table_names = set(connection.introspection.table_names())
+
+        if "core_user" not in table_names:
+            print("Repairing migration history: applying core.0001_initial schema")
+            loader = MigrationLoader(connection)
+            migration = loader.get_migration(*core_initial)
+            state = loader.project_state([migration.dependencies[0]])
+            with transaction.atomic(using=connection.alias):
+                with connection.schema_editor() as schema_editor:
+                    migration.apply(state, schema_editor)
+            recorder.record_applied(*core_initial)
+        else:
+            print("Repairing migration history: recording core.0001_initial")
+            recorder.record_applied(*core_initial)
         return True
 
     return False
