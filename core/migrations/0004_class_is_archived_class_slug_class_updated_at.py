@@ -42,6 +42,10 @@ class Migration(migrations.Migration):
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.RunPython(populate_slugs),
+        migrations.RunSQL(
+            'DROP INDEX IF EXISTS "core_class_slug_e293aa55_like"',
+            reverse_sql=migrations.RunSQL.noop,
+        ),
         migrations.AlterField(
             model_name='class',
             name='slug',
