@@ -1,6 +1,7 @@
 from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group
+from django.db import transaction
 
 from django_summernote.admin import SummernoteModelAdmin
 
@@ -163,11 +164,29 @@ class UserAdmin(BaseUserAdmin):
                 level=messages.ERROR,
             )
             return
-        super().delete_model(request, obj)
+
+        try:
+            with transaction.atomic():
+                super().delete_model(request, obj)
+        except Exception as exc:
+            self.message_user(
+                request,
+                f"Could not delete user '{obj.username or obj.pk}': {exc}",
+                level=messages.ERROR,
+            )
 
     def delete_queryset(self, request, queryset):
         if not request.user.is_authenticated:
-            super().delete_queryset(request, queryset)
+            for obj in queryset:
+                try:
+                    with transaction.atomic():
+                        obj.delete()
+                except Exception as exc:
+                    self.message_user(
+                        request,
+                        f"Could not delete user '{obj.username or obj.pk}': {exc}",
+                        level=messages.ERROR,
+                    )
             return
 
         filtered_queryset = queryset.exclude(pk=request.user.pk)
@@ -178,8 +197,28 @@ class UserAdmin(BaseUserAdmin):
                 level=messages.WARNING,
             )
 
-        if filtered_queryset.exists():
-            super().delete_queryset(request, filtered_queryset)
+        if not filtered_queryset.exists():
+            return
+
+        deleted_count = 0
+        for obj in filtered_queryset:
+            try:
+                with transaction.atomic():
+                    obj.delete()
+                deleted_count += 1
+            except Exception as exc:
+                self.message_user(
+                    request,
+                    f"Could not delete user '{obj.username or obj.pk}': {exc}",
+                    level=messages.ERROR,
+                )
+
+        if deleted_count:
+            self.message_user(
+                request,
+                f"Deleted {deleted_count} user(s).",
+                level=messages.SUCCESS,
+            )
 
 
 # =====================================================
