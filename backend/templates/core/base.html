@@ -1,4 +1,5 @@
 {% load static %}
+{% load avatar_tags %}
 <!DOCTYPE html>
 
 <html lang="en">
@@ -103,15 +104,23 @@
             aria-expanded="false"
         >
 
-            {% if user.avatar %}
+            {% with avatar=user|get_user_avatar %}
 
-                    <img
-                        src="{{ user.avatar.url }}"
-                        alt="User Avatar"
-                        class="rounded-circle"
-                        width="32"
-                        height="32"
-                    >
+            {% if avatar %}
+
+                <div
+                    style="
+                        width:32px;
+                        height:32px;
+                        overflow:hidden;
+                        border-radius:50%;
+                        flex-shrink:0;
+                    "
+                >
+
+                    {% include "core/components/avatar/avatar_display.html" with avatar=avatar navbar=True %}
+
+                </div>
 
             {% else %}
 
@@ -124,6 +133,8 @@
 
             {% endif %}
 
+            {% endwith %}
+
             <span>
                 {{ user.username }}
             </span>
@@ -132,7 +143,9 @@
 
         <ul class="dropdown-menu dropdown-menu-end">
 
-            {% if user.avatar %}
+            {% with avatar=user|get_user_avatar %}
+
+            {% if avatar %}
 
                 <li>
 
@@ -159,6 +172,8 @@
                 </li>
 
             {% endif %}
+
+            {% endwith %}
 
             <li>
                 <hr class="dropdown-divider">
