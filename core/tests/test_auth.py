@@ -142,3 +142,22 @@ class AuthenticationTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Profile updated successfully.")
+
+    def test_signup_redirects_to_teacher_dashboard(self):
+
+        response = self.client.post(
+            reverse("account_signup"),
+            {
+                "email": "newteacher@example.com",
+                "password1": "Testpass123!",
+                "password2": "Testpass123!",
+                "role": "teacher",
+                "first_name": "New",
+                "last_name": "Teacher",
+                "school": "New Test School",
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.redirect_chain[-1][0], "/teacher/")

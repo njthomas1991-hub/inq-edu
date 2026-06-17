@@ -1,4 +1,8 @@
-{% if request.user.avatar %}
+{% load avatar_tags %}
+
+{% with avatar=request.user|get_user_avatar %}
+
+{% if avatar %}
 
     <div
         style="
@@ -29,3 +33,5 @@
     </div>
 
 {% endif %}
+
+{% endwith %}

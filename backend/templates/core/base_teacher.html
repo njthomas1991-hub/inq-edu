@@ -1,3 +1,5 @@
+{% load avatar_tags %}
+
 {% load static %}
 <!DOCTYPE html>
 
@@ -356,44 +358,46 @@
 
                             {% if user.is_authenticated %}
 
-    {% if request.user.avatar %}
+                                {% with avatar=request.user|get_user_avatar %}
+                                    {% if avatar %}
 
-        <div
-            style="
-                width:42px;
-                height:42px;
-                overflow:hidden;
-                border-radius:50%;
-            "
-        >
+                                        <div
+                                            style="
+                                                width:42px;
+                                                height:42px;
+                                                overflow:hidden;
+                                                border-radius:50%;
+                                            "
+                                        >
 
-            {% include "core/components/avatar/avatar_display.html" with avatar=request.user.avatar navbar=True %}
+                                            {% include "core/components/avatar/avatar_display.html" with avatar=avatar navbar=True %}
 
-        </div>
+                                        </div>
 
-    {% else %}
+                                    {% else %}
 
-        <i class="fas fa-user-circle fs-4"></i>
+                                        <i class="fas fa-user-circle fs-4"></i>
 
-    {% endif %}
+                                    {% endif %}
+                                {% endwith %}
 
-    <span>
+                                <span>
 
-        {{ user.get_full_name|default:user.username }}
+                                    {{ user.get_full_name|default:user.username }}
 
-    </span>
+                                </span>
 
-{% else %}
+                            {% else %}
 
-    <i class="fas fa-user-circle fs-4"></i>
+                                <i class="fas fa-user-circle fs-4"></i>
 
-    <span>
+                                <span>
 
-        Account
+                                    Account
 
-    </span>
+                                </span>
 
-{% endif %}
+                            {% endif %}
 
                         </a>
 
@@ -428,7 +432,7 @@
 
                                     <form
                                         method="post"
-                                        action="{% url 'logout' %}"
+                                        action="{% url 'account_logout' %}"
                                     >
 
                                         {% csrf_token %}
