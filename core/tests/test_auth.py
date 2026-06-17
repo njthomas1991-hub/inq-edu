@@ -161,3 +161,41 @@ class AuthenticationTestCase(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.redirect_chain[-1][0], "/teacher/")
+
+    def test_signup_redirects_student_to_student_dashboard(self):
+
+        response = self.client.post(
+            reverse("account_signup"),
+            {
+                "email": "newstudent@example.com",
+                "password1": "Testpass123!",
+                "password2": "Testpass123!",
+                "role": "student",
+                "first_name": "New",
+                "last_name": "Student",
+                "school": "New Student School",
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.redirect_chain[-1][0], "/student/")
+
+    def test_signup_redirects_school_admin_to_dashboard(self):
+
+        response = self.client.post(
+            reverse("account_signup"),
+            {
+                "email": "newadmin@example.com",
+                "password1": "Testpass123!",
+                "password2": "Testpass123!",
+                "role": "school_admin",
+                "first_name": "New",
+                "last_name": "Admin",
+                "school": "New Admin School",
+            },
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.redirect_chain[-1][0], "/school-admin/")

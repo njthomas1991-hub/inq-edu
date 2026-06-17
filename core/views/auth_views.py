@@ -9,10 +9,12 @@ from allauth.account.views import LoginView, SignupView
 
 def get_dashboard_redirect_url(user):
 
-    if getattr(user, "role", None) == "student":
+    role = getattr(user, "role", user)
+
+    if role == "student":
         return reverse("student_dashboard")
 
-    if getattr(user, "role", None) == "school_admin":
+    if role == "school_admin":
         return reverse("school_admin_dashboard")
 
     return reverse("teacher_dashboard")
@@ -21,6 +23,10 @@ def get_dashboard_redirect_url(user):
 class CustomAccountAdapter(DefaultAccountAdapter):
 
     def get_signup_redirect_url(self, request):
+        role = request.POST.get("role")
+        if role:
+            return get_dashboard_redirect_url(role)
+
         if request.user.is_authenticated:
             return get_dashboard_redirect_url(request.user)
 
@@ -50,8 +56,8 @@ class FlashMessageLoginView(LoginView):
 class FlashMessageSignupView(SignupView):
 
     def get_success_url(self):
-
-        return get_dashboard_redirect_url(self.request.user)
+        user = getattr(self, "user", None) or self.request.user
+        return get_dashboard_redirect_url(user)
 
     def form_valid(self, form):
 
