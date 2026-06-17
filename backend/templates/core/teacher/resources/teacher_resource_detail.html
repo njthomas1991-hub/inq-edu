@@ -208,14 +208,14 @@
 
                             <div class="small text-muted mt-1">
 
-                                {{ resource.file.name|slice:"19:" }}
+                                {{ resource.uploaded_file.name|slice:"19:" }}
 
                             </div>
 
                         </div>
 
                         <a
-                            href="{{ resource.file.url }}"
+                            href="{{ resource.uploaded_file.url }}"
                             class="btn btn-primary btn-sm"
                             download
                         >
