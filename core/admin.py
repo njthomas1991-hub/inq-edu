@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group
 
@@ -154,6 +154,32 @@ class UserAdmin(BaseUserAdmin):
         "created_at",
         "updated_at",
     )
+
+    def delete_model(self, request, obj):
+        if request.user.is_authenticated and obj.pk == request.user.pk:
+            self.message_user(
+                request,
+                "You cannot delete the account you are currently signed in with.",
+                level=messages.ERROR,
+            )
+            return
+        super().delete_model(request, obj)
+
+    def delete_queryset(self, request, queryset):
+        if not request.user.is_authenticated:
+            super().delete_queryset(request, queryset)
+            return
+
+        filtered_queryset = queryset.exclude(pk=request.user.pk)
+        if filtered_queryset.count() != queryset.count():
+            self.message_user(
+                request,
+                "Your own account was skipped. Sign in with a different admin account to delete it.",
+                level=messages.WARNING,
+            )
+
+        if filtered_queryset.exists():
+            super().delete_queryset(request, filtered_queryset)
 
 
 # =====================================================
