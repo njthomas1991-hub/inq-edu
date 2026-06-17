@@ -1,30 +1,23 @@
 from django.db import migrations
 
-from allauth.account.models import EmailAddress
-
 
 def sync_user_emails(apps, schema_editor):
     User = apps.get_model("core", "User")
+    EmailAddress = apps.get_model("account", "EmailAddress")
 
-    # First, delete orphaned EmailAddress records (user_id doesn't exist in User table)
+    # First, delete orphaned EmailAddress records (user_id doesn't exist in User table).
+    # Keep migration writes FK-safe across environments with legacy schema drift.
     valid_user_ids = set(User.objects.values_list("pk", flat=True))
     orphaned = EmailAddress.objects.exclude(user_id__in=valid_user_ids)
     orphaned.delete()
 
-    # Now sync emails for existing users
+    # Backfill only User.email from primary EmailAddress when User.email is blank.
+    # Avoid creating/updating EmailAddress rows inside migration to prevent FK issues.
     for user in User.objects.all().iterator():
         user_email = (user.email or "").strip()
         email_addresses = EmailAddress.objects.filter(user_id=user.pk)
 
         if user_email:
-            EmailAddress.objects.update_or_create(
-                user_id=user.pk,
-                email=user_email,
-                defaults={
-                    "primary": True,
-                    "verified": False,
-                },
-            )
             continue
 
         primary_email_address = (
