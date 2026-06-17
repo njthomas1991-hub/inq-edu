@@ -1,7 +1,7 @@
 from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import Group
-from django.db import transaction
+from django.db import DatabaseError, transaction
 
 from django_summernote.admin import SummernoteModelAdmin
 
@@ -155,6 +155,49 @@ class UserAdmin(BaseUserAdmin):
         "created_at",
         "updated_at",
     )
+
+    def _safe_admin_log(self, request, action_label, callback, *args):
+        try:
+            return callback(*args)
+        except DatabaseError as exc:
+            self.message_user(
+                request,
+                (
+                    "The action completed, but admin audit logging failed due to "
+                    f"a database constraint issue during {action_label}: {exc}"
+                ),
+                level=messages.WARNING,
+            )
+            return None
+
+    def log_addition(self, request, obj, message):
+        return self._safe_admin_log(
+            request,
+            "create",
+            super().log_addition,
+            request,
+            obj,
+            message,
+        )
+
+    def log_change(self, request, obj, message):
+        return self._safe_admin_log(
+            request,
+            "update",
+            super().log_change,
+            request,
+            obj,
+            message,
+        )
+
+    def log_deletions(self, request, queryset):
+        return self._safe_admin_log(
+            request,
+            "delete",
+            super().log_deletions,
+            request,
+            queryset,
+        )
 
     def delete_model(self, request, obj):
         if request.user.is_authenticated and obj.pk == request.user.pk:
