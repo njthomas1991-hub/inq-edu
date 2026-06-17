@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from allauth.account.forms import LoginForm as AllauthLoginForm, SignupForm
+from allauth.account.models import EmailAddress
 
 from core.models import School, User
 
@@ -146,6 +147,7 @@ class CustomSignupForm(SignupForm):
 
         user = super().save(request)
 
+        user.email = email
         user.username = username
 
         role = self.cleaned_data.get("role", "teacher")
@@ -163,6 +165,16 @@ class CustomSignupForm(SignupForm):
         user.is_staff = role in ["teacher", "school_admin"]
 
         user.save()
+
+        if email:
+            EmailAddress.objects.update_or_create(
+                user=user,
+                email=email,
+                defaults={
+                    "primary": True,
+                    "verified": False,
+                },
+            )
 
         return user
 
