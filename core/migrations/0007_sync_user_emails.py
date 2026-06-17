@@ -6,6 +6,12 @@ from allauth.account.models import EmailAddress
 def sync_user_emails(apps, schema_editor):
     User = apps.get_model("core", "User")
 
+    # First, delete orphaned EmailAddress records (user_id doesn't exist in User table)
+    valid_user_ids = set(User.objects.values_list("pk", flat=True))
+    orphaned = EmailAddress.objects.exclude(user_id__in=valid_user_ids)
+    orphaned.delete()
+
+    # Now sync emails for existing users
     for user in User.objects.all().iterator():
         user_email = (user.email or "").strip()
         email_addresses = EmailAddress.objects.filter(user_id=user.pk)
