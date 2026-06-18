@@ -8,7 +8,7 @@ def terms_of_use(request):
 
 def subscription_details(request):
 
-    return render(request, "core/public/subscription_detials.html")
+    return render(request, "core/public/subscription_details.html")
 
 
 def privacy_policy(request):

@@ -13,27 +13,28 @@
             
             <div class="card shadow-sm mb-4">
                 <div class="card-body p-4">
-                    <form>
+                    <form method="post" action="{% url 'contact' %}">
+                        {% csrf_token %}
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="firstName" class="form-label">First Name *</label>
-                                <input type="text" class="form-control" id="firstName" required>
+                                <input type="text" class="form-control" id="firstName" name="first_name" value="{{ request.POST.first_name|default:'' }}" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="lastName" class="form-label">Last Name *</label>
-                                <input type="text" class="form-control" id="lastName" required>
+                                <input type="text" class="form-control" id="lastName" name="last_name" value="{{ request.POST.last_name|default:'' }}" required>
                             </div>
                             <div class="col-12">
                                 <label for="email" class="form-label">Email *</label>
-                                <input type="email" class="form-control" id="email" required>
+                                <input type="email" class="form-control" id="email" name="email" value="{{ request.POST.email|default:'' }}" required>
                             </div>
                             <div class="col-12">
                                 <label for="subject" class="form-label">Subject *</label>
-                                <input type="text" class="form-control" id="subject" required>
+                                <input type="text" class="form-control" id="subject" name="subject" value="{{ request.POST.subject|default:'' }}" required>
                             </div>
                             <div class="col-12">
                                 <label for="message" class="form-label">Message *</label>
-                                <textarea class="form-control" id="message" rows="5" required></textarea>
+                                <textarea class="form-control" id="message" name="message" rows="5" required>{{ request.POST.message|default:'' }}</textarea>
                             </div>
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary btn-lg w-100">Send Message</button>

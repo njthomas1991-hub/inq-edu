@@ -4,7 +4,7 @@ import KindlewickRuntime from './KindlewickRuntime';
 import KindlewickTeacherPanel from './KindlewickTeacherPanel';
 import { fetchKindlewickJson } from '../utils/kindlewickApi';
 
-const LOGIN_URL = 'http://127.0.0.1:8000/login/';
+const LOGIN_URL = '/login/';
 
 const GAME_TYPES = [
   { value: 'map', label: 'Map Exploration' },

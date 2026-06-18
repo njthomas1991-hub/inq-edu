@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.shortcuts import redirect, render
 
 
@@ -41,6 +42,22 @@ def teacher_hub_view(request):
 
 
 def contact_page_view(request):
+    if request.method == "POST":
+        first_name = (request.POST.get("first_name") or "").strip()
+        last_name = (request.POST.get("last_name") or "").strip()
+        email = (request.POST.get("email") or "").strip()
+        subject = (request.POST.get("subject") or "").strip()
+        message = (request.POST.get("message") or "").strip()
+
+        if first_name and last_name and email and subject and message:
+            messages.success(
+                request,
+                "Thanks for getting in touch. We’ll review your message soon.",
+            )
+            return redirect("contact")
+
+        messages.error(request, "Please complete every required field.")
+
     return render(request, "core/public/contact.html")
 
 
